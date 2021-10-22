@@ -21,7 +21,6 @@ public final class GameManager implements Listener {
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
 
-
     public GameManager(LamaGamesPlugin plugin) {
         this.plugin = plugin;
         this.configFile = new File(plugin.getDataFolder(), "games.json");
@@ -57,7 +56,7 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C> void loadGame(GameType<G, C> type, World world, JsonObject config) {
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+        GsonBuilder builder = new GsonBuilder();
         Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
         if (typeAdapters != null) for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
         Gson gson = builder.create();
