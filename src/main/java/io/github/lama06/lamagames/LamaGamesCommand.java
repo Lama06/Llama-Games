@@ -76,7 +76,7 @@ public class LamaGamesCommand extends LamaCommand {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
 
-        plugin.getGameManager().startGame(game.get());
+        game.get().startGame();
         sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.GREEN).append("The game was successfully started").create());
     }
 
@@ -86,7 +86,7 @@ public class LamaGamesCommand extends LamaCommand {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
 
-        plugin.getGameManager().endGame(game.get());
+        game.get().endGame();
         sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.GREEN).append("The game was successfully stopped").create());
     }
 }

@@ -56,15 +56,21 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C> void loadGame(GameType<G, C> type, World world, JsonObject config) {
+        G game = type.getCreator().createGame(plugin, world);
+        games.add(game);
+
         GsonBuilder builder = new GsonBuilder();
-        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
-        if (typeAdapters != null) for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getConfigTypeAdapters();
+        if (typeAdapters != null) {
+            for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
+                builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+            }
+        }
         Gson gson = builder.create();
 
         C deserializedConfig = gson.fromJson(config, type.getConfigType());
-        G game = type.getCreator().createGame(plugin, world, deserializedConfig);
-        games.add(game);
-        game.handleGameLoaded();
+
+        game.handleGameLoaded(deserializedConfig);
     }
 
     public void loadGames() throws GamesLoadFailedException {
@@ -109,8 +115,12 @@ public final class GameManager implements Listener {
             game.handleGameUnloaded();
 
             GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getType().getTypeAdapters();
-            if (typeAdapters != null) for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getConfigTypeAdapters();
+            if (typeAdapters != null) {
+                for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
+                    builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+                }
+            }
             Gson gson = builder.create();
 
             JsonObject gameConfigEntry = new JsonObject();
@@ -142,11 +152,11 @@ public final class GameManager implements Listener {
             return;
         }
 
+        G game = type.getCreator().createGame(plugin, world);
         C config = type.getDefaultConfigCreator().get();
-        G game = type.getCreator().createGame(plugin, world, config);
 
         games.add(game);
-        game.handleGameLoaded();
+        game.handleGameLoaded(config);
     }
 
     public void deleteGame(World world) throws GamesSaveFailedException {
@@ -156,20 +166,6 @@ public final class GameManager implements Listener {
             game.get().handleGameUnloaded();
             saveGames();
         }
-    }
-
-    public void startGame(Game<?, ?> game) {
-        if (game.isRunning()) return;
-
-        game.setRunning(true);
-        game.handleGameStarted();
-    }
-
-    public void endGame(Game<?, ?> game) {
-        if (!game.isRunning()) return;
-
-        game.setRunning(false);
-        game.handleGameEnded();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
