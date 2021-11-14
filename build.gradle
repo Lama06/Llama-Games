@@ -8,10 +8,10 @@ targetCompatibility = JavaVersion.VERSION_16
 repositories {
     mavenCentral()
     maven {
-        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+        url "https://papermc.io/repo/repository/maven-public/"
     }
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT"
+    compileOnly "io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT"
 }

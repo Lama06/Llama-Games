@@ -2,9 +2,10 @@ package io.github.lama06.lamagames;
 
 import com.google.gson.TypeAdapter;
 import io.github.lama06.lamagames.util.Pair;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -97,7 +99,11 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
         } else if (event.getPlayer().getWorld().equals(world)) {
             if (running) {
                 event.getPlayer().setGameMode(GameMode.SPECTATOR);
-                event.getPlayer().sendTitle("You are not spectating", null, 20, 60, 20);
+                event.getPlayer().showTitle(Title.title(
+                        Component.text("You are now spectating"),
+                        Component.empty(),
+                        Title.Times.of(Duration.ofSeconds(2), Duration.ofSeconds(3), Duration.ofSeconds(1))
+                ));
             } else {
                 event.getPlayer().setGameMode(GameMode.ADVENTURE);
                 players.add(event.getPlayer().getUniqueId());
@@ -129,20 +135,22 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
             if (canStart()) {
                 startGame();
             } else {
-                broadcast(new ComponentBuilder().color(ChatColor.RED).append("Start Failed").create());
+                getBroadcastAudience().sendMessage(Component.text("Start failed").color(NamedTextColor.RED));
             }
         } else {
             for (Player player : world.getPlayers()) {
-                player.sendTitle(ChatColor.GREEN.toString() + countdown, null, 0, 20, 0);
+                player.showTitle(Title.title(
+                        Component.text(countdown).color(NamedTextColor.GREEN),
+                        Component.empty(),
+                        Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
+                ));
             }
             countdownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> startAfterCountdown(countdown - 1), 20);
         }
     }
 
-    public void broadcast(BaseComponent... msg) {
-        for (Player player : world.getPlayers()) {
-            player.spigot().sendMessage(msg);
-        }
+    public Audience getBroadcastAudience() {
+        return Audience.audience(world.getPlayers());
     }
 
     public LamaGamesPlugin getPlugin() {

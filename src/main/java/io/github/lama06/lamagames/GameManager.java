@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 
 public final class GameManager implements Listener {
-    private final JsonParser parser = new JsonParser();
     private final LamaGamesPlugin plugin;
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
@@ -44,7 +43,7 @@ public final class GameManager implements Listener {
 
         JsonElement gamesConfig;
         try {
-            gamesConfig = parser.parse(reader);
+            gamesConfig = JsonParser.parseReader(reader);
         } catch (JsonParseException e) {
             throw new GamesLoadFailedException("Failed to parse games config file", e);
         }

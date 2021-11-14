@@ -1,8 +1,8 @@
 package io.github.lama06.lamagames;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -29,18 +29,23 @@ public class LamaCommand implements TabExecutor {
         subCommands.put(name, executor);
     }
 
-    private BaseComponent[] getHelpMessage() {
-        ComponentBuilder text = new ComponentBuilder();
+    private Component getHelpMessage() {
+        TextComponent.Builder builder = Component.text();
         for (Map.Entry<String, SubCommandExecutor> subCommand : subCommands.entrySet()) {
-            text.append("/").append(name).append(" ").append(subCommand.getKey()).append("\n");
+            builder.append(Component.text("/"));
+            builder.append(Component.text(name));
+            builder.append(Component.text(" "));
+            builder.append(Component.text(subCommand.getKey()));
+            builder.append(Component.newline());
         }
-        return text.create();
+        return builder.build();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if ((args.length == 0) || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
-            sender.spigot().sendMessage(getHelpMessage());
+            sender.sendMessage(getHelpMessage());
+
             return true;
         }
 
@@ -69,7 +74,12 @@ public class LamaCommand implements TabExecutor {
 
     public static boolean requireArgsExact(CommandSender sender, String[] args, int number) {
         if (args.length != number) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("This commands needs " + number + " arguments").create());
+            sender.sendMessage(Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("This command needs "))
+                    .append(Component.text(number))
+                    .append(Component.text(" arguments"))
+            );
             return true;
         }
         return false;
@@ -77,7 +87,7 @@ public class LamaCommand implements TabExecutor {
 
     public static Optional<Player> requirePlayer(CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("This command can only be used by players").create());
+            sender.sendMessage(Component.text("This command can only be used by players").color(NamedTextColor.RED));
             return Optional.empty();
         }
         return Optional.of(player);
@@ -86,7 +96,7 @@ public class LamaCommand implements TabExecutor {
     public static Optional<Player> requireOnlinePlayer(CommandSender sender, String name) {
         Player player = Bukkit.getPlayer(name);
         if (player == null) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("No player with this name was found on the server").create());
+            sender.sendMessage(Component.text("No player with this name was found on the server").color(NamedTextColor.RED));
             return Optional.empty();
         }
         return Optional.of(player);
@@ -95,7 +105,7 @@ public class LamaCommand implements TabExecutor {
     public static Optional<World> requireWorld(CommandSender sender, String name) {
         World world = Bukkit.getWorld(name);
         if (world == null) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("No world with this name was found").create());
+            sender.sendMessage(Component.text("No world with this name was found").color(NamedTextColor.RED));
             return Optional.empty();
         }
         return Optional.of(world);
@@ -107,7 +117,7 @@ public class LamaCommand implements TabExecutor {
 
         Optional<Game<?, ?>> game = plugin.getGameManager().getGameForWorld(world.get());
         if (game.isEmpty()) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("No game exists in this world").create());
+            sender.sendMessage(Component.text("No game exists in this world").color(NamedTextColor.RED));
             return Optional.empty();
         }
         return game;

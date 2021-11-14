@@ -1,7 +1,8 @@
 package io.github.lama06.lamagames;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,17 +27,17 @@ public class LamaGamesCommand extends LamaCommand {
 
         Optional<GameType<?, ?>> type = GameType.getByName(args[1]);
         if (type.isEmpty()) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("Invalid game type specified").create());
+            sender.sendMessage(Component.text("Invalid game type specified").color(NamedTextColor.RED));
             return;
         }
 
         if (plugin.getGameManager().getGameForWorld(world.get()).isPresent()) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("A game already exists in this world").create());
+            sender.sendMessage(Component.text("A game already exists in this world").color(NamedTextColor.RED));
             return;
         }
 
         plugin.getGameManager().createGame(world.get(), type.get());
-        sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.GREEN).append("The game was successfully created").create());
+        sender.sendMessage(Component.text("The game was successfully created").color(NamedTextColor.GREEN));
 
         if (sender instanceof Player player && !player.getWorld().equals(world.get())) {
             player.teleport(world.get().getSpawnLocation());
@@ -51,9 +52,9 @@ public class LamaGamesCommand extends LamaCommand {
 
         try {
             plugin.getGameManager().deleteGame(game.get().getWorld());
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.GREEN).append("The game was successfully deleted").create());
+            sender.sendMessage(Component.text("The game was successfully deleted").color(NamedTextColor.GREEN));
         } catch (GameManager.GamesSaveFailedException e) {
-            sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.RED).append("Internal error while saving the config file").create());
+            sender.sendMessage(Component.text("Internal error while saving the config file").color(NamedTextColor.RED));
         }
     }
 
@@ -63,11 +64,14 @@ public class LamaGamesCommand extends LamaCommand {
             return;
         }
 
-        ComponentBuilder text = new ComponentBuilder().append("Games on the server:");
+        TextComponent.Builder text = Component.text().content("Games on the server:");
         for (Game<?, ?> game : plugin.getGameManager().getGames()) {
-            text.append("\n").append(game.getWorld().getName()).append(" -> ").append(game.getType().getName());
+            text.append(Component.newline());
+            text.append(Component.text(game.getWorld().getName()));
+            text.append(Component.text(" -> "));
+            text.append(Component.text(game.getType().getName()));
         }
-        sender.spigot().sendMessage(text.create());
+        sender.sendMessage(text);
     }
 
     public void start(CommandSender sender, String[] args) {
@@ -77,7 +81,7 @@ public class LamaGamesCommand extends LamaCommand {
         if (game.isEmpty()) return;
 
         game.get().startGame();
-        sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.GREEN).append("The game was successfully started").create());
+        sender.sendMessage(Component.text("The game was successfully started").color(NamedTextColor.GREEN));
     }
 
     public void stop(CommandSender sender, String[] args) {
@@ -87,6 +91,6 @@ public class LamaGamesCommand extends LamaCommand {
         if (game.isEmpty()) return;
 
         game.get().endGame();
-        sender.spigot().sendMessage(new ComponentBuilder().color(ChatColor.GREEN).append("The game was successfully stopped").create());
+        sender.sendMessage(Component.text("The game was successfully stopped").color(NamedTextColor.GREEN));
     }
 }

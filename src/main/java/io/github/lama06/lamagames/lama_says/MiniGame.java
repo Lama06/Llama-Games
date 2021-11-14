@@ -1,5 +1,8 @@
 package io.github.lama06.lamagames.lama_says;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -9,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.time.Duration;
 import java.util.function.Consumer;
 
 public abstract class MiniGame<T extends MiniGame<T>> implements Listener {
@@ -32,10 +36,14 @@ public abstract class MiniGame<T extends MiniGame<T>> implements Listener {
 
         String title = getTitle();
 
-        game.broadcast(new ComponentBuilder().color(ChatColor.YELLOW).append(title).create());
+        game.getBroadcastAudience().sendMessage(Component.text(title).color(NamedTextColor.YELLOW));
 
         for (Player player : game.getPlayers()) {
-            player.sendTitle(ChatColor.YELLOW + title, null, 10, 40, 10);
+            player.showTitle(Title.title(
+                    Component.text(title).color(NamedTextColor.YELLOW),
+                    Component.empty(),
+                    Title.Times.of(Duration.ofMillis(500), Duration.ofSeconds(2), Duration.ofMillis(500))
+            ));
         }
 
         timeoutTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), this::endGame, 10);

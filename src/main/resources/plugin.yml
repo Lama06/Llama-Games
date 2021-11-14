@@ -5,5 +5,3 @@ version: 1.0.0
 commands:
   lamagames:
     description: The main command of the LamaGames plugin
-  blockparty:
-    description:
