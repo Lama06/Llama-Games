@@ -15,13 +15,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGame> {
-    private static final List<PotionType> potionTypesWithEffect = Arrays.stream(PotionType.values()).filter(p -> p.getEffectType() != null).collect(Collectors.toList());
+    private static final List<PotionType> POTION_TYPES_WITH_EFFECT = Arrays.stream(PotionType.values()).filter(p -> p.getEffectType() != null).collect(Collectors.toList());
     private final PotionType potionType;
 
     public DrinkThePotionMiniGame(LamaSaysGame game, Consumer<DrinkThePotionMiniGame> callback) {
         super(game, callback);
-
-        potionType = potionTypesWithEffect.get(game.getRandom().nextInt(potionTypesWithEffect.size()));
+        potionType = POTION_TYPES_WITH_EFFECT.get(game.getRandom().nextInt(POTION_TYPES_WITH_EFFECT.size()));
     }
 
     @Override
@@ -38,7 +37,7 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
 
         int hotbarSlot = game.getRandom().nextInt(9);
 
-        List<PotionType> possibleWrongPotionTypes = potionTypesWithEffect.stream().filter(p -> p != potionType).collect(Collectors.toList());
+        List<PotionType> possibleWrongPotionTypes = POTION_TYPES_WITH_EFFECT.stream().filter(p -> p != potionType).collect(Collectors.toList());
 
         for (Player player : game.getPlayers()) {
             for (int i = 0; i <= 8; i++) {

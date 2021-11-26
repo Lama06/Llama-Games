@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class Game<G extends Game<G, C>, C> implements Listener {
     protected LamaGamesPlugin plugin;
@@ -32,34 +33,47 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
     protected final Set<UUID> players = new HashSet<>();
     private BukkitTask countdownTask = null;
 
-    public Game(LamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
+    public Game(LamaGamesPlugin plugin, World world, GameType<G, C> type) {
         this.plugin = plugin;
         this.type = type;
         this.world = world;
-        this.config = config;
     }
 
-    public final void startGame() {
-        if (running || !canStart()) return;
+    public final boolean startGame() {
+        if (running || !canStart()) {
+            return false;
+        }
+
+        if (countdownTask != null) {
+            countdownTask.cancel();
+        }
 
         running = true;
         handleGameStarted();
+
+        return true;
     }
 
-    public final void endGame() {
-        if (!running) return;
+    public final boolean endGame() {
+        if (!running) {
+            return false;
+        }
 
         running = false;
         handleGameEnded();
 
         players.clear();
         addAllPlayers();
+
+        return true;
     }
 
-    public void handleGameLoaded(C config) {
+    public final void loadGame(C config) {
         this.config = config;
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
+
+        handleGameLoaded();
 
         addAllPlayers();
 
@@ -68,15 +82,23 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
         }
     }
 
-    public void handleGameUnloaded() {
+    public final void unloadGame() {
         HandlerList.unregisterAll(this);
 
         if (countdownTask != null) {
             countdownTask.cancel();
         }
+
+        handleGameUnloaded();
     }
 
-    public abstract Set<Pair<Class<?>, TypeAdapter<?>>> getConfigTypeAdapters();
+    public Set<Pair<Class<?>, TypeAdapter<?>>> getConfigTypeAdapters() {
+        return null;
+    }
+
+    public void handleGameLoaded() { }
+
+    public void handleGameUnloaded() { }
 
     public abstract void handleGameStarted();
 
@@ -108,7 +130,9 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
                 event.getPlayer().setGameMode(GameMode.ADVENTURE);
                 players.add(event.getPlayer().getUniqueId());
 
-                startAfterCountdown();
+                if (canStart()) {
+                    startAfterCountdown();
+                }
             }
         }
     }
@@ -122,7 +146,7 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
     }
 
     private void addAllPlayers() {
-        players.addAll(world.getPlayers().stream().map(Player::getUniqueId).toList());
+        players.addAll(world.getPlayers().stream().map(Player::getUniqueId).collect(Collectors.toList()));
     }
 
     private void startAfterCountdown() {
@@ -132,9 +156,7 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
     public void startAfterCountdown(int countdown) {
         if (countdown == 0) {
             countdownTask = null;
-            if (canStart()) {
-                startGame();
-            } else {
+            if (!startGame()) {
                 getBroadcastAudience().sendMessage(Component.text("Start failed").color(NamedTextColor.RED));
             }
         } else {
@@ -173,17 +195,13 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
         return running;
     }
 
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
-
     public Set<Player> getPlayers() {
         Set<Player> result = new HashSet<>(players.size());
 
         Iterator<UUID> iterator = players.iterator();
         while (iterator.hasNext()) {
             Player player = Bukkit.getPlayer(iterator.next());
-            if (player == null) {
+            if (player == null || !player.getWorld().equals(world)) {
                 iterator.remove();
                 continue;
             }

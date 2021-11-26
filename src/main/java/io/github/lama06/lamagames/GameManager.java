@@ -9,10 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public final class GameManager implements Listener {
@@ -27,9 +24,14 @@ public final class GameManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private JsonObject getGamesConfig() throws GamesLoadFailedException {
+    private JsonObject loadGamesConfig() throws GamesLoadFailedException {
         try {
-            configFile.createNewFile();
+            if (configFile.createNewFile()) {
+                try (FileWriter writer = new FileWriter(configFile)) {
+                    writer.write("{}");
+                }
+                return new JsonObject();
+            }
         } catch (IOException e) {
             throw new GamesLoadFailedException("Failed to create games config file", e);
         }
@@ -55,7 +57,7 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C> void loadGame(GameType<G, C> type, World world, JsonObject config) {
-        G game = type.getCreator().createGame(plugin, world);
+        G game = type.getCreator().createGame(plugin, world, type);
         games.add(game);
 
         GsonBuilder builder = new GsonBuilder();
@@ -69,11 +71,11 @@ public final class GameManager implements Listener {
 
         C deserializedConfig = gson.fromJson(config, type.getConfigType());
 
-        game.handleGameLoaded(deserializedConfig);
+        game.loadGame(deserializedConfig);
     }
 
     public void loadGames() throws GamesLoadFailedException {
-        JsonObject gamesConfig = getGamesConfig();
+        JsonObject gamesConfig = loadGamesConfig();
 
         for (Map.Entry<String, JsonElement> gameEntry : gamesConfig.entrySet()) {
             String worldName = gameEntry.getKey();
@@ -111,7 +113,7 @@ public final class GameManager implements Listener {
         gamesConfig.addProperty("dataVersion", 1);
 
         for (Game<?, ?> game : games) {
-            game.handleGameUnloaded();
+            game.unloadGame();
 
             GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
             Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getConfigTypeAdapters();
@@ -132,14 +134,11 @@ public final class GameManager implements Listener {
         }
         games.clear();
 
-        FileWriter writer;
-        try {
-            writer = new FileWriter(configFile);
+        try (FileWriter writer = new FileWriter(configFile)) {
+            new GsonBuilder().setPrettyPrinting().create().toJson(gamesConfig, writer);
         } catch (IOException e) {
             throw new GamesSaveFailedException("Failed to write to games.json", e);
         }
-
-        new GsonBuilder().setPrettyPrinting().create().toJson(gamesConfig, writer);
     }
 
     public Optional<Game<?, ?>> getGameForWorld(World world) {
@@ -151,18 +150,18 @@ public final class GameManager implements Listener {
             return;
         }
 
-        G game = type.getCreator().createGame(plugin, world);
+        G game = type.getCreator().createGame(plugin, world, type);
         C config = type.getDefaultConfigCreator().get();
 
         games.add(game);
-        game.handleGameLoaded(config);
+        game.loadGame(config);
     }
 
     public void deleteGame(World world) throws GamesSaveFailedException {
         Optional<Game<?, ?>> game = games.stream().filter(g -> !g.getWorld().equals(world)).findFirst();
         if (game.isPresent()) {
             games.remove(game.get());
-            game.get().handleGameUnloaded();
+            game.get().unloadGame();
             saveGames();
         }
     }

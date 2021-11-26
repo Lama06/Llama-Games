@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-public abstract class MiniGame<T extends MiniGame<T>> implements Listener {
+public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener permits CompeteMiniGame, CompleteMiniGame {
     protected final LamaSaysGame game;
     private final Consumer<T> callback;
     private BukkitTask timeoutTask;
@@ -51,8 +51,9 @@ public abstract class MiniGame<T extends MiniGame<T>> implements Listener {
 
     @SuppressWarnings("unchecked")
     public final void endGame() {
-        if (!timeoutTask.isCancelled()) {
+        if (timeoutTask != null && !timeoutTask.isCancelled()) {
             timeoutTask.cancel();
+            timeoutTask = null;
         }
 
         HandlerList.unregisterAll(this);

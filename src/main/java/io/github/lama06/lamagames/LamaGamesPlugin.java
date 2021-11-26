@@ -2,6 +2,8 @@ package io.github.lama06.lamagames;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.function.Consumer;
+
 public class LamaGamesPlugin extends JavaPlugin {
     private GameManager gameManager;
 
@@ -20,6 +22,13 @@ public class LamaGamesPlugin extends JavaPlugin {
         }
 
         new LamaGamesCommand(this, "lamagames");
+
+        for (GameType<?, ?> gameType : GameType.getValues()) {
+            Consumer<LamaGamesPlugin> callback = gameType.getPluginEnableCallback();
+            if (callback != null) {
+                callback.accept(this);
+            }
+        }
     }
 
     @Override
@@ -28,6 +37,13 @@ public class LamaGamesPlugin extends JavaPlugin {
             gameManager.saveGames();
         } catch (GameManager.GamesSaveFailedException e) {
             e.printStackTrace();
+        }
+
+        for (GameType<?, ?> gameType : GameType.getValues()) {
+            Consumer<LamaGamesPlugin> callback = gameType.getPluginDisableCallback();
+            if (callback != null) {
+                callback.accept(this);
+            }
         }
     }
 

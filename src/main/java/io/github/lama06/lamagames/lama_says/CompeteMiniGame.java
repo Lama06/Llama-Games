@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public abstract class CompeteMiniGame<T extends CompeteMiniGame<T>> extends MiniGame<T> {
+public abstract non-sealed class CompeteMiniGame<T extends CompeteMiniGame<T>> extends MiniGame<T> {
     private final List<UUID> ranking = new ArrayList<>();
 
     public CompeteMiniGame(LamaSaysGame game, Consumer<T> callback) {

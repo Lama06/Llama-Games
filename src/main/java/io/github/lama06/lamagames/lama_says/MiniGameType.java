@@ -1,14 +1,14 @@
 package io.github.lama06.lamagames.lama_says;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class MiniGameType<T extends MiniGame<T>> {
-    private static final Set<MiniGameType<?>> types = new HashSet<>();
+    private static final List<MiniGameType<?>> types = new ArrayList<>();
 
-    public static Set<MiniGameType<?>> getTypes() {
+    public static List<MiniGameType<?>> getTypes() {
         return types;
     }
 

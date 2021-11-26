@@ -80,8 +80,11 @@ public class LamaGamesCommand extends LamaCommand {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
 
-        game.get().startGame();
-        sender.sendMessage(Component.text("The game was successfully started").color(NamedTextColor.GREEN));
+        if (game.get().startGame()) {
+            sender.sendMessage(Component.text("The game was successfully started").color(NamedTextColor.GREEN));
+        } else {
+            sender.sendMessage(Component.text("Failed to start the game").color(NamedTextColor.RED));
+        }
     }
 
     public void stop(CommandSender sender, String[] args) {
@@ -90,7 +93,10 @@ public class LamaGamesCommand extends LamaCommand {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
 
-        game.get().endGame();
-        sender.sendMessage(Component.text("The game was successfully stopped").color(NamedTextColor.GREEN));
+        if (game.get().endGame()) {
+            sender.sendMessage(Component.text("The game was successfully stopped").color(NamedTextColor.GREEN));
+        } else {
+            sender.sendMessage(Component.text("Failed to stop the game").color(NamedTextColor.RED));
+        }
     }
 }

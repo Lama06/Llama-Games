@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public abstract class CompleteMiniGame<T extends CompleteMiniGame<T>> extends MiniGame<T> {
+public abstract non-sealed class CompleteMiniGame<T extends CompleteMiniGame<T>> extends MiniGame<T> {
     private final Set<UUID> successfulPlayers = new HashSet<>();
 
     public CompleteMiniGame(LamaSaysGame game, Consumer<T> callback) {

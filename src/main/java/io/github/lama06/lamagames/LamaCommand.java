@@ -7,12 +7,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class LamaCommand implements TabExecutor {
+public abstract class LamaCommand implements TabExecutor {
     protected final LamaGamesPlugin plugin;
     protected final String name;
     private final Map<String, SubCommandExecutor> subCommands = new HashMap<>();
@@ -21,8 +22,11 @@ public class LamaCommand implements TabExecutor {
         this.plugin = plugin;
         this.name = name;
 
-        Bukkit.getPluginCommand(name).setExecutor(this);
-        Bukkit.getPluginCommand(name).setTabCompleter(this);
+        PluginCommand cmd = Bukkit.getPluginCommand(name);
+        if (cmd != null) {
+            cmd.setExecutor(this);
+            cmd.setTabCompleter(this);
+        }
     }
 
     public void addSubCommand(String name, SubCommandExecutor executor) {

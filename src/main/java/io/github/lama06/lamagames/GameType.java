@@ -1,5 +1,7 @@
 package io.github.lama06.lamagames;
 
+import io.github.lama06.lamagames.lama_says.LamaSaysConfig;
+import io.github.lama06.lamagames.lama_says.LamaSaysGame;
 import org.bukkit.World;
 
 import java.util.HashSet;
@@ -20,8 +22,17 @@ public final class GameType<G extends Game<G, C>, C> {
         return values.stream().filter(type -> type.name.equalsIgnoreCase(name)).findFirst();
     }
 
+    public static final GameType<LamaSaysGame, LamaSaysConfig> LAMA_SAYS = new GameType<>(
+            "lama_says",
+            LamaSaysGame::new,
+            LamaSaysConfig.class,
+            LamaSaysConfig::new,
+            LamaSaysGame::onPluginEnabled,
+            null
+    );
+
     private final String name;
-    private final GameCreator<G> creator;
+    private final GameCreator<G, C> creator;
     private final Class<C> configType;
     private final Supplier<C> defaultConfigCreator;
     private final Consumer<LamaGamesPlugin> pluginEnableCallback;
@@ -29,7 +40,8 @@ public final class GameType<G extends Game<G, C>, C> {
 
     private GameType(
             String name,
-            GameCreator<G> creator, Class<C> configType,
+            GameCreator<G, C> creator,
+            Class<C> configType,
             Supplier<C> defaultConfigCreator,
             Consumer<LamaGamesPlugin> pluginEnableCallback,
             Consumer<LamaGamesPlugin> pluginDisableCallback
@@ -48,7 +60,7 @@ public final class GameType<G extends Game<G, C>, C> {
         return name;
     }
 
-    public GameCreator<G> getCreator() {
+    public GameCreator<G, C> getCreator() {
         return creator;
     }
 
@@ -69,7 +81,7 @@ public final class GameType<G extends Game<G, C>, C> {
     }
 
     @FunctionalInterface
-    public interface GameCreator<G extends Game<G, ?>> {
-        G createGame(LamaGamesPlugin plugin, World world);
+    public interface GameCreator<G extends Game<G, C>, C> {
+        G createGame(LamaGamesPlugin plugin, World world, GameType<G, C> type);
     }
 }
