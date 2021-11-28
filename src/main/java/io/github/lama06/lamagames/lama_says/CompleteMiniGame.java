@@ -9,13 +9,20 @@ import java.util.function.Consumer;
 
 public abstract non-sealed class CompleteMiniGame<T extends CompleteMiniGame<T>> extends MiniGame<T> {
     private final Set<UUID> successfulPlayers = new HashSet<>();
+    private final Set<UUID> failedPlayers = new HashSet<>();
 
     public CompleteMiniGame(LamaSaysGame game, Consumer<T> callback) {
         super(game, callback);
     }
 
     protected void addSuccessfulPlayer(Player player) {
-        successfulPlayers.add(player.getUniqueId());
+        if (!failedPlayers.contains(player.getUniqueId())) {
+            successfulPlayers.add(player.getUniqueId());
+        }
+    }
+
+    protected void addFailedPlayer(Player player) {
+        failedPlayers.add(player.getUniqueId());
     }
 
     public Set<UUID> getSuccessfulPlayers() {

@@ -8,12 +8,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -24,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public abstract class Game<G extends Game<G, C>, C> implements Listener {
+public abstract class Game<G extends Game<G, C>, C extends GameConfig> implements Listener {
     protected LamaGamesPlugin plugin;
     protected GameType<G, C> type;
     protected World world;
@@ -83,6 +85,10 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
     }
 
     public final void unloadGame() {
+        if (running) {
+            endGame();
+        }
+
         HandlerList.unregisterAll(this);
 
         if (countdownTask != null) {
@@ -108,6 +114,24 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
 
     public void handlePlayerLeft(Player player) { }
 
+    private void handlePlayerJoined(Player player) {
+        if (running) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.showTitle(Title.title(
+                    Component.text("You are now spectating"),
+                    Component.empty(),
+                    Title.Times.of(Duration.ofSeconds(2), Duration.ofSeconds(3), Duration.ofSeconds(1))
+            ));
+        } else {
+            player.setGameMode(GameMode.SURVIVAL);
+            players.add(player.getUniqueId());
+
+            if (canStart()) {
+                startAfterCountdown();
+            }
+        }
+    }
+
     @EventHandler
     public void handlePlayerChangeWorldEvent(PlayerChangedWorldEvent event) {
         if (event.getFrom().equals(world)) {
@@ -119,27 +143,20 @@ public abstract class Game<G extends Game<G, C>, C> implements Listener {
                 endGame();
             }
         } else if (event.getPlayer().getWorld().equals(world)) {
-            if (running) {
-                event.getPlayer().setGameMode(GameMode.SPECTATOR);
-                event.getPlayer().showTitle(Title.title(
-                        Component.text("You are now spectating"),
-                        Component.empty(),
-                        Title.Times.of(Duration.ofSeconds(2), Duration.ofSeconds(3), Duration.ofSeconds(1))
-                ));
-            } else {
-                event.getPlayer().setGameMode(GameMode.ADVENTURE);
-                players.add(event.getPlayer().getUniqueId());
+            handlePlayerJoined(event.getPlayer());
+        }
+    }
 
-                if (canStart()) {
-                    startAfterCountdown();
-                }
-            }
+    @EventHandler
+    public void handlePlayerJoinEvent(PlayerJoinEvent event) {
+        if (event.getPlayer().getWorld().equals(world)) {
+            handlePlayerJoined(event.getPlayer());
         }
     }
 
     @EventHandler
     public void handlePlayerQuitEvent(PlayerQuitEvent event) {
-        if (players.stream().anyMatch(id -> event.getPlayer().getUniqueId().equals(id))) {
+        if (players.contains(event.getPlayer().getUniqueId())) {
             players.remove(event.getPlayer().getUniqueId());
             handlePlayerLeft(event.getPlayer());
         }

@@ -1,10 +1,9 @@
 package io.github.lama06.lamagames.lama_says;
 
-import com.google.gson.TypeAdapter;
 import io.github.lama06.lamagames.Game;
 import io.github.lama06.lamagames.GameType;
 import io.github.lama06.lamagames.LamaGamesPlugin;
-import io.github.lama06.lamagames.util.Pair;
+import io.github.lama06.lamagames.util.EventCanceler;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -20,19 +19,28 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
     private List<MiniGameType<?>> remainingGameTypes;
     private MiniGame<?> currentMiniGame;
     private Map<UUID, Integer> points;
+    private final EventCanceler canceler;
 
     public LamaSaysGame(LamaGamesPlugin plugin, World world, GameType<LamaSaysGame, LamaSaysConfig> type) {
         super(plugin, world, type);
+
+        canceler = new EventCanceler(plugin, world);
+        canceler.disallowAll();
     }
 
     @Override
-    public Set<Pair<Class<?>, TypeAdapter<?>>> getConfigTypeAdapters() {
-        return null;
+    public void handleGameLoaded() {
+        canceler.registerEvents();
+    }
+
+    @Override
+    public void handleGameUnloaded() {
+        canceler.unregisterEvents();
     }
 
     @Override
     public void handleGameStarted() {
-        remainingRounds = 10;
+        remainingRounds = config.numberOfRounds;
         remainingGameTypes = new ArrayList<>(MiniGameType.getTypes());
         points = new HashMap<>();
         for (Player player : getPlayers()) {
@@ -53,12 +61,14 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
         }
 
         currentMiniGame = type.getCreator().createMiniGame(this, game -> {
+            canceler.disallowAll();
+
             if (game instanceof CompeteMiniGame<?> compete) {
                 List<UUID> ranking = compete.getRanking();
 
-                points.put(ranking.get(0), points.get(ranking.get(0)) + 3);
-                points.put(ranking.get(1), points.get(ranking.get(1)) + 2);
-                points.put(ranking.get(2), points.get(ranking.get(2)) + 1);
+                if (ranking.size() == 1) points.put(ranking.get(0), points.get(ranking.get(0)) + 3);
+                if (ranking.size() == 2) points.put(ranking.get(1), points.get(ranking.get(1)) + 2);
+                if (ranking.size() == 3) points.put(ranking.get(2), points.get(ranking.get(2)) + 1);
             } else if (game instanceof CompleteMiniGame<?> complete) {
                 Set<UUID> successfulPlayers = complete.getSuccessfulPlayers();
                 for (UUID successfulPlayer : successfulPlayers) {
@@ -77,23 +87,22 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
     }
 
     @Override
-    public void handlePlayerLeft(Player player) {
-        points.remove(player.getUniqueId());
-    }
-
-    @Override
     public void handleGameEnded() {
         if (currentMiniGame != null) {
-            currentMiniGame.endGame();
+            currentMiniGame.endGame(false);
         }
     }
 
     @Override
     public boolean canStart() {
-        return true;
+        return players.size() >= 1;
     }
 
     public Random getRandom() {
         return random;
+    }
+
+    public EventCanceler getEventCanceler() {
+        return canceler;
     }
 }

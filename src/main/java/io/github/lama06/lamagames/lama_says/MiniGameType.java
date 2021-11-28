@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-@SuppressWarnings("ClassCanBeRecord")
+@SuppressWarnings({"unused", "ClassCanBeRecord"})
 public final class MiniGameType<T extends MiniGame<T>> {
     private static final List<MiniGameType<?>> types = new ArrayList<>();
 
@@ -13,6 +13,8 @@ public final class MiniGameType<T extends MiniGame<T>> {
     }
 
     public static final MiniGameType<DrinkThePotionMiniGame> DRINK_THE_POTION = new MiniGameType<>("drink_the_potion", DrinkThePotionMiniGame::new);
+
+    public static final MiniGameType<SlapOtherPlayerMiniGame> SLAP_OTHER_PLAYER = new MiniGameType<>("slap_other_player", SlapOtherPlayerMiniGame::new);
 
     private final String name;
     private final MiniGameCreator<T> creator;

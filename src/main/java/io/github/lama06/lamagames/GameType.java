@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@SuppressWarnings("ClassCanBeRecord")
-public final class GameType<G extends Game<G, C>, C> {
+@SuppressWarnings({"unused", "ClassCanBeRecord"})
+public final class GameType<G extends Game<G, C>, C extends GameConfig> {
     private final static Set<GameType<?, ?>> values = new HashSet<>();
 
     public static Set<GameType<?, ?>> getValues() {
@@ -81,7 +81,7 @@ public final class GameType<G extends Game<G, C>, C> {
     }
 
     @FunctionalInterface
-    public interface GameCreator<G extends Game<G, C>, C> {
+    public interface GameCreator<G extends Game<G, C>, C extends GameConfig> {
         G createGame(LamaGamesPlugin plugin, World world, GameType<G, C> type);
     }
 }

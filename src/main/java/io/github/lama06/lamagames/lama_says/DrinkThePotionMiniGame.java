@@ -3,6 +3,7 @@ package io.github.lama06.lamagames.lama_says;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -21,6 +22,7 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
     public DrinkThePotionMiniGame(LamaSaysGame game, Consumer<DrinkThePotionMiniGame> callback) {
         super(game, callback);
         potionType = POTION_TYPES_WITH_EFFECT.get(game.getRandom().nextInt(POTION_TYPES_WITH_EFFECT.size()));
+        game.getEventCanceler().setCancelItemConsummation(false);
     }
 
     @Override
@@ -50,12 +52,10 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
 
                 ItemStack wrongPotion = new ItemStack(Material.POTION);
                 PotionMeta wrongPotionMeta = (PotionMeta) wrongPotion.getItemMeta();
-                meta.setBasePotionData(new PotionData(wrongPotionType));
+                wrongPotionMeta.setBasePotionData(new PotionData(wrongPotionType));
                 wrongPotion.setItemMeta(wrongPotionMeta);
 
                 player.getInventory().setItem(i, wrongPotion);
-
-                break;
             }
         }
     }
@@ -72,7 +72,15 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
 
         if (type == potionType) {
             addSuccessfulPlayer(event.getPlayer());
+        } else {
+            addFailedPlayer(event.getPlayer());
         }
-        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void handleEntityPotionEffectEvent(EntityPotionEffectEvent event) {
+        if (event.getEntity() instanceof Player player && player.getWorld().equals(game.getWorld())) {
+            event.setCancelled(true);
+        }
     }
 }

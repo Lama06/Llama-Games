@@ -56,7 +56,7 @@ public final class GameManager implements Listener {
         return gamesConfig.getAsJsonObject();
     }
 
-    private <G extends Game<G, C>, C> void loadGame(GameType<G, C> type, World world, JsonObject config) {
+    private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
         G game = type.getCreator().createGame(plugin, world, type);
         games.add(game);
 
@@ -145,7 +145,7 @@ public final class GameManager implements Listener {
         return games.stream().filter(game -> game.getWorld().equals(world)).findFirst();
     }
 
-    public <G extends Game<G, C>, C> void createGame(World world, GameType<G, C> type) {
+    public <G extends Game<G, C>, C extends GameConfig> void createGame(World world, GameType<G, C> type) {
         if (games.stream().anyMatch(game -> game.getWorld().equals(world))) {
             return;
         }
@@ -157,13 +157,14 @@ public final class GameManager implements Listener {
         game.loadGame(config);
     }
 
-    public void deleteGame(World world) throws GamesSaveFailedException {
-        Optional<Game<?, ?>> game = games.stream().filter(g -> !g.getWorld().equals(world)).findFirst();
+    public boolean deleteGame(World world) {
+        Optional<Game<?, ?>> game = games.stream().filter(g -> g.getWorld().equals(world)).findFirst();
         if (game.isPresent()) {
             games.remove(game.get());
             game.get().unloadGame();
-            saveGames();
+            return true;
         }
+        return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

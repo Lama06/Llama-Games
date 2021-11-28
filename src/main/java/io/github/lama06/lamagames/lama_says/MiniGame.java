@@ -25,6 +25,10 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
 
     public abstract String getTitle();
 
+    public int getTimeoutDelay() {
+        return 200;
+    }
+
     public abstract void handleGameStarted();
 
     public void handleGameEnded() { }
@@ -44,14 +48,14 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
             ));
         }
 
-        timeoutTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), this::endGame, 10);
+        timeoutTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> endGame(true), getTimeoutDelay());
 
         handleGameStarted();
     }
 
     @SuppressWarnings("unchecked")
-    public final void endGame() {
-        if (timeoutTask != null && !timeoutTask.isCancelled()) {
+    public final void endGame(boolean callCallback) {
+        if (timeoutTask != null) {
             timeoutTask.cancel();
             timeoutTask = null;
         }
@@ -68,6 +72,8 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
             }
         }
 
-        callback.accept((T) this);
+        if (callCallback) {
+            callback.accept((T) this);
+        }
     }
 }

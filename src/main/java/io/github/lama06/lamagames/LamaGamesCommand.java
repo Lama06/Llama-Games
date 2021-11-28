@@ -47,12 +47,17 @@ public class LamaGamesCommand extends LamaCommand {
     public void delete(CommandSender sender, String[] args) {
         if (requireArgsExact(sender, args, 1)) return;
 
-        Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
-        if (game.isEmpty()) return;
+        Optional<World> world = requireWorld(sender, args[0]);
+        if (world.isEmpty()) return;
+
+        if (plugin.getGameManager().deleteGame(world.get())) {
+            sender.sendMessage(Component.text("The game was successfully deleted").color(NamedTextColor.GREEN));
+        } else {
+            sender.sendMessage(Component.text("Failed to delete the game").color(NamedTextColor.RED));
+        }
 
         try {
-            plugin.getGameManager().deleteGame(game.get().getWorld());
-            sender.sendMessage(Component.text("The game was successfully deleted").color(NamedTextColor.GREEN));
+            plugin.getGameManager().saveGames();
         } catch (GameManager.GamesSaveFailedException e) {
             sender.sendMessage(Component.text("Internal error while saving the config file").color(NamedTextColor.RED));
         }
@@ -60,7 +65,7 @@ public class LamaGamesCommand extends LamaCommand {
 
     public void list(CommandSender sender, String[] args) {
         if (plugin.getGameManager().getGames().isEmpty()) {
-            sender.sendMessage("There are no games on the server");
+            sender.sendMessage(Component.text("There are no games on the server"));
             return;
         }
 
