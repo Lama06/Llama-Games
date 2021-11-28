@@ -9,27 +9,31 @@ import java.util.function.Consumer;
 
 public abstract non-sealed class CompeteMiniGame<T extends CompeteMiniGame<T>> extends MiniGame<T> {
     private final List<UUID> ranking = new ArrayList<>();
-    private final Set<UUID> failed = new HashSet<>();
+    private final Set<UUID> failedPlayers = new HashSet<>();
 
     public CompeteMiniGame(LamaSaysGame game, Consumer<T> callback) {
         super(game, callback);
     }
 
     protected void addSuccessfulPlayer(Player player) {
-        if (!ranking.contains(player.getUniqueId()) && !failed.contains(player.getUniqueId())) {
+        if (!ranking.contains(player.getUniqueId()) && !failedPlayers.contains(player.getUniqueId())) {
             ranking.add(player.getUniqueId());
             player.sendMessage(Component.text("You got %d".formatted(ranking.size())).color(NamedTextColor.GREEN));
         }
     }
 
     protected void addFailedPlayer(Player player) {
-        if (!ranking.contains(player.getUniqueId()) && !failed.contains(player.getUniqueId())) {
-            failed.add(player.getUniqueId());
+        if (!ranking.contains(player.getUniqueId()) && !failedPlayers.contains(player.getUniqueId())) {
+            failedPlayers.add(player.getUniqueId());
             player.sendMessage(Component.text("You failed").color(NamedTextColor.RED));
         }
     }
 
     public final List<UUID> getRanking() {
         return ranking;
+    }
+
+    public Set<UUID> getFailedPlayers() {
+        return failedPlayers;
     }
 }

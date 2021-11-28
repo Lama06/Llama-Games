@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,7 +41,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     public final boolean startGame() {
-        if (running || !canStart()) {
+        if (running || !canStart() || !isConfigComplete()) {
             return false;
         }
 
@@ -79,7 +78,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
         addAllPlayers();
 
-        if (canStart()) {
+        if (canStart() && isConfigComplete()) {
             startAfterCountdown();
         }
     }
@@ -112,6 +111,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public abstract boolean canStart();
 
+    public boolean isConfigComplete() {
+        return config.spawnPoint != null;
+    }
+
     public void handlePlayerLeft(Player player) { }
 
     private void handlePlayerJoined(Player player) {
@@ -126,7 +129,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             player.setGameMode(GameMode.SURVIVAL);
             players.add(player.getUniqueId());
 
-            if (canStart()) {
+            if (canStart() && isConfigComplete()) {
                 startAfterCountdown();
             }
         }
@@ -170,7 +173,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         startAfterCountdown(10);
     }
 
-    public void startAfterCountdown(int countdown) {
+    private void startAfterCountdown(int countdown) {
         if (countdown == 0) {
             countdownTask = null;
             if (!startGame()) {

@@ -95,7 +95,22 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
 
     @Override
     public boolean canStart() {
-        return players.size() >= 1;
+        return world.getPlayers().size() >= 1;
+    }
+
+    @Override
+    public boolean isConfigComplete() {
+        boolean result = super.isConfigComplete();
+
+        if (config.floor == null || config.floor.getPosition1() == null || config.floor.getPosition2() == null) {
+            result = false;
+        }
+
+        if (config.floorCenter == null) {
+            result = false;
+        }
+
+        return result;
     }
 
     public Random getRandom() {

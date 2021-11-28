@@ -1,5 +1,7 @@
 package io.github.lama06.lamagames.lama_says;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -16,16 +18,24 @@ public abstract non-sealed class CompleteMiniGame<T extends CompleteMiniGame<T>>
     }
 
     protected void addSuccessfulPlayer(Player player) {
-        if (!failedPlayers.contains(player.getUniqueId())) {
+        if (!failedPlayers.contains(player.getUniqueId()) && !successfulPlayers.contains(player.getUniqueId())) {
             successfulPlayers.add(player.getUniqueId());
+            player.sendMessage(Component.text("Success").color(NamedTextColor.GREEN));
         }
     }
 
     protected void addFailedPlayer(Player player) {
-        failedPlayers.add(player.getUniqueId());
+        if (!failedPlayers.contains(player.getUniqueId()) && !successfulPlayers.contains(player.getUniqueId())) {
+            failedPlayers.add(player.getUniqueId());
+            player.sendMessage(Component.text("You failed").color(NamedTextColor.RED));
+        }
     }
 
     public Set<UUID> getSuccessfulPlayers() {
         return successfulPlayers;
+    }
+
+    public Set<UUID> getFailedPlayers() {
+        return failedPlayers;
     }
 }

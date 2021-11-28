@@ -1,3 +1,7 @@
 package io.github.lama06.lamagames;
 
-public class GameConfig { }
+import io.github.lama06.lamagames.util.BlockPosition;
+
+public class GameConfig {
+    public BlockPosition spawnPoint;
+}

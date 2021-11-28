@@ -13,8 +13,8 @@ public final class MiniGameType<T extends MiniGame<T>> {
     }
 
     public static final MiniGameType<DrinkThePotionMiniGame> DRINK_THE_POTION = new MiniGameType<>("drink_the_potion", DrinkThePotionMiniGame::new);
-
     public static final MiniGameType<SlapOtherPlayerMiniGame> SLAP_OTHER_PLAYER = new MiniGameType<>("slap_other_player", SlapOtherPlayerMiniGame::new);
+    public static final MiniGameType<SmeltMiniGame> SMELT = new MiniGameType<>("smelt", SmeltMiniGame::new);
 
     private final String name;
     private final MiniGameCreator<T> creator;
