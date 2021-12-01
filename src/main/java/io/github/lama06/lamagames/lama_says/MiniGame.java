@@ -23,7 +23,7 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
         this.callback = callback;
     }
 
-    public abstract String getTitle();
+    public abstract Component getTitle();
 
     public int getTimeoutDelay() {
         return 200;
@@ -36,13 +36,17 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
     public final void startGame() {
         Bukkit.getPluginManager().registerEvents(this, game.getPlugin());
 
-        String title = getTitle();
+        for (Player player : game.getWorld().getPlayers()) {
+            player.teleport(game.getConfig().spawnPoint.asLocation(game.getWorld()));
+        }
 
-        game.getBroadcastAudience().sendMessage(Component.text(title).color(NamedTextColor.YELLOW));
+        Component title = getTitle();
+
+        game.getBroadcastAudience().sendMessage(title.color(NamedTextColor.YELLOW));
 
         for (Player player : game.getPlayers()) {
             player.showTitle(Title.title(
-                    Component.text(title).color(NamedTextColor.YELLOW),
+                    title.color(NamedTextColor.YELLOW),
                     Component.empty(),
                     Title.Times.of(Duration.ofMillis(500), Duration.ofSeconds(2), Duration.ofMillis(500))
             ));

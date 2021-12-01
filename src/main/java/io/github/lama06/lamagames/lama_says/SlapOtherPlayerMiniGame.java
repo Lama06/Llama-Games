@@ -1,5 +1,6 @@
 package io.github.lama06.lamagames.lama_says;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,8 +32,8 @@ public class SlapOtherPlayerMiniGame extends CompeteMiniGame<SlapOtherPlayerMini
     }
 
     @Override
-    public String getTitle() {
-        return "Slap a player with: " + item.getKey().getKey();
+    public Component getTitle() {
+        return Component.text("Slap a player with: ").append(Component.translatable(item));
     }
 
     @Override

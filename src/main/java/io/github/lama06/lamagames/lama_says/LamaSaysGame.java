@@ -71,6 +71,7 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
                 if (ranking.size() == 3) points.put(ranking.get(2), points.get(ranking.get(2)) + 1);
             } else if (game instanceof CompleteMiniGame<?> complete) {
                 Set<UUID> successfulPlayers = complete.getSuccessfulPlayers();
+
                 for (UUID successfulPlayer : successfulPlayers) {
                     points.put(successfulPlayer, points.get(successfulPlayer) + 1);
                 }

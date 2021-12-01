@@ -1,6 +1,7 @@
 package io.github.lama06.lamagames.util;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public class BlockPosition {
     private int x;
@@ -30,5 +31,9 @@ public class BlockPosition {
 
     public Location asLocation() {
         return new Location(null, x, y, z);
+    }
+
+    public Location asLocation(World world) {
+        return new Location(world, x, y, z);
     }
 }

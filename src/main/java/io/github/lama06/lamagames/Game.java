@@ -49,6 +49,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             countdownTask.cancel();
         }
 
+        for (Player player : world.getPlayers()) {
+            player.teleport(config.spawnPoint.asLocation(world));
+        }
+
         running = true;
         handleGameStarted();
 
@@ -73,6 +77,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         this.config = config;
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
+
+        if (!isConfigComplete()) {
+            plugin.getLogger().warning("The configuration for the following game is not complete: %s".formatted(world.getName()));
+        }
 
         handleGameLoaded();
 
@@ -133,6 +141,8 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
                 startAfterCountdown();
             }
         }
+
+        player.teleport(config.spawnPoint == null ? world.getSpawnLocation() : config.spawnPoint.asLocation(world));
     }
 
     @EventHandler

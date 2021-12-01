@@ -1,5 +1,6 @@
 package io.github.lama06.lamagames;
 
+import io.github.lama06.lamagames.util.BlockPosition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,6 +13,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public abstract class LamaCommand implements TabExecutor {
     protected final LamaGamesPlugin plugin;
@@ -35,12 +37,17 @@ public abstract class LamaCommand implements TabExecutor {
 
     private Component getHelpMessage() {
         TextComponent.Builder builder = Component.text();
+        boolean first = true;
         for (Map.Entry<String, SubCommandExecutor> subCommand : subCommands.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                builder.append(Component.newline());
+            }
             builder.append(Component.text("/"));
             builder.append(Component.text(name));
             builder.append(Component.text(" "));
             builder.append(Component.text(subCommand.getKey()));
-            builder.append(Component.newline());
         }
         return builder.build();
     }
@@ -82,7 +89,7 @@ public abstract class LamaCommand implements TabExecutor {
                     .color(NamedTextColor.RED)
                     .append(Component.text("This command needs "))
                     .append(Component.text(number))
-                    .append(Component.text(" arguments"))
+                    .append(Component.text(number == 1 ? " argument" : " arguments"))
             );
             return true;
         }
@@ -125,5 +132,80 @@ public abstract class LamaCommand implements TabExecutor {
             return Optional.empty();
         }
         return game;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <G extends Game<G, ?>> Optional<G> requireGame(LamaGamesPlugin plugin, CommandSender sender, String worldName, Class<? extends G> type) {
+        Optional<Game<?, ?>> game = requireGame(plugin, sender, worldName);
+        if (game.isEmpty()) return Optional.empty();
+
+        if (!type.isAssignableFrom(game.get().getClass())) {
+            sender.sendMessage(Component.text("This world contains a game that is not of the right type").color(NamedTextColor.RED));
+            return Optional.empty();
+        }
+
+        return Optional.of((G) game.get());
+    }
+
+    public static OptionalInt requireNumber(CommandSender sender, String text) {
+        try {
+            return OptionalInt.of(Integer.parseInt(text));
+        } catch (NumberFormatException e) {
+            sender.sendMessage(Component.text("This is not a number").color(NamedTextColor.RED));
+            return OptionalInt.empty();
+        }
+    }
+
+    public static Optional<BlockPosition> requirePosition(CommandSender sender, String x, String y, String z) {
+        try {
+            int xPos = Integer.parseInt(x);
+            int yPos = Integer.parseInt(y);
+            int zPos = Integer.parseInt(z);
+
+            return Optional.of(new BlockPosition(xPos, yPos, zPos));
+        } catch (NumberFormatException e) {
+            sender.sendMessage(Component.text("This is not a number").color(NamedTextColor.RED));
+            return Optional.empty();
+        }
+    }
+
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBlockConfigChangeSubCommand(
+            LamaGamesPlugin plugin,
+            Class<? extends G> gameType,
+            BiConsumer<? super C, ? super BlockPosition> callback,
+            String successMessage
+    ) {
+        return (sender, args) -> {
+            if (requireArgsExact(sender, args, 4)) return;
+
+            Optional<G> game = requireGame(plugin, sender, args[0], gameType);
+            if (game.isEmpty()) return;
+
+            Optional<BlockPosition> position = requirePosition(sender, args[1], args[2], args[3]);
+            if (position.isEmpty()) return;
+
+            callback.accept(game.get().getConfig(), position.get());
+            sender.sendMessage(Component.text(successMessage).color(NamedTextColor.GREEN));
+        };
+    }
+
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createNumberConfigChangeSubCommand(
+            LamaGamesPlugin plugin,
+            Class<? extends G> gameType,
+            BiConsumer<? super C, ? super Integer> callback,
+            String successMessage
+    ) {
+        return (sender, args) -> {
+            if (requireArgsExact(sender, args, 1)) return;
+
+            Optional<G> game = requireGame(plugin, sender, args[0], gameType);
+            if (game.isEmpty()) return;
+
+            OptionalInt number = requireNumber(sender, args[0]);
+            if (number.isEmpty()) return;
+
+            callback.accept(game.get().getConfig(), number.getAsInt());
+            sender.sendMessage(Component.text(successMessage).color(NamedTextColor.GREEN));
+        };
     }
 }

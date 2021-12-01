@@ -1,5 +1,6 @@
 package io.github.lama06.lamagames.lama_says;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,8 +27,11 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
     }
 
     @Override
-    public String getTitle() {
-        return "Drink the potion: " + potionType.name();
+    public Component getTitle() {
+        ItemStack potion = new ItemStack(Material.POTION);
+        potion.editMeta(PotionMeta.class, meta -> meta.setBasePotionData(new PotionData(potionType)));
+
+        return Component.text("Drink the potion: ").append(Component.translatable(potion));
     }
 
     @Override
@@ -62,10 +66,14 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
 
     @EventHandler
     public void handlePlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
-        if (!game.getPlayers().contains(event.getPlayer())) return;
+        if (!game.getPlayers().contains(event.getPlayer())) {
+            return;
+        }
 
         ItemStack item = event.getItem();
-        if (item.getType() != Material.POTION) return;
+        if (item.getType() != Material.POTION) {
+            return;
+        }
 
         PotionMeta meta = (PotionMeta) item.getItemMeta();
         PotionType type = meta.getBasePotionData().getType();

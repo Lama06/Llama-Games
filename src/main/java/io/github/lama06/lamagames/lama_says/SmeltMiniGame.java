@@ -1,5 +1,6 @@
 package io.github.lama06.lamagames.lama_says;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,8 +33,8 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
 
 
     @Override
-    public String getTitle() {
-        return "Smelt " + ingredient.getKey();
+    public Component getTitle() {
+        return Component.text("Smelt ").append(Component.translatable(ingredient));
     }
 
     @Override
