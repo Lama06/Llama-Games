@@ -213,12 +213,12 @@ public abstract class LamaCommand implements TabExecutor {
             String successMessage
     ) {
         return (sender, args) -> {
-            if (requireArgsExact(sender, args, 1)) return;
+            if (requireArgsExact(sender, args, 2)) return;
 
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
             if (game.isEmpty()) return;
 
-            Optional<Integer> number = requireNumber(sender, args[0]);
+            Optional<Integer> number = requireNumber(sender, args[1]);
             if (number.isEmpty()) return;
 
             callback.accept(game.get().getConfig(), number.get());
@@ -233,12 +233,12 @@ public abstract class LamaCommand implements TabExecutor {
             String successMessage
     ) {
         return (sender, args) -> {
-            if (requireArgsExact(sender, args, 1)) return;
+            if (requireArgsExact(sender, args, 2)) return;
 
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
             if (game.isEmpty()) return;
 
-            Optional<Boolean> flag = requireBoolean(sender, args[0]);
+            Optional<Boolean> flag = requireBoolean(sender, args[1]);
             if (flag.isEmpty()) return;
 
             callback.accept(game.get().getConfig(), flag.get());
