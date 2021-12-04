@@ -135,11 +135,16 @@ public abstract class LamaCommand implements TabExecutor {
     }
 
     @SuppressWarnings("unchecked")
-    public static <G extends Game<G, ?>> Optional<G> requireGame(LamaGamesPlugin plugin, CommandSender sender, String worldName, Class<? extends G> type) {
+    public static <G extends Game<G, ?>> Optional<G> requireGame(
+            LamaGamesPlugin plugin,
+            CommandSender sender,
+            String worldName,
+            Class<? extends G> gameType
+    ) {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, worldName);
         if (game.isEmpty()) return Optional.empty();
 
-        if (!type.isAssignableFrom(game.get().getClass())) {
+        if (gameType != null && !gameType.isAssignableFrom(game.get().getClass())) {
             sender.sendMessage(Component.text("This world contains a game that is not of the right type").color(NamedTextColor.RED));
             return Optional.empty();
         }
