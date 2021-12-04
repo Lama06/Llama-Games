@@ -152,13 +152,25 @@ public abstract class LamaCommand implements TabExecutor {
         return Optional.of((G) game.get());
     }
 
-    public static OptionalInt requireNumber(CommandSender sender, String text) {
+    public static Optional<Integer> requireNumber(CommandSender sender, String text) {
         try {
-            return OptionalInt.of(Integer.parseInt(text));
+            return Optional.of(Integer.parseInt(text));
         } catch (NumberFormatException e) {
             sender.sendMessage(Component.text("This is not a number").color(NamedTextColor.RED));
-            return OptionalInt.empty();
+            return Optional.empty();
         }
+    }
+
+    private static final Set<String> TRUE_STRINGS = Set.of("yes", "true", "on", "1");
+    private static final Set<String> FALSE_STRINGS = Set.of("no", "false", "off", "0");
+
+    public static Optional<Boolean> requireBoolean(CommandSender sender, String text) {
+        if (!TRUE_STRINGS.contains(text) && !FALSE_STRINGS.contains(text)) {
+            sender.sendMessage(Component.text("Failed to parse: %s".formatted(text)).color(NamedTextColor.RED));
+            return Optional.empty();
+        }
+
+        return Optional.of(TRUE_STRINGS.contains(text));
     }
 
     public static Optional<BlockPosition> requirePosition(CommandSender sender, String x, String y, String z) {
@@ -206,10 +218,30 @@ public abstract class LamaCommand implements TabExecutor {
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
             if (game.isEmpty()) return;
 
-            OptionalInt number = requireNumber(sender, args[0]);
+            Optional<Integer> number = requireNumber(sender, args[0]);
             if (number.isEmpty()) return;
 
-            callback.accept(game.get().getConfig(), number.getAsInt());
+            callback.accept(game.get().getConfig(), number.get());
+            sender.sendMessage(Component.text(successMessage).color(NamedTextColor.GREEN));
+        };
+    }
+
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBooleanConfigChangeSubCommand(
+            LamaGamesPlugin plugin,
+            Class<? extends G> gameType,
+            BiConsumer<? super C, ? super Boolean> callback,
+            String successMessage
+    ) {
+        return (sender, args) -> {
+            if (requireArgsExact(sender, args, 1)) return;
+
+            Optional<G> game = requireGame(plugin, sender, args[0], gameType);
+            if (game.isEmpty()) return;
+
+            Optional<Boolean> flag = requireBoolean(sender, args[0]);
+            if (flag.isEmpty()) return;
+
+            callback.accept(game.get().getConfig(), flag.get());
             sender.sendMessage(Component.text(successMessage).color(NamedTextColor.GREEN));
         };
     }

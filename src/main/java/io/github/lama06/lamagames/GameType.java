@@ -1,7 +1,10 @@
 package io.github.lama06.lamagames;
 
+import com.google.gson.TypeAdapter;
+import io.github.lama06.lamagames.lama_says.LamaSaysCommand;
 import io.github.lama06.lamagames.lama_says.LamaSaysConfig;
 import io.github.lama06.lamagames.lama_says.LamaSaysGame;
+import io.github.lama06.lamagames.util.Pair;
 import org.bukkit.World;
 
 import java.util.HashSet;
@@ -26,14 +29,16 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             "lama_says",
             LamaSaysGame::new,
             LamaSaysConfig.class,
+            null,
             LamaSaysConfig::new,
-            LamaSaysGame::onPluginEnabled,
+            plugin -> new LamaSaysCommand(plugin, "lamasays"),
             null
     );
 
     private final String name;
     private final GameCreator<G, C> creator;
     private final Class<C> configType;
+    private final Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters;
     private final Supplier<C> defaultConfigCreator;
     private final Consumer<LamaGamesPlugin> pluginEnableCallback;
     private final Consumer<LamaGamesPlugin> pluginDisableCallback;
@@ -42,6 +47,7 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             String name,
             GameCreator<G, C> creator,
             Class<C> configType,
+            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters,
             Supplier<C> defaultConfigCreator,
             Consumer<LamaGamesPlugin> pluginEnableCallback,
             Consumer<LamaGamesPlugin> pluginDisableCallback
@@ -49,6 +55,7 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
         this.name = name;
         this.creator = creator;
         this.configType = configType;
+        this.typeAdapters = typeAdapters;
         this.defaultConfigCreator = defaultConfigCreator;
         this.pluginEnableCallback = pluginEnableCallback;
         this.pluginDisableCallback = pluginDisableCallback;
@@ -68,6 +75,10 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
         return configType;
     }
 
+    public Set<Pair<Class<?>, TypeAdapter<?>>> getTypeAdapters() {
+        return typeAdapters;
+    }
+
     public Supplier<C> getDefaultConfigCreator() {
         return defaultConfigCreator;
     }
@@ -82,6 +93,6 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
 
     @FunctionalInterface
     public interface GameCreator<G extends Game<G, C>, C extends GameConfig> {
-        G createGame(LamaGamesPlugin plugin, World world, GameType<G, C> type);
+        G createGame(LamaGamesPlugin plugin, World world, C config, GameType<G, C> type);
     }
 }

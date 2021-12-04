@@ -57,11 +57,8 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
-        G game = type.getCreator().createGame(plugin, world, type);
-        games.add(game);
-
         GsonBuilder builder = new GsonBuilder();
-        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getConfigTypeAdapters();
+        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
         if (typeAdapters != null) {
             for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
                 builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
@@ -71,7 +68,10 @@ public final class GameManager implements Listener {
 
         C deserializedConfig = gson.fromJson(config, type.getConfigType());
 
-        game.loadGame(deserializedConfig);
+        G game = type.getCreator().createGame(plugin, world, deserializedConfig, type);
+        games.add(game);
+
+        game.loadGame();
     }
 
     public void loadGames() throws GamesLoadFailedException {
@@ -88,9 +88,11 @@ public final class GameManager implements Listener {
                 throw new GamesLoadFailedException("The games config file has an invalid format");
             }
 
-            if (!gameEntry.getValue().getAsJsonObject().has("type")
-                    || !gameEntry.getValue().getAsJsonObject().get("type").isJsonPrimitive()
-                    || !gameEntry.getValue().getAsJsonObject().get("type").getAsJsonPrimitive().isString()) {
+            if (
+                    !gameEntry.getValue().getAsJsonObject().has("type") ||
+                    !gameEntry.getValue().getAsJsonObject().get("type").isJsonPrimitive() ||
+                    !gameEntry.getValue().getAsJsonObject().get("type").getAsJsonPrimitive().isString()
+            ) {
                 throw new GamesLoadFailedException("The games config file contains a game without a type attribute");
             }
             String gameTypeName = gameEntry.getValue().getAsJsonObject().get("type").getAsString();
@@ -116,7 +118,7 @@ public final class GameManager implements Listener {
             game.unloadGame();
 
             GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getConfigTypeAdapters();
+            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getType().getTypeAdapters();
             if (typeAdapters != null) {
                 for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
                     builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
@@ -150,11 +152,11 @@ public final class GameManager implements Listener {
             return;
         }
 
-        G game = type.getCreator().createGame(plugin, world, type);
         C config = type.getDefaultConfigCreator().get();
+        G game = type.getCreator().createGame(plugin, world, config, type);
 
         games.add(game);
-        game.loadGame(config);
+        game.loadGame();
     }
 
     public boolean deleteGame(World world) {

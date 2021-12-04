@@ -1,6 +1,7 @@
 package io.github.lama06.lamagames;
 
 import com.google.gson.TypeAdapter;
+import io.github.lama06.lamagames.util.EventCanceler;
 import io.github.lama06.lamagames.util.Pair;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -33,11 +34,16 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     protected boolean running = false;
     protected final Set<UUID> players = new HashSet<>();
     private BukkitTask countdownTask = null;
+    protected final EventCanceler canceler;
 
-    public Game(LamaGamesPlugin plugin, World world, GameType<G, C> type) {
+    public Game(LamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
         this.plugin = plugin;
-        this.type = type;
         this.world = world;
+        this.config = config;
+        this.type = type;
+
+        canceler = new EventCanceler(plugin, this);
+        canceler.disallowAll();
     }
 
     public final boolean startGame() {
@@ -73,9 +79,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         return true;
     }
 
-    public final void loadGame(C config) {
-        this.config = config;
-
+    public final void loadGame() {
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
         if (!isConfigComplete()) {
@@ -103,10 +107,6 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
 
         handleGameUnloaded();
-    }
-
-    public Set<Pair<Class<?>, TypeAdapter<?>>> getConfigTypeAdapters() {
-        return null;
     }
 
     public void handleGameLoaded() { }

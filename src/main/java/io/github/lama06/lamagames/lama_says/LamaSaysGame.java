@@ -10,22 +10,14 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
-    public static void onPluginEnabled(LamaGamesPlugin plugin) {
-        new LamaSaysCommand(plugin, "lamasays");
-    }
-
     private final Random random = new Random();
     private int remainingRounds;
     private List<MiniGameType<?>> remainingGameTypes;
     private MiniGame<?> currentMiniGame;
     private Map<UUID, Integer> points;
-    private final EventCanceler canceler;
 
-    public LamaSaysGame(LamaGamesPlugin plugin, World world, GameType<LamaSaysGame, LamaSaysConfig> type) {
-        super(plugin, world, type);
-
-        canceler = new EventCanceler(plugin, world);
-        canceler.disallowAll();
+    public LamaSaysGame(LamaGamesPlugin plugin, World world, LamaSaysConfig config, GameType<LamaSaysGame, LamaSaysConfig> type) {
+        super(plugin, world, config, type);
     }
 
     @Override

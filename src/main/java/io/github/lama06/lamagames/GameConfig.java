@@ -4,4 +4,5 @@ import io.github.lama06.lamagames.util.BlockPosition;
 
 public class GameConfig {
     public BlockPosition spawnPoint;
+    public boolean cancelEvents;
 }
