@@ -36,4 +36,9 @@ public class BlockPosition {
     public Location asLocation(World world) {
         return new Location(world, x, y, z);
     }
+
+    @Override
+    public String toString() {
+        return x + " " + y + " " + z;
+    }
 }

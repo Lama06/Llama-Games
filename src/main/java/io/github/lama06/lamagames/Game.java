@@ -1,8 +1,6 @@
 package io.github.lama06.lamagames;
 
-import com.google.gson.TypeAdapter;
 import io.github.lama06.lamagames.util.EventCanceler;
-import io.github.lama06.lamagames.util.Pair;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

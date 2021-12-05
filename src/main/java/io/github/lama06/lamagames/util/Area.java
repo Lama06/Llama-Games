@@ -21,4 +21,9 @@ public class Area {
     public BlockPosition getPosition2() {
         return position2;
     }
+
+    @Override
+    public String toString() {
+        return position1 + " " + position2;
+    }
 }
