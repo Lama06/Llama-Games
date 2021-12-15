@@ -15,6 +15,10 @@ public final class MiniGameType<T extends MiniGame<T>> {
     public static final MiniGameType<DrinkThePotionMiniGame> DRINK_THE_POTION = new MiniGameType<>("drink_the_potion", DrinkThePotionMiniGame::new);
     public static final MiniGameType<SlapOtherPlayerMiniGame> SLAP_OTHER_PLAYER = new MiniGameType<>("slap_other_player", SlapOtherPlayerMiniGame::new);
     public static final MiniGameType<SmeltMiniGame> SMELT = new MiniGameType<>("smelt", SmeltMiniGame::new);
+    public static final MiniGameType<GetIntoMinecartMiniGame> GET_INTO_MINECART = new MiniGameType<>("get_into_minecart", GetIntoMinecartMiniGame::new);
+    public static final MiniGameType<ThrowTridentMiniGame> THROW_TRIDENT_AT_OTHER_PLAYER = new MiniGameType<>("throw_trident", ThrowTridentMiniGame::new);
+    public static final MiniGameType<InsertMusicDiscMiniGame> INSERT_MUSIC_DISC = new MiniGameType<>("insert_music_disc", InsertMusicDiscMiniGame::new);
+    public static final MiniGameType<WriteToChatMiniGame> WRITE_TO_CHAT = new MiniGameType<>("write_to_chat", WriteToChatMiniGame::new);
 
     private final String name;
     private final MiniGameCreator<T> creator;

@@ -47,7 +47,7 @@ public class SlapOtherPlayerMiniGame extends CompeteMiniGame<SlapOtherPlayerMini
 
     @EventHandler
     public void handlePlayerInteractEvent(PlayerInteractEvent event) {
-        if (!event.getPlayer().getWorld().equals(game.getWorld()) || !game.getPlayers().contains(event.getPlayer())) {
+        if (!game.getPlayers().contains(event.getPlayer())) {
             return;
         }
 

@@ -3,6 +3,7 @@ package io.github.lama06.lamagames.util;
 import io.github.lama06.lamagames.Game;
 import io.github.lama06.lamagames.LamaGamesPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -11,12 +12,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class EventCanceler implements Listener {
     private final LamaGamesPlugin plugin;
     private final Game<?, ?> game;
+    private boolean cancelEntityDamage;
     private boolean cancelEntityDamageByEntity;
     private boolean cancelEntityDamageByBlock;
     private boolean cancelBlockPlacement;
@@ -38,12 +41,16 @@ public class EventCanceler implements Listener {
     }
 
     private void setAllFlags(boolean flag) {
-        cancelEntityDamageByEntity = flag;
-        cancelEntityDamageByBlock = flag;
-        cancelBlockPlacement = flag;
-        cancelBlockBreaking = flag;
-        cancelItemConsummation = flag;
-        cancelHunger = flag;
+        setCancelEntityDamage(flag);
+        setCancelEntityDamageByEntity(flag);
+        setCancelEntityDamageByBlock(flag);
+        setCancelBlockPlacement(flag);
+        setCancelBlockBreaking(flag);
+        setCancelItemConsummation(flag);
+        setCancelHunger(flag);
+
+        setCancelTime(flag);
+        setCancelWeather(flag);
     }
 
     public void allowAll() {
@@ -56,6 +63,13 @@ public class EventCanceler implements Listener {
 
     private boolean shouldCancel(World world) {
         return world.equals(game.getWorld()) && game.getConfig().cancelEvents;
+    }
+
+    @EventHandler
+    public void handleEntityDamageEvent(EntityDamageEvent event) {
+        if (cancelEntityDamage && shouldCancel(event.getEntity().getWorld())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -100,6 +114,10 @@ public class EventCanceler implements Listener {
         }
     }
 
+    public void setCancelEntityDamage(boolean cancelEntityDamage) {
+        this.cancelEntityDamage = cancelEntityDamage;
+    }
+
     public void setCancelEntityDamageByEntity(boolean cancelEntityDamageByEntity) {
         this.cancelEntityDamageByEntity = cancelEntityDamageByEntity;
     }
@@ -118,5 +136,17 @@ public class EventCanceler implements Listener {
 
     public void setCancelItemConsummation(boolean cancelItemConsummation) {
         this.cancelItemConsummation = cancelItemConsummation;
+    }
+
+    public void setCancelHunger(boolean cancelHunger) {
+        this.cancelHunger = cancelHunger;
+    }
+
+    public void setCancelTime(boolean cancelTime) {
+        game.getWorld().setGameRule(GameRule.DO_DAYLIGHT_CYCLE, !cancelTime);
+    }
+
+    public void setCancelWeather(boolean cancelWeather) {
+        game.getWorld().setGameRule(GameRule.DO_WEATHER_CYCLE, !cancelWeather);
     }
 }

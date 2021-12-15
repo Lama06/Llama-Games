@@ -29,7 +29,7 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
         return 200;
     }
 
-    public abstract void handleGameStarted();
+    public void handleGameStarted() { };
 
     public void handleGameEnded() { }
 

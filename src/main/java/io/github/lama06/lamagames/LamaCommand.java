@@ -108,7 +108,7 @@ public abstract class LamaCommand implements TabExecutor {
         if (argsCase.isPresent()) {
             argsCase.get().getRight().run();
         } else {
-            sender.sendMessage("The number arguments is not correct");
+            sender.sendMessage(Component.text("The number of arguments is not correct").color(NamedTextColor.RED));
         }
     }
 

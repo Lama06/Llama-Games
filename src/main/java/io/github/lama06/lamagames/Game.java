@@ -88,9 +88,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
         addAllPlayers();
 
-        if (canStart() && isConfigComplete()) {
-            startAfterCountdown();
-        }
+        startAfterCountdown();
     }
 
     public final void unloadGame() {
@@ -135,9 +133,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             player.setGameMode(GameMode.SURVIVAL);
             players.add(player.getUniqueId());
 
-            if (canStart() && isConfigComplete()) {
-                startAfterCountdown();
-            }
+            startAfterCountdown();
         }
 
         player.teleport(config.spawnPoint == null ? world.getSpawnLocation() : config.spawnPoint.asLocation(world));
@@ -178,6 +174,8 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void startAfterCountdown() {
+        if (!canStart() || !isConfigComplete() || countdownTask != null) return;
+
         startAfterCountdown(10);
     }
 

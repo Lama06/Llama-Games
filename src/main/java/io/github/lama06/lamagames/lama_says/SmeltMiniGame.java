@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
+import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -14,8 +15,7 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
     private static final List<Material> INGREDIENTS = List.of(
             Material.RAW_COPPER,
             Material.RAW_IRON,
-            Material.RAW_GOLD,
-            Material.BEEF
+            Material.RAW_GOLD
     );
 
     private static final List<Material> FURNACE_TYPES = List.of(
@@ -58,6 +58,19 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
         for (int i = 0; i < FURNACE_TYPES.size(); i++) {
             game.getWorld().setBlockData(game.getConfig().spawnPoint.asLocation().add(0, 1 + i, 0), Material.AIR.createBlockData());
         }
+    }
+
+    @EventHandler
+    public void handleFurnaceStartSmeltEvent(FurnaceStartSmeltEvent event) {
+        if (!event.getBlock().getWorld().equals(game.getWorld())) {
+            return;
+        }
+
+        if (event.getSource().getType() != ingredient) {
+            return;
+        }
+
+        event.setTotalCookTime(1);
     }
 
     @EventHandler

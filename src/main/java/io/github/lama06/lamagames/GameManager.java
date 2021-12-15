@@ -31,35 +31,37 @@ public final class GameManager implements Listener {
     }
 
     private JsonObject loadGamesConfig() throws GamesLoadFailedException {
+        boolean created;
+
         try {
-            if (configFile.createNewFile()) {
-                try (FileWriter writer = new FileWriter(configFile)) {
-                    writer.write("{}");
-                }
-                return new JsonObject();
-            }
+            created = configFile.createNewFile();
         } catch (IOException e) {
-            throw new GamesLoadFailedException("Failed to create games config file", e);
+            throw new GamesLoadFailedException("Failed to create the config file", e);
         }
 
-        FileReader reader;
-        try {
-            reader = new FileReader(configFile);
+        if (created) {
+            try (FileWriter writer = new FileWriter(configFile)) {
+                writer.write("{}");
+
+                return new JsonObject();
+            } catch (IOException e) {
+                throw new GamesLoadFailedException("Failed to write to the config file", e);
+            }
+        }
+
+        try (FileReader reader = new FileReader(configFile)) {
+            JsonElement gamesConfig = JsonParser.parseReader(reader);
+
+            if (!gamesConfig.isJsonObject()) {
+                throw new GamesLoadFailedException("The games config file does not contain a root object");
+            }
+
+            return gamesConfig.getAsJsonObject();
         } catch (IOException e) {
             throw new GamesLoadFailedException("Failed to load games config file", e);
-        }
-
-        JsonElement gamesConfig;
-        try {
-            gamesConfig = JsonParser.parseReader(reader);
         } catch (JsonParseException e) {
             throw new GamesLoadFailedException("Failed to parse games config file", e);
         }
-
-        if (!gamesConfig.isJsonObject()) {
-            throw new GamesLoadFailedException("The games config file does not contain a root object");
-        }
-        return gamesConfig.getAsJsonObject();
     }
 
     private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
@@ -94,8 +96,7 @@ public final class GameManager implements Listener {
                 throw new GamesLoadFailedException("The games config file has an invalid format");
             }
 
-            if (
-                    !gameEntry.getValue().getAsJsonObject().has("type") ||
+            if (!gameEntry.getValue().getAsJsonObject().has("type") ||
                     !gameEntry.getValue().getAsJsonObject().get("type").isJsonPrimitive() ||
                     !gameEntry.getValue().getAsJsonObject().get("type").getAsJsonPrimitive().isString()
             ) {

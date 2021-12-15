@@ -4,10 +4,14 @@ import io.github.lama06.lamagames.Game;
 import io.github.lama06.lamagames.GameType;
 import io.github.lama06.lamagames.LamaGamesPlugin;
 import io.github.lama06.lamagames.util.EventCanceler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.List;
 
 public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
     private final Random random = new Random();
@@ -84,6 +88,17 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
         if (currentMiniGame != null) {
             currentMiniGame.endGame(false);
         }
+
+        TextComponent.Builder builder = Component.text();
+        builder.append(Component.text("Results: ").color(NamedTextColor.GOLD)).append(Component.newline());
+
+        int i = 1;
+        for (Player player : getPlayers()) {
+            builder.append(Component.text("%d. %s: %d".formatted(i, player.getName(), points.get(player.getUniqueId()))).color(i <= 3 ? NamedTextColor.GOLD : NamedTextColor.BLUE));
+            i++;
+        }
+
+        getBroadcastAudience().sendMessage(builder);
     }
 
     @Override
