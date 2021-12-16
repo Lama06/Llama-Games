@@ -117,13 +117,11 @@ public final class GameManager implements Listener {
         }
     }
 
-    public void saveGames() throws GamesSaveFailedException {
+    public void saveGameConfig() throws GamesSaveFailedException {
         JsonObject gamesConfig = new JsonObject();
         gamesConfig.addProperty("dataVersion", 1);
 
         for (Game<?, ?> game : games) {
-            game.unloadGame();
-
             GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
             Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getType().getTypeAdapters();
             if (typeAdapters != null) {
@@ -147,6 +145,13 @@ public final class GameManager implements Listener {
             new GsonBuilder().setPrettyPrinting().create().toJson(gamesConfig, writer);
         } catch (IOException e) {
             throw new GamesSaveFailedException("Failed to write to games.json", e);
+        }
+    }
+
+    public void unloadGames() {
+        for (Game<?, ?> game : games) {
+            game.unloadGame();
+            games.remove(game);
         }
     }
 

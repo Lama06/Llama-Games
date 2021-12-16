@@ -57,7 +57,7 @@ public class LamaGamesCommand extends LamaCommand {
         }
 
         try {
-            plugin.getGameManager().saveGames();
+            plugin.getGameManager().saveGameConfig();
         } catch (GameManager.GamesSaveFailedException e) {
             sender.sendMessage(Component.text("Internal error while saving the config file").color(NamedTextColor.RED));
         }

@@ -19,6 +19,7 @@ public final class MiniGameType<T extends MiniGame<T>> {
     public static final MiniGameType<ThrowTridentMiniGame> THROW_TRIDENT_AT_OTHER_PLAYER = new MiniGameType<>("throw_trident", ThrowTridentMiniGame::new);
     public static final MiniGameType<InsertMusicDiscMiniGame> INSERT_MUSIC_DISC = new MiniGameType<>("insert_music_disc", InsertMusicDiscMiniGame::new);
     public static final MiniGameType<WriteToChatMiniGame> WRITE_TO_CHAT = new MiniGameType<>("write_to_chat", WriteToChatMiniGame::new);
+    public static final MiniGameType<StandStillMiniGame> STAND_STILL = new MiniGameType<>("stand_still", StandStillMiniGame::new);
 
     private final String name;
     private final MiniGameCreator<T> creator;

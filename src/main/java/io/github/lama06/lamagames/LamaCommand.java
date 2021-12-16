@@ -63,8 +63,9 @@ public abstract class LamaCommand implements TabExecutor {
             return true;
         }
 
-        subCommands.entrySet().stream().filter(subCommand -> subCommand.getKey().equals(args[0])).findFirst().ifPresent(subCommand ->
-                subCommand.getValue().executeSubCommand(sender, Arrays.copyOfRange(args, 1, args.length))
+        subCommands.entrySet().stream().filter(subCommand -> subCommand.getKey().equals(args[0])).findFirst().ifPresentOrElse(
+                subCommand -> subCommand.getValue().executeSubCommand(sender, Arrays.copyOfRange(args, 1, args.length)),
+                () -> sender.sendMessage(Component.text("There is not sub command with this name", NamedTextColor.RED))
         );
 
         return true;

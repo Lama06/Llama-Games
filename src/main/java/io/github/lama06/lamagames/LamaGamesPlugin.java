@@ -34,10 +34,12 @@ public class LamaGamesPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
-            gameManager.saveGames();
+            gameManager.saveGameConfig();
         } catch (GameManager.GamesSaveFailedException e) {
             e.printStackTrace();
         }
+
+        gameManager.unloadGames();
 
         for (GameType<?, ?> gameType : GameType.getValues()) {
             Consumer<LamaGamesPlugin> callback = gameType.getPluginDisableCallback();
