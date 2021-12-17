@@ -1,8 +1,8 @@
-package io.github.lama06.lamagames;
+package io.github.lama06.llamagames;
 
-import io.github.lama06.lamagames.util.Area;
-import io.github.lama06.lamagames.util.BlockPosition;
-import io.github.lama06.lamagames.util.Pair;
+import io.github.lama06.llamagames.util.Area;
+import io.github.lama06.llamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,12 +18,12 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public abstract class LamaCommand implements TabExecutor {
-    protected final LamaGamesPlugin plugin;
+public abstract class LlamaCommand implements TabExecutor {
+    protected final LlamaGamesPlugin plugin;
     protected final String name;
     private final Map<String, SubCommandExecutor> subCommands = new HashMap<>();
 
-    public LamaCommand(LamaGamesPlugin plugin, String name) {
+    public LlamaCommand(LlamaGamesPlugin plugin, String name) {
         this.plugin = plugin;
         this.name = name;
 
@@ -173,7 +173,7 @@ public abstract class LamaCommand implements TabExecutor {
         return Optional.of(world);
     }
 
-    public static Optional<Game<?, ?>> requireGame(LamaGamesPlugin plugin, CommandSender sender, String worldName) {
+    public static Optional<Game<?, ?>> requireGame(LlamaGamesPlugin plugin, CommandSender sender, String worldName) {
         Optional<World> world = requireWorld(sender, worldName);
         if (world.isEmpty()) return Optional.empty();
 
@@ -187,7 +187,7 @@ public abstract class LamaCommand implements TabExecutor {
 
     @SuppressWarnings("unchecked")
     public static <G extends Game<G, ?>> Optional<G> requireGame(
-            LamaGamesPlugin plugin,
+            LlamaGamesPlugin plugin,
             CommandSender sender,
             String worldName,
             Class<? extends G> gameType
@@ -204,7 +204,7 @@ public abstract class LamaCommand implements TabExecutor {
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBooleanConfigSubCommand(
-            LamaGamesPlugin plugin,
+            LlamaGamesPlugin plugin,
             Class<? extends G> gameType,
             Function<? super C, String> queryMessageSupplier,
             BiConsumer<? super C, ? super Boolean> configChangedCallback,
@@ -232,7 +232,7 @@ public abstract class LamaCommand implements TabExecutor {
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createNumberConfigSubCommand(
-            LamaGamesPlugin plugin,
+            LlamaGamesPlugin plugin,
             Class<? extends G> gameType,
             Function<? super C, String> queryMessageSupplier,
             BiConsumer<? super C, ? super Integer> configChangedCallback,
@@ -260,7 +260,7 @@ public abstract class LamaCommand implements TabExecutor {
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBlockConfigSubCommand(
-            LamaGamesPlugin plugin,
+            LlamaGamesPlugin plugin,
             Class<? extends G> gameType,
             Function<? super C, String> queryMessageSupplier,
             BiConsumer<? super C, ? super BlockPosition> configChangedCallback,
@@ -288,7 +288,7 @@ public abstract class LamaCommand implements TabExecutor {
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createAreaConfigSubCommand(
-            LamaGamesPlugin plugin,
+            LlamaGamesPlugin plugin,
             Class<? extends G> gameType,
             Function<? super C, String> queryMessageSupplier,
             BiConsumer<? super C, ? super Area> configChangedCallback,

@@ -1,6 +1,6 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.lamagames.util.Pair;
+import io.github.lama06.llamagames.util.Pair;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
 
     private final Pair<Material, Material> ingredient;
 
-    public SmeltMiniGame(LamaSaysGame game, Consumer<SmeltMiniGame> callback) {
+    public SmeltMiniGame(LlamaSaysGame game, Consumer<SmeltMiniGame> callback) {
         super(game, callback);
         ingredient = INGREDIENTS.get(game.getRandom().nextInt(INGREDIENTS.size()));
     }

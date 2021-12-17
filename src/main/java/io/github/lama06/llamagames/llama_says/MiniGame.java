@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,11 +14,11 @@ import java.time.Duration;
 import java.util.function.Consumer;
 
 public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener permits CompeteMiniGame, CompleteMiniGame {
-    protected final LamaSaysGame game;
+    protected final LlamaSaysGame game;
     private final Consumer<T> callback;
     private BukkitTask timeoutTask;
 
-    public MiniGame(LamaSaysGame game, Consumer<T> callback) {
+    public MiniGame(LlamaSaysGame game, Consumer<T> callback) {
         this.game = game;
         this.callback = callback;
     }

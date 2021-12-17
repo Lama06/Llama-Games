@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -13,7 +13,7 @@ public class StandStillMiniGame extends CompleteMiniGame<StandStillMiniGame> {
     private boolean checkForMovement = false;
     private final BukkitTask enableMovementCheckingTask;
 
-    public StandStillMiniGame(LamaSaysGame game, Consumer<StandStillMiniGame> callback) {
+    public StandStillMiniGame(LlamaSaysGame game, Consumer<StandStillMiniGame> callback) {
         super(game, callback);
         enableMovementCheckingTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> checkForMovement = true, 20);
     }

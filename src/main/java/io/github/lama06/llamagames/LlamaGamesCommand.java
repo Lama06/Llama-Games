@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames;
+package io.github.lama06.llamagames;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-public class LamaGamesCommand extends LamaCommand {
-    public LamaGamesCommand(LamaGamesPlugin plugin, String name) {
+public class LlamaGamesCommand extends LlamaCommand {
+    public LlamaGamesCommand(LlamaGamesPlugin plugin, String name) {
         super(plugin, name);
         addSubCommand("create", this::create);
         addSubCommand("delete", this::delete);
@@ -98,7 +98,7 @@ public class LamaGamesCommand extends LamaCommand {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
 
-        if (game.get().endGame()) {
+        if (game.get().endGame(Game.GameEndReason.COMMAND)) {
             sender.sendMessage(Component.text("The game was successfully stopped").color(NamedTextColor.GREEN));
         } else {
             sender.sendMessage(Component.text("Failed to stop the game").color(NamedTextColor.RED));

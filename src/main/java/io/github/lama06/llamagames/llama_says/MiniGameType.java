@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +41,6 @@ public final class MiniGameType<T extends MiniGame<T>> {
 
     @FunctionalInterface
     public interface MiniGameCreator<T extends MiniGame<T>> {
-        T createMiniGame(LamaSaysGame game, Consumer<T> callback);
+        T createMiniGame(LlamaSaysGame game, Consumer<T> callback);
     }
 }

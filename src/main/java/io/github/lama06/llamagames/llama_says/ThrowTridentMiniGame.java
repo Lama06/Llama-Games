@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.function.Consumer;
 
 public class ThrowTridentMiniGame extends CompleteMiniGame<ThrowTridentMiniGame> {
-    public ThrowTridentMiniGame(LamaSaysGame game, Consumer<ThrowTridentMiniGame> callback) {
+    public ThrowTridentMiniGame(LlamaSaysGame game, Consumer<ThrowTridentMiniGame> callback) {
         super(game, callback);
     }
 

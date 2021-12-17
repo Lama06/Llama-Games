@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import io.papermc.paper.text.PaperComponents;
@@ -23,7 +23,7 @@ public class WriteToChatMiniGame extends CompeteMiniGame<WriteToChatMiniGame> {
 
     private final String word;
 
-    public WriteToChatMiniGame(LamaSaysGame game, Consumer<WriteToChatMiniGame> callback) {
+    public WriteToChatMiniGame(LlamaSaysGame game, Consumer<WriteToChatMiniGame> callback) {
         super(game, callback);
         word = WORDS.get(game.getRandom().nextInt(WORDS.size()));
     }

@@ -1,7 +1,7 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.lamagames.util.Area;
-import io.github.lama06.lamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.Area;
+import io.github.lama06.llamagames.util.BlockPosition;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMiniGame> {
-    public GetIntoMinecartMiniGame(LamaSaysGame game, Consumer<GetIntoMinecartMiniGame> callback) {
+    public GetIntoMinecartMiniGame(LlamaSaysGame game, Consumer<GetIntoMinecartMiniGame> callback) {
         super(game, callback);
     }
 

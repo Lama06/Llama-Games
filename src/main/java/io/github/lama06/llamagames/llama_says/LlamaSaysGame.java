@@ -1,9 +1,9 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.lamagames.Game;
-import io.github.lama06.lamagames.GameType;
-import io.github.lama06.lamagames.LamaGamesPlugin;
-import io.github.lama06.lamagames.util.EventCanceler;
+import io.github.lama06.llamagames.Game;
+import io.github.lama06.llamagames.GameType;
+import io.github.lama06.llamagames.LlamaGamesPlugin;
+import io.github.lama06.llamagames.util.EventCanceler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,14 +13,14 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.List;
 
-public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
+public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     private final Random random = new Random();
     private int remainingRounds;
     private List<MiniGameType<?>> remainingGameTypes;
     private MiniGame<?> currentMiniGame;
     private Map<UUID, Integer> points;
 
-    public LamaSaysGame(LamaGamesPlugin plugin, World world, LamaSaysConfig config, GameType<LamaSaysGame, LamaSaysConfig> type) {
+    public LlamaSaysGame(LlamaGamesPlugin plugin, World world, LlamaSaysConfig config, GameType<LlamaSaysGame, LlamaSaysConfig> type) {
         super(plugin, world, config, type);
     }
 
@@ -74,7 +74,7 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
             }
 
             if (remainingRounds == 0) {
-                endGame();
+                endGame(GameEndReason.ENDED);
             } else {
                 startNextRound();
             }
@@ -84,7 +84,7 @@ public class LamaSaysGame extends Game<LamaSaysGame, LamaSaysConfig> {
     }
 
     @Override
-    public void handleGameEnded() {
+    public void handleGameEnded(GameEndReason reason) {
         if (currentMiniGame != null) {
             currentMiniGame.endGame(false);
         }

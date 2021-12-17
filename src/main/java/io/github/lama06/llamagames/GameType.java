@@ -1,10 +1,10 @@
-package io.github.lama06.lamagames;
+package io.github.lama06.llamagames;
 
 import com.google.gson.TypeAdapter;
-import io.github.lama06.lamagames.lama_says.LamaSaysCommand;
-import io.github.lama06.lamagames.lama_says.LamaSaysConfig;
-import io.github.lama06.lamagames.lama_says.LamaSaysGame;
-import io.github.lama06.lamagames.util.Pair;
+import io.github.lama06.llamagames.llama_says.LlamaSaysCommand;
+import io.github.lama06.llamagames.llama_says.LlamaSaysConfig;
+import io.github.lama06.llamagames.llama_says.LlamaSaysGame;
+import io.github.lama06.llamagames.util.Pair;
 import org.bukkit.World;
 
 import java.util.HashSet;
@@ -25,13 +25,13 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
         return values.stream().filter(type -> type.name.equalsIgnoreCase(name)).findFirst();
     }
 
-    public static final GameType<LamaSaysGame, LamaSaysConfig> LAMA_SAYS = new GameType<>(
+    public static final GameType<LlamaSaysGame, LlamaSaysConfig> LAMA_SAYS = new GameType<>(
             "lama_says",
-            LamaSaysGame::new,
-            LamaSaysConfig.class,
+            LlamaSaysGame::new,
+            LlamaSaysConfig.class,
             null,
-            LamaSaysConfig::new,
-            plugin -> new LamaSaysCommand(plugin, "lamasays"),
+            LlamaSaysConfig::new,
+            plugin -> new LlamaSaysCommand(plugin, "lamasays"),
             null
     );
 
@@ -40,8 +40,8 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
     private final Class<C> configType;
     private final Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters;
     private final Supplier<C> defaultConfigCreator;
-    private final Consumer<LamaGamesPlugin> pluginEnableCallback;
-    private final Consumer<LamaGamesPlugin> pluginDisableCallback;
+    private final Consumer<LlamaGamesPlugin> pluginEnableCallback;
+    private final Consumer<LlamaGamesPlugin> pluginDisableCallback;
 
     private GameType(
             String name,
@@ -49,8 +49,8 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             Class<C> configType,
             Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters,
             Supplier<C> defaultConfigCreator,
-            Consumer<LamaGamesPlugin> pluginEnableCallback,
-            Consumer<LamaGamesPlugin> pluginDisableCallback
+            Consumer<LlamaGamesPlugin> pluginEnableCallback,
+            Consumer<LlamaGamesPlugin> pluginDisableCallback
     ) {
         this.name = name;
         this.creator = creator;
@@ -83,16 +83,16 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
         return defaultConfigCreator;
     }
 
-    public Consumer<LamaGamesPlugin> getPluginEnableCallback() {
+    public Consumer<LlamaGamesPlugin> getPluginEnableCallback() {
         return pluginEnableCallback;
     }
 
-    public Consumer<LamaGamesPlugin> getPluginDisableCallback() {
+    public Consumer<LlamaGamesPlugin> getPluginDisableCallback() {
         return pluginDisableCallback;
     }
 
     @FunctionalInterface
     public interface GameCreator<G extends Game<G, C>, C extends GameConfig> {
-        G createGame(LamaGamesPlugin plugin, World world, C config, GameType<G, C> type);
+        G createGame(LlamaGamesPlugin plugin, World world, C config, GameType<G, C> type);
     }
 }

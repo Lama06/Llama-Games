@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.util;
+package io.github.lama06.llamagames.util;
 
 import org.bukkit.Location;
 import org.bukkit.World;

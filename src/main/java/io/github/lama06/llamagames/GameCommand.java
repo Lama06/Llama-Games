@@ -1,7 +1,7 @@
-package io.github.lama06.lamagames;
+package io.github.lama06.llamagames;
 
-public abstract class GameCommand extends LamaCommand {
-    public GameCommand(LamaGamesPlugin plugin, String name) {
+public abstract class GameCommand extends LlamaCommand {
+    public GameCommand(LlamaGamesPlugin plugin, String name) {
         super(plugin, name);
         addSubCommand("spawn", createBlockConfigSubCommand(
                 plugin,

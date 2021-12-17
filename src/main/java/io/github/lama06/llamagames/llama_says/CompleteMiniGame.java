@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,7 +13,7 @@ public abstract non-sealed class CompleteMiniGame<T extends CompleteMiniGame<T>>
     private final Set<UUID> successfulPlayers = new HashSet<>();
     private final Set<UUID> failedPlayers = new HashSet<>();
 
-    public CompleteMiniGame(LamaSaysGame game, Consumer<T> callback) {
+    public CompleteMiniGame(LlamaSaysGame game, Consumer<T> callback) {
         super(game, callback);
     }
 

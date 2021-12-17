@@ -1,6 +1,6 @@
-package io.github.lama06.lamagames;
+package io.github.lama06.llamagames;
 
-import io.github.lama06.lamagames.util.EventCanceler;
+import io.github.lama06.llamagames.util.EventCanceler;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public abstract class Game<G extends Game<G, C>, C extends GameConfig> implements Listener {
-    protected LamaGamesPlugin plugin;
+    protected LlamaGamesPlugin plugin;
     protected GameType<G, C> type;
     protected World world;
     protected C config;
@@ -34,7 +34,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     private BukkitTask countdownTask = null;
     protected final EventCanceler canceler;
 
-    public Game(LamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
+    public Game(LlamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
         this.plugin = plugin;
         this.world = world;
         this.config = config;
@@ -63,16 +63,20 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         return true;
     }
 
-    public final boolean endGame() {
+    public final boolean endGame(GameEndReason reason) {
         if (!running) {
             return false;
         }
 
         running = false;
-        handleGameEnded();
+        handleGameEnded(reason);
 
         players.clear();
         addAllPlayers();
+
+        if (reason.isShouldAttemptToStartNextGame()) {
+            tryToStartAfterCountdown();
+        }
 
         return true;
     }
@@ -88,12 +92,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
         addAllPlayers();
 
-        startAfterCountdown();
+        tryToStartAfterCountdown();
     }
 
     public final void unloadGame() {
         if (running) {
-            endGame();
+            endGame(GameEndReason.UNLOAD);
         }
 
         HandlerList.unregisterAll(this);
@@ -111,7 +115,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public abstract void handleGameStarted();
 
-    public abstract void handleGameEnded();
+    public abstract void handleGameEnded(GameEndReason reason);
 
     public abstract boolean canStart();
 
@@ -133,7 +137,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             player.setGameMode(GameMode.SURVIVAL);
             players.add(player.getUniqueId());
 
-            startAfterCountdown();
+            tryToStartAfterCountdown();
         }
 
         player.teleport(config.spawnPoint == null ? world.getSpawnLocation() : config.spawnPoint.asLocation(world));
@@ -147,7 +151,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             handlePlayerLeft(event.getPlayer());
 
             if (world.getPlayers().size() == 0) {
-                endGame();
+                endGame(GameEndReason.MISSING_REQUIREMENTS_TO_CONTINUE);
             }
         } else if (event.getPlayer().getWorld().equals(world)) {
             handlePlayerJoined(event.getPlayer());
@@ -173,7 +177,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         players.addAll(world.getPlayers().stream().map(Player::getUniqueId).collect(Collectors.toList()));
     }
 
-    private void startAfterCountdown() {
+    private void tryToStartAfterCountdown() {
         if (!canStart() || !isConfigComplete() || countdownTask != null) return;
 
         startAfterCountdown(10);
@@ -201,7 +205,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         return Audience.audience(world.getPlayers());
     }
 
-    public LamaGamesPlugin getPlugin() {
+    public LlamaGamesPlugin getPlugin() {
         return plugin;
     }
 
@@ -235,5 +239,22 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
 
         return result;
+    }
+
+    public enum GameEndReason {
+        UNLOAD(false),
+        COMMAND(false),
+        MISSING_REQUIREMENTS_TO_CONTINUE(false),
+        ENDED(true);
+
+        private final boolean shouldAttemptToStartNextGame;
+
+        GameEndReason(boolean shouldAttemptToStartNextGame) {
+            this.shouldAttemptToStartNextGame = shouldAttemptToStartNextGame;
+        }
+
+        public boolean isShouldAttemptToStartNextGame() {
+            return shouldAttemptToStartNextGame;
+        }
     }
 }

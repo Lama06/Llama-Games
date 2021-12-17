@@ -1,7 +1,7 @@
-package io.github.lama06.lamagames.util;
+package io.github.lama06.llamagames.util;
 
-import io.github.lama06.lamagames.Game;
-import io.github.lama06.lamagames.LamaGamesPlugin;
+import io.github.lama06.llamagames.Game;
+import io.github.lama06.llamagames.LlamaGamesPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
@@ -17,7 +17,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class EventCanceler implements Listener {
-    private final LamaGamesPlugin plugin;
+    private final LlamaGamesPlugin plugin;
     private final Game<?, ?> game;
     private boolean cancelEntityDamage;
     private boolean cancelEntityDamageByEntity;
@@ -27,7 +27,7 @@ public class EventCanceler implements Listener {
     private boolean cancelItemConsummation;
     private boolean cancelHunger;
 
-    public EventCanceler(LamaGamesPlugin plugin, Game<?, ?> game) {
+    public EventCanceler(LlamaGamesPlugin plugin, Game<?, ?> game) {
         this.plugin = plugin;
         this.game = game;
     }

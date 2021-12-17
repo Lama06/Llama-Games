@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,7 +11,7 @@ public abstract non-sealed class CompeteMiniGame<T extends CompeteMiniGame<T>> e
     private final List<UUID> ranking = new ArrayList<>();
     private final Set<UUID> failedPlayers = new HashSet<>();
 
-    public CompeteMiniGame(LamaSaysGame game, Consumer<T> callback) {
+    public CompeteMiniGame(LlamaSaysGame game, Consumer<T> callback) {
         super(game, callback);
     }
 

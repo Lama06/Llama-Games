@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -20,7 +20,7 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
     private static final List<PotionType> POTION_TYPES_WITH_EFFECT = Arrays.stream(PotionType.values()).filter(p -> p.getEffectType() != null).collect(Collectors.toList());
     private final PotionType potionType;
 
-    public DrinkThePotionMiniGame(LamaSaysGame game, Consumer<DrinkThePotionMiniGame> callback) {
+    public DrinkThePotionMiniGame(LlamaSaysGame game, Consumer<DrinkThePotionMiniGame> callback) {
         super(game, callback);
         potionType = POTION_TYPES_WITH_EFFECT.get(game.getRandom().nextInt(POTION_TYPES_WITH_EFFECT.size()));
         game.getEventCanceler().setCancelItemConsummation(false);

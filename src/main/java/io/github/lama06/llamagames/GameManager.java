@@ -1,7 +1,7 @@
-package io.github.lama06.lamagames;
+package io.github.lama06.llamagames;
 
 import com.google.gson.*;
-import io.github.lama06.lamagames.util.Pair;
+import io.github.lama06.llamagames.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -19,11 +19,11 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class GameManager implements Listener {
-    private final LamaGamesPlugin plugin;
+    private final LlamaGamesPlugin plugin;
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
 
-    public GameManager(LamaGamesPlugin plugin) {
+    public GameManager(LlamaGamesPlugin plugin) {
         this.plugin = plugin;
         this.configFile = new File(plugin.getDataFolder(), "games.json");
 

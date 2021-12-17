@@ -1,4 +1,4 @@
-package io.github.lama06.lamagames.lama_says;
+package io.github.lama06.llamagames.llama_says;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -25,7 +25,7 @@ public class SlapOtherPlayerMiniGame extends CompeteMiniGame<SlapOtherPlayerMini
 
     private final Material item;
 
-    public SlapOtherPlayerMiniGame(LamaSaysGame game, Consumer<SlapOtherPlayerMiniGame> callback) {
+    public SlapOtherPlayerMiniGame(LlamaSaysGame game, Consumer<SlapOtherPlayerMiniGame> callback) {
         super(game, callback);
 
         item = ITEMS.get(game.getRandom().nextInt(ITEMS.size()));

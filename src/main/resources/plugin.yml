@@ -1,10 +1,10 @@
 name: Lama-Games
 api-version: 1.17
-main: io.github.lama06.lamagames.LamaGamesPlugin
+main: io.github.lama06.llamagames.LlamaGamesPlugin
 version: 1.0.0
 
 commands:
   lamagames:
-    description: The main command of the LamaGames plugin
+    description: The main command of the LlamaGames plugin
   lamasays:
-    description: Used to setup LamaSays games
+    description: Used to setup LlamaSays games
