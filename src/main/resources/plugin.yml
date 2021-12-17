@@ -1,4 +1,4 @@
-name: Lama-Games
+name: Llama-Games
 api-version: 1.17
 main: io.github.lama06.llamagames.LlamaGamesPlugin
 version: 1.0.0
