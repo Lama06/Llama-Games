@@ -15,7 +15,7 @@ public class StandStillMiniGame extends CompleteMiniGame<StandStillMiniGame> {
 
     public StandStillMiniGame(LlamaSaysGame game, Consumer<StandStillMiniGame> callback) {
         super(game, callback);
-        enableMovementCheckingTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> checkForMovement = true, 20);
+        enableMovementCheckingTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> checkForMovement = true, 30);
     }
 
     @Override

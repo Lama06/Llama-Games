@@ -62,9 +62,9 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
             if (game instanceof CompeteMiniGame<?> compete) {
                 List<UUID> ranking = compete.getRanking();
 
-                if (ranking.size() == 1) points.put(ranking.get(0), points.get(ranking.get(0)) + 3);
-                if (ranking.size() == 2) points.put(ranking.get(1), points.get(ranking.get(1)) + 2);
-                if (ranking.size() == 3) points.put(ranking.get(2), points.get(ranking.get(2)) + 1);
+                if (ranking.size() >= 1) points.put(ranking.get(0), points.get(ranking.get(0)) + 3);
+                if (ranking.size() >= 2) points.put(ranking.get(1), points.get(ranking.get(1)) + 2);
+                if (ranking.size() >= 3) points.put(ranking.get(2), points.get(ranking.get(2)) + 1);
             } else if (game instanceof CompleteMiniGame<?> complete) {
                 Set<UUID> successfulPlayers = complete.getSuccessfulPlayers();
 

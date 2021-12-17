@@ -31,14 +31,23 @@ public class EatUntilYouAreFullMiniGame extends CompeteMiniGame<EatUntilYouAreFu
     public EatUntilYouAreFullMiniGame(LlamaSaysGame game, Consumer<EatUntilYouAreFullMiniGame> callback) {
         super(game, callback);
         items = Util.pickRandomElements(FOOD_ITEMS, 9, game.getRandom());
+        game.getEventCanceler().setCancelItemConsummation(false);
     }
 
     @Override
     public void handleGameStarted() {
         for (Player player : game.getPlayers()) {
+            player.setFoodLevel(0);
             for (int i = 0; i <= 8; i++) {
                 player.getInventory().setItem(i, new ItemStack(items.get(i)));
             }
+        }
+    }
+
+    @Override
+    public void handleGameEnded() {
+        for (Player player : game.getPlayers()) {
+            player.setFoodLevel(20);
         }
     }
 

@@ -109,7 +109,7 @@ public class EventCanceler implements Listener {
 
     @EventHandler
     public void cancelHunger(FoodLevelChangeEvent event) {
-        if (cancelHunger && shouldCancel(event.getEntity().getWorld())) {
+        if (cancelHunger && shouldCancel(event.getEntity().getWorld()) && event.getEntity().getFoodLevel() > event.getFoodLevel()) {
             event.setCancelled(true);
         }
     }

@@ -33,7 +33,7 @@ public class ShootYourselfWithAnArrowMiniGame extends CompeteMiniGame<ShootYours
         if (event.getHitEntity() instanceof Player player &&
                 event.getEntity() instanceof Arrow arrow &&
                 player.equals(arrow.getShooter())) {
-            addFailedPlayer(player);
+            addSuccessfulPlayer(player);
         }
     }
 }

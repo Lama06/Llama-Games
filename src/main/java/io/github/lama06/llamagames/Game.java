@@ -49,10 +49,6 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             return false;
         }
 
-        if (countdownTask != null) {
-            countdownTask.cancel();
-        }
-
         for (Player player : world.getPlayers()) {
             player.teleport(config.spawnPoint.asLocation(world));
         }
@@ -65,6 +61,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public final boolean endGame(GameEndReason reason) {
         if (!running) {
+            if (countdownTask != null) {
+                countdownTask.cancel();
+                countdownTask = null;
+                return true;
+            }
+
             return false;
         }
 
@@ -96,15 +98,9 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     public final void unloadGame() {
-        if (running) {
-            endGame(GameEndReason.UNLOAD);
-        }
+        endGame(GameEndReason.UNLOAD);
 
         HandlerList.unregisterAll(this);
-
-        if (countdownTask != null) {
-            countdownTask.cancel();
-        }
 
         handleGameUnloaded();
     }

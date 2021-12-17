@@ -73,7 +73,7 @@ public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMin
 
     @EventHandler
     public void handleVehicleExitEvent(VehicleExitEvent event) {
-        if (!event.getVehicle().getWorld().equals(game.getWorld()) || !(event.getExited() instanceof Player player)) {
+        if (!event.getVehicle().getWorld().equals(game.getWorld()) || !(event.getExited() instanceof Player)) {
             return;
         }
 
