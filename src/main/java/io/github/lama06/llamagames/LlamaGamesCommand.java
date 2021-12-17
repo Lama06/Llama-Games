@@ -17,6 +17,7 @@ public class LlamaGamesCommand extends LlamaCommand {
         addSubCommand("list", this::list);
         addSubCommand("start", this::start);
         addSubCommand("stop", this::stop);
+        addSubCommand("saveConfig", this::saveConfig);
     }
 
     public void create(CommandSender sender, String[] args) {
@@ -103,5 +104,16 @@ public class LlamaGamesCommand extends LlamaCommand {
         } else {
             sender.sendMessage(Component.text("Failed to stop the game").color(NamedTextColor.RED));
         }
+    }
+
+    public void saveConfig(CommandSender sender, String[] args) {
+        try {
+            plugin.getGameManager().saveGameConfig();
+        } catch (GameManager.GamesSaveFailedException e) {
+            sender.sendMessage(Component.text("Failed to save the config", NamedTextColor.RED));
+            return;
+        }
+
+        sender.sendMessage(Component.text("Saved the config file", NamedTextColor.GREEN));
     }
 }

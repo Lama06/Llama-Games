@@ -4,7 +4,7 @@ main: io.github.lama06.llamagames.LlamaGamesPlugin
 version: 1.0.0
 
 commands:
-  lamagames:
+  llamagames:
     description: The main command of the LlamaGames plugin
-  lamasays:
+  llamasays:
     description: Used to setup LlamaSays games

@@ -20,6 +20,8 @@ public final class MiniGameType<T extends MiniGame<T>> {
     public static final MiniGameType<InsertMusicDiscMiniGame> INSERT_MUSIC_DISC = new MiniGameType<>("insert_music_disc", InsertMusicDiscMiniGame::new);
     public static final MiniGameType<WriteToChatMiniGame> WRITE_TO_CHAT = new MiniGameType<>("write_to_chat", WriteToChatMiniGame::new);
     public static final MiniGameType<StandStillMiniGame> STAND_STILL = new MiniGameType<>("stand_still", StandStillMiniGame::new);
+    public static final MiniGameType<EatUntilYouAreFullMiniGame> EAT_UNTIL_YOU_ARE_FULL = new MiniGameType<>("eat_until_you_are_full", EatUntilYouAreFullMiniGame::new);
+    public static final MiniGameType<ShootYourselfWithAnArrowMiniGame> SHOOT_YOURSELF_WITH_AN_ARROW = new MiniGameType<>("shoot_yourself_with_an_arrow", ShootYourselfWithAnArrowMiniGame::new);
 
     private final String name;
     private final MiniGameCreator<T> creator;

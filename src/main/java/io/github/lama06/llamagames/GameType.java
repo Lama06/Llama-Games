@@ -26,12 +26,12 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
     }
 
     public static final GameType<LlamaSaysGame, LlamaSaysConfig> LAMA_SAYS = new GameType<>(
-            "lama_says",
+            "llama_says",
             LlamaSaysGame::new,
             LlamaSaysConfig.class,
             null,
             LlamaSaysConfig::new,
-            plugin -> new LlamaSaysCommand(plugin, "lamasays"),
+            plugin -> new LlamaSaysCommand(plugin, "llamasays"),
             null
     );
 

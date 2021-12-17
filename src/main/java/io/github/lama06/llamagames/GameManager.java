@@ -98,8 +98,7 @@ public final class GameManager implements Listener {
 
             if (!gameEntry.getValue().getAsJsonObject().has("type") ||
                     !gameEntry.getValue().getAsJsonObject().get("type").isJsonPrimitive() ||
-                    !gameEntry.getValue().getAsJsonObject().get("type").getAsJsonPrimitive().isString()
-            ) {
+                    !gameEntry.getValue().getAsJsonObject().get("type").getAsJsonPrimitive().isString()) {
                 throw new GamesLoadFailedException("The games config file contains a game without a type attribute");
             }
             String gameTypeName = gameEntry.getValue().getAsJsonObject().get("type").getAsString();
@@ -122,7 +121,7 @@ public final class GameManager implements Listener {
         gamesConfig.addProperty("dataVersion", 1);
 
         for (Game<?, ?> game : games) {
-            GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+            GsonBuilder builder = new GsonBuilder().setPrettyPrinting().serializeNulls();
             Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getType().getTypeAdapters();
             if (typeAdapters != null) {
                 for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
@@ -139,7 +138,6 @@ public final class GameManager implements Listener {
 
             gamesConfig.add(game.getWorld().getName(), gameConfigEntry);
         }
-        games.clear();
 
         try (FileWriter writer = new FileWriter(configFile)) {
             new GsonBuilder().setPrettyPrinting().create().toJson(gamesConfig, writer);

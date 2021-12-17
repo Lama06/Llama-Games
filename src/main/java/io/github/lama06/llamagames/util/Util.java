@@ -18,7 +18,7 @@ public class Util {
         return result;
     }
 
-    public static <T> List<T> pickRandomElements(List<T> source, int amount) {
+    public static <T> List<T> pickRandomElements(Collection<T> source, int amount) {
         return pickRandomElements(source, amount, RANDOM);
     }
 

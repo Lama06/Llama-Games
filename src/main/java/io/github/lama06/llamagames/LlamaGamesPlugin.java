@@ -21,7 +21,7 @@ public class LlamaGamesPlugin extends JavaPlugin {
             return;
         }
 
-        new LlamaGamesCommand(this, "lamagames");
+        new LlamaGamesCommand(this, "llamagames");
 
         for (GameType<?, ?> gameType : GameType.getValues()) {
             Consumer<LlamaGamesPlugin> callback = gameType.getPluginEnableCallback();

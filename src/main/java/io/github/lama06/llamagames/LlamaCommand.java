@@ -31,6 +31,8 @@ public abstract class LlamaCommand implements TabExecutor {
         if (cmd != null) {
             cmd.setExecutor(this);
             cmd.setTabCompleter(this);
+        } else {
+            plugin.getLogger().warning("Failed to register command: %s".formatted(name));
         }
     }
 
