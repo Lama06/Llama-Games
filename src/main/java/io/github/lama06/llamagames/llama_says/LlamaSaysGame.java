@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.List;
 
 public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
-    private final Random random = new Random();
     private int remainingRounds;
     private List<MiniGameType<?>> remainingGameTypes;
     private MiniGame<?> currentMiniGame;
@@ -119,10 +118,6 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
         }
 
         return result;
-    }
-
-    public Random getRandom() {
-        return random;
     }
 
     public EventCanceler getEventCanceler() {

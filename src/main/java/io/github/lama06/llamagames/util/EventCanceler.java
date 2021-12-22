@@ -10,8 +10,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -20,8 +18,6 @@ public class EventCanceler implements Listener {
     private final LlamaGamesPlugin plugin;
     private final Game<?, ?> game;
     private boolean cancelEntityDamage;
-    private boolean cancelEntityDamageByEntity;
-    private boolean cancelEntityDamageByBlock;
     private boolean cancelBlockPlacement;
     private boolean cancelBlockBreaking;
     private boolean cancelItemConsummation;
@@ -42,8 +38,6 @@ public class EventCanceler implements Listener {
 
     private void setAllFlags(boolean flag) {
         setCancelEntityDamage(flag);
-        setCancelEntityDamageByEntity(flag);
-        setCancelEntityDamageByBlock(flag);
         setCancelBlockPlacement(flag);
         setCancelBlockBreaking(flag);
         setCancelItemConsummation(flag);
@@ -68,20 +62,6 @@ public class EventCanceler implements Listener {
     @EventHandler
     public void handleEntityDamageEvent(EntityDamageEvent event) {
         if (cancelEntityDamage && shouldCancel(event.getEntity().getWorld())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void cancelEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        if (cancelEntityDamageByEntity && shouldCancel(event.getEntity().getWorld())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void cancelEntityDamageByBlockEvent(EntityDamageByBlockEvent event) {
-        if (cancelEntityDamageByBlock && shouldCancel(event.getEntity().getWorld())) {
             event.setCancelled(true);
         }
     }
@@ -116,14 +96,6 @@ public class EventCanceler implements Listener {
 
     public void setCancelEntityDamage(boolean cancelEntityDamage) {
         this.cancelEntityDamage = cancelEntityDamage;
-    }
-
-    public void setCancelEntityDamageByEntity(boolean cancelEntityDamageByEntity) {
-        this.cancelEntityDamageByEntity = cancelEntityDamageByEntity;
-    }
-
-    public void setCancelEntityDamageByBlock(boolean cancelEntityDamageByBlock) {
-        this.cancelEntityDamageByBlock = cancelEntityDamageByBlock;
     }
 
     public void setCancelBlockPlacement(boolean cancelBlockPlacement) {

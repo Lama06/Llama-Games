@@ -29,7 +29,7 @@ public abstract non-sealed class CompeteMiniGame<T extends CompeteMiniGame<T>> e
         }
     }
 
-    public final List<UUID> getRanking() {
+    public List<UUID> getRanking() {
         return ranking;
     }
 

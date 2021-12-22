@@ -1,5 +1,8 @@
 package io.github.lama06.llamagames.util;
 
+import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -65,6 +68,38 @@ public class Area {
         return blocks;
     }
 
+    public void clone(World world, Area destination) {
+        if (!hasSameDimensions(destination)) {
+            return;
+        }
+
+        BlockPosition sourceLowerCorner = getLowerCorner();
+        BlockPosition sourceUpperCorner = getUpperCorner();
+        BlockPosition destinationLowerCorner = destination.getLowerCorner();
+
+        for (int x = sourceLowerCorner.getX(); x <= sourceUpperCorner.getX(); x++) {
+            for (int y = sourceLowerCorner.getY(); y <= sourceUpperCorner.getY(); y++) {
+                for (int z = sourceLowerCorner.getZ(); z <= sourceUpperCorner.getZ(); z++) {
+                    int xOffset = x-sourceLowerCorner.getX();
+                    int yOffset = y-sourceLowerCorner.getY();
+                    int zOffset = z-sourceLowerCorner.getZ();
+
+                    world.getBlockAt(
+                            destinationLowerCorner.getX()+xOffset,
+                            destinationLowerCorner.getY()+yOffset,
+                            destinationLowerCorner.getZ()+zOffset
+                    ).setBlockData(world.getBlockData(x, y, z));
+                }
+            }
+        }
+    }
+
+    public void fill(World world, BlockData data) {
+        for (BlockPosition block : getBlocks()) {
+            world.getBlockAt(block.asLocation(world)).setBlockData(data);
+        }
+    }
+
     public int getHeight() {
         return getUpperX()-getLowerX() + 1;
     }
@@ -75,6 +110,10 @@ public class Area {
 
     public int getWidthZ() {
         return getLowerZ()-getUpperZ() + 1;
+    }
+
+    public boolean hasSameDimensions(Area other) {
+        return getHeight() == other.getHeight() && getWidthX() == other.getWidthX() && getWidthZ() == other.getWidthZ();
     }
 
     public BlockPosition getPosition1() {

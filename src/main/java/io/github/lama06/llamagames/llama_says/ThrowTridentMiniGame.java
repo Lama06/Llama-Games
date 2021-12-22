@@ -43,8 +43,7 @@ public class ThrowTridentMiniGame extends CompleteMiniGame<ThrowTridentMiniGame>
         if (event.getHitEntity() != null &&
                 event.getHitEntity() instanceof Player defender &&
                 trident.getShooter() != null &&
-                trident.getShooter() instanceof Player attacker
-        ) {
+                trident.getShooter() instanceof Player attacker) {
             addSuccessfulPlayer(attacker);
             addFailedPlayer(defender);
         }

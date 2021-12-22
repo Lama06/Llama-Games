@@ -18,10 +18,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Game<G extends Game<G, C>, C extends GameConfig> implements Listener {
@@ -30,9 +27,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     protected World world;
     protected C config;
     protected boolean running = false;
-    protected final Set<UUID> players = new HashSet<>();
+    protected Set<UUID> players = new HashSet<>();
     private BukkitTask countdownTask = null;
     protected final EventCanceler canceler;
+    protected final Random random = new Random();
 
     public Game(LlamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
         this.plugin = plugin;
@@ -49,11 +47,14 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             return false;
         }
 
+        players = new HashSet<>();
         for (Player player : world.getPlayers()) {
+            players.add(player.getUniqueId());
             player.teleport(config.spawnPoint.asLocation(world));
         }
 
         running = true;
+
         handleGameStarted();
 
         return true;
@@ -73,8 +74,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         running = false;
         handleGameEnded(reason);
 
-        players.clear();
-        addAllPlayers();
+        players = null;
 
         if (reason.isShouldAttemptToStartNextGame()) {
             tryToStartAfterCountdown();
@@ -91,8 +91,6 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
 
         handleGameLoaded();
-
-        addAllPlayers();
 
         tryToStartAfterCountdown();
     }
@@ -219,6 +217,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public boolean isRunning() {
         return running;
+    }
+
+    public Random getRandom() {
+        return random;
     }
 
     public Set<Player> getPlayers() {

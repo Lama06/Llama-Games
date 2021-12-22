@@ -1,9 +1,11 @@
 package io.github.lama06.llamagames;
 
 import com.google.gson.*;
+import io.github.lama06.llamagames.util.BlockDataTypeAdapter;
 import io.github.lama06.llamagames.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,6 +21,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class GameManager implements Listener {
+    private static final Set<Pair<Class<?>, TypeAdapter<?>>> DEFAULT_TYPE_ADAPTERS = Set.of(
+            Pair.of(BlockData.class, new BlockDataTypeAdapter())
+    );
+
     private final LlamaGamesPlugin plugin;
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
@@ -28,6 +34,23 @@ public final class GameManager implements Listener {
         this.configFile = new File(plugin.getDataFolder(), "games.json");
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    private Gson createGson(GameType<?, ?> type) {
+        GsonBuilder builder = new GsonBuilder().serializeNulls().setPrettyPrinting();
+
+        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
+        if (typeAdapters != null) {
+            for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
+                builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+            }
+        }
+
+        for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : DEFAULT_TYPE_ADAPTERS) {
+            builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+        }
+
+        return builder.create();
     }
 
     private JsonObject loadGamesConfig() throws GamesLoadFailedException {
@@ -65,14 +88,7 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
-        GsonBuilder builder = new GsonBuilder();
-        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
-        if (typeAdapters != null) {
-            for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
-                builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
-            }
-        }
-        Gson gson = builder.create();
+        Gson gson = createGson(type);
 
         C deserializedConfig = gson.fromJson(config, type.getConfigType());
 
@@ -121,14 +137,7 @@ public final class GameManager implements Listener {
         gamesConfig.addProperty("dataVersion", 1);
 
         for (Game<?, ?> game : games) {
-            GsonBuilder builder = new GsonBuilder().setPrettyPrinting().serializeNulls();
-            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = game.getType().getTypeAdapters();
-            if (typeAdapters != null) {
-                for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
-                    builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
-                }
-            }
-            Gson gson = builder.create();
+            Gson gson = createGson(game.getType());
 
             JsonObject gameConfigEntry = new JsonObject();
             gameConfigEntry.addProperty("type", game.getType().getName());
