@@ -7,17 +7,17 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Area {
+public class BlockArea {
     private BlockPosition position1;
     private BlockPosition position2;
 
-    public Area(BlockPosition position1, BlockPosition position2) {
+    public BlockArea(BlockPosition position1, BlockPosition position2) {
         this.position1 = position1;
         this.position2 = position2;
     }
 
     // Gson
-    public Area() { }
+    public BlockArea() { }
 
     public int getUpperX() {
         return Math.max(position1.getX(), position2.getX());
@@ -68,7 +68,7 @@ public class Area {
         return blocks;
     }
 
-    public void clone(World world, Area destination) {
+    public void clone(World world, BlockArea destination) {
         if (!hasSameDimensions(destination)) {
             return;
         }
@@ -112,7 +112,7 @@ public class Area {
         return getLowerZ()-getUpperZ() + 1;
     }
 
-    public boolean hasSameDimensions(Area other) {
+    public boolean hasSameDimensions(BlockArea other) {
         return getHeight() == other.getHeight() && getWidthX() == other.getWidthX() && getWidthZ() == other.getWidthZ();
     }
 
@@ -133,7 +133,7 @@ public class Area {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Area area = (Area) o;
+        BlockArea area = (BlockArea) o;
         return Objects.equals(position1, area.position1) && Objects.equals(position2, area.position2);
     }
 

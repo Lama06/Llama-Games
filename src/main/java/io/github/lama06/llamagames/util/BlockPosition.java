@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class BlockPosition {
+public final class BlockPosition {
     private int x;
     private int y;
     private int z;
@@ -47,7 +47,7 @@ public class BlockPosition {
     }
 
     public Distance getDistanceTo(BlockPosition other) {
-        Area area = new Area(this, other);
+        BlockArea area = new BlockArea(this, other);
         return new Distance(area.getWidthX(), area.getHeight(), area.getWidthZ());
     }
 
@@ -73,7 +73,6 @@ public class BlockPosition {
         @Override
         public int compareTo(@NotNull BlockPosition.Distance other) {
             return Integer.compare(sum(), other.sum());
-
         }
 
         public int sum() {

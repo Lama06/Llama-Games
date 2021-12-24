@@ -3,7 +3,7 @@ package io.github.lama06.llamagames.util;
 import java.util.Objects;
 
 @SuppressWarnings("ClassCanBeRecord")
-public class Pair<L, R> {
+public final class Pair<L, R> {
     private final L left;
     private final R right;
 

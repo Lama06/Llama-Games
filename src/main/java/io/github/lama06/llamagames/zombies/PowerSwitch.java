@@ -4,5 +4,5 @@ import io.github.lama06.llamagames.util.BlockPosition;
 
 public class PowerSwitch {
     public BlockPosition position;
-    public int gold;
+    public int price;
 }

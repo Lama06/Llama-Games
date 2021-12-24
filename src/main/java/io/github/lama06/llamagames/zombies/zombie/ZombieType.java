@@ -2,6 +2,7 @@ package io.github.lama06.llamagames.zombies.zombie;
 
 import io.github.lama06.llamagames.zombies.ZombiesGame;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Zombie;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,11 +15,13 @@ public final class ZombieType<T extends AbstractZombie<T, E>, E extends Entity> 
         return TYPES;
     }
 
+    public static final ZombieType<NormalZombie, Zombie> NORMAL_ZOMBIE = NormalZombie.TYPE;
+
     private final SpawnType spawnType;
     private final Class<E> entityType;
     private final ZombieCreator<T, E> creator;
 
-    private ZombieType(SpawnType spawnType, Class<E> entityType, ZombieCreator<T, E> creator) {
+    public ZombieType(SpawnType spawnType, Class<E> entityType, ZombieCreator<T, E> creator) {
         this.spawnType = spawnType;
         this.creator = creator;
         this.entityType = entityType;

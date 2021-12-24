@@ -1,9 +1,10 @@
 package io.github.lama06.llamagames.zombies.zombie;
 
-import io.github.lama06.llamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.EntityPosition;
 import io.github.lama06.llamagames.zombies.ZombiesGame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -21,13 +22,13 @@ public abstract class AbstractZombie<T extends AbstractZombie<T, E>, E extends E
         Bukkit.getPluginManager().registerEvents(this, game.getPlugin());
     }
 
-    public void spawn(BlockPosition position) {
+    public void spawn(EntityPosition position) {
         entity = game.getWorld().spawn(position.asLocation(game.getWorld()), type.getEntityType(), this::onSpawn);
     }
 
-    public abstract void onSpawn(E entity);
+    protected abstract void onSpawn(E entity);
 
-    public abstract int getInitialHealth();
+    protected abstract int getInitialHealth();
 
     public void onRemove(ZombieRemoveReason reason) {
         HandlerList.unregisterAll(this);
@@ -47,6 +48,17 @@ public abstract class AbstractZombie<T extends AbstractZombie<T, E>, E extends E
 
     public void damage(int damage) {
         setHealth(health - damage);
+    }
+
+    protected Player getNearbyPlayer() {
+        return game.getPlayers().stream().min((p1, p2) -> {
+            EntityPosition position = new EntityPosition(entity.getLocation());
+
+            EntityPosition.Distance distance1 = new EntityPosition(p1.getLocation()).getDistanceTo(position);
+            EntityPosition.Distance distance2 = new EntityPosition(p2.getLocation()).getDistanceTo(position);
+
+            return distance1.compareTo(distance2);
+        }).orElse(null);
     }
 
     public E getEntity() {

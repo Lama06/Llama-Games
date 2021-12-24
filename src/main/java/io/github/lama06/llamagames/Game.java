@@ -119,8 +119,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public void handlePlayerLeft(Player player) { }
 
-    private void handlePlayerJoined(Player player) {
-        if (running) {
+    protected void setSpectator(Player player, boolean spectator) {
+        if (spectator) {
+            players.remove(player.getUniqueId());
+
             player.setGameMode(GameMode.SPECTATOR);
             player.showTitle(Title.title(
                     Component.text("You are now spectating"),
@@ -128,11 +130,16 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
                     Title.Times.of(Duration.ofSeconds(2), Duration.ofSeconds(3), Duration.ofSeconds(1))
             ));
         } else {
-            player.setGameMode(GameMode.SURVIVAL);
             players.add(player.getUniqueId());
 
-            tryToStartAfterCountdown();
+            player.setGameMode(GameMode.SURVIVAL);
         }
+    }
+
+    private void handlePlayerJoined(Player player) {
+        setSpectator(player, running);
+
+        tryToStartAfterCountdown();
 
         player.teleport(config.spawnPoint == null ? world.getSpawnLocation() : config.spawnPoint.asLocation(world));
     }
@@ -172,7 +179,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void tryToStartAfterCountdown() {
-        if (!canStart() || !isConfigComplete() || countdownTask != null) return;
+        if (!running && !canStart() || !isConfigComplete() || countdownTask != null) return;
 
         startAfterCountdown(10);
     }
@@ -237,6 +244,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
 
         return result;
+    }
+
+    public Set<UUID> getPlayerUUUIDs() {
+        return getPlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
     }
 
     public enum GameEndReason {

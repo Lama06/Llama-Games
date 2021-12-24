@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.llamagames.util.Area;
+import io.github.lama06.llamagames.util.BlockArea;
 import io.github.lama06.llamagames.util.BlockPosition;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.EntityType;
@@ -27,7 +27,7 @@ public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMin
     @Override
     public void handleGameStarted() {
         int numberOfMinecarts = getNumberOfMinecarts();
-        Area floor = game.getConfig().floor;
+        BlockArea floor = game.getConfig().floor;
         Set<BlockPosition> minecartPositions = new HashSet<>();
 
         for (int i = 1; i <= numberOfMinecarts; i++) {
