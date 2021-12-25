@@ -1,6 +1,9 @@
 package io.github.lama06.llamagames;
 
 import com.google.gson.TypeAdapter;
+import io.github.lama06.llamagames.blockparty.BlockPartyCommand;
+import io.github.lama06.llamagames.blockparty.BlockPartyConfig;
+import io.github.lama06.llamagames.blockparty.BlockPartyGame;
 import io.github.lama06.llamagames.llama_says.LlamaSaysCommand;
 import io.github.lama06.llamagames.llama_says.LlamaSaysConfig;
 import io.github.lama06.llamagames.llama_says.LlamaSaysGame;
@@ -32,6 +35,16 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             null,
             LlamaSaysConfig::new,
             plugin -> new LlamaSaysCommand(plugin, "llamasays"),
+            null
+    );
+
+    public static final GameType<BlockPartyGame, BlockPartyConfig> BLOCK_PARTY = new GameType<>(
+            "block_party",
+            BlockPartyGame::new,
+            BlockPartyConfig.class,
+            null,
+            BlockPartyConfig::new,
+            plugin -> new BlockPartyCommand(plugin, "blockparty"),
             null
     );
 

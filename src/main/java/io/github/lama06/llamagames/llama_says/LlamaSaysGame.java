@@ -3,7 +3,6 @@ package io.github.lama06.llamagames.llama_says;
 import io.github.lama06.llamagames.Game;
 import io.github.lama06.llamagames.GameType;
 import io.github.lama06.llamagames.LlamaGamesPlugin;
-import io.github.lama06.llamagames.util.EventCanceler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -102,7 +101,12 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
 
     @Override
     public boolean canStart() {
-        return world.getPlayers().size() >= 1;
+        return super.canStart() && world.getPlayers().size() >= 1;
+    }
+
+    @Override
+    public boolean canContinueAfterPlayerLeft() {
+        return getPlayers().size() >= 1;
     }
 
     @Override
@@ -118,9 +122,5 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
         }
 
         return result;
-    }
-
-    public EventCanceler getEventCanceler() {
-        return canceler;
     }
 }

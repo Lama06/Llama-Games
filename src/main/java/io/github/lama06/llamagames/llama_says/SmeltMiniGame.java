@@ -30,8 +30,8 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
     public SmeltMiniGame(LlamaSaysGame game, Consumer<SmeltMiniGame> callback) {
         super(game, callback);
         ingredient = INGREDIENTS.get(game.getRandom().nextInt(INGREDIENTS.size()));
+        game.getEventCanceler().setCancelInventoryEvents(false);
     }
-
 
     @Override
     public Component getTitle() {

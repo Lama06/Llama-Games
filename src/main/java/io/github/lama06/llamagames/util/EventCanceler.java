@@ -12,6 +12,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class EventCanceler implements Listener {
@@ -21,6 +23,8 @@ public class EventCanceler implements Listener {
     private boolean cancelBlockPlacement;
     private boolean cancelBlockBreaking;
     private boolean cancelItemConsummation;
+    private boolean cancelInventoryEvents;
+    private boolean cancelItemDrops;
     private boolean cancelHunger;
 
     public EventCanceler(LlamaGamesPlugin plugin, Game<?, ?> game) {
@@ -41,6 +45,8 @@ public class EventCanceler implements Listener {
         setCancelBlockPlacement(flag);
         setCancelBlockBreaking(flag);
         setCancelItemConsummation(flag);
+        setCancelInventoryEvents(flag);
+        setCancelItemDrops(flag);
         setCancelHunger(flag);
 
         setCancelTime(flag);
@@ -60,36 +66,50 @@ public class EventCanceler implements Listener {
     }
 
     @EventHandler
-    public void handleEntityDamageEvent(EntityDamageEvent event) {
+    private void handleEntityDamageEvent(EntityDamageEvent event) {
         if (cancelEntityDamage && shouldCancel(event.getEntity().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void cancelBlockPlaceEvent(BlockPlaceEvent event) {
+    private void cancelBlockPlaceEvent(BlockPlaceEvent event) {
         if (cancelBlockPlacement && shouldCancel(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void cancelBlockBreakEvent(BlockBreakEvent event) {
+    private void cancelBlockBreakEvent(BlockBreakEvent event) {
         if (cancelBlockBreaking && shouldCancel(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void cancelItemConsummation(PlayerItemConsumeEvent event) {
+    private void cancelItemConsummation(PlayerItemConsumeEvent event) {
         if (cancelItemConsummation && shouldCancel(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void cancelHunger(FoodLevelChangeEvent event) {
+    private void cancelInventoryEvents(InventoryClickEvent event) {
+        if (cancelInventoryEvents && shouldCancel(event.getWhoClicked().getWorld())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    private void cancelHunger(FoodLevelChangeEvent event) {
         if (cancelHunger && shouldCancel(event.getEntity().getWorld()) && event.getEntity().getFoodLevel() > event.getFoodLevel()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    private void cancelItemDrops(PlayerDropItemEvent event) {
+        if (cancelItemDrops && shouldCancel(event.getPlayer().getWorld())) {
             event.setCancelled(true);
         }
     }
@@ -108,6 +128,14 @@ public class EventCanceler implements Listener {
 
     public void setCancelItemConsummation(boolean cancelItemConsummation) {
         this.cancelItemConsummation = cancelItemConsummation;
+    }
+
+    public void setCancelInventoryEvents(boolean cancelInventoryEvents) {
+        this.cancelInventoryEvents = cancelInventoryEvents;
+    }
+
+    public void setCancelItemDrops(boolean cancelItemDrops) {
+        this.cancelItemDrops = cancelItemDrops;
     }
 
     public void setCancelHunger(boolean cancelHunger) {

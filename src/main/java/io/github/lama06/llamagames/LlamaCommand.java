@@ -7,8 +7,7 @@ import io.github.lama06.llamagames.util.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -17,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class LlamaCommand implements TabExecutor {
@@ -141,6 +141,16 @@ public abstract class LlamaCommand implements TabExecutor {
         }
     }
 
+    public static Optional<NamespacedKey> requireNamespacedKey(CommandSender sender, String name) {
+        NamespacedKey key = NamespacedKey.fromString(name);
+        if (key == null) {
+            sender.sendMessage("%s is not a valid key".formatted(name));
+            return Optional.empty();
+        }
+
+        return Optional.of(key);
+    }
+
     public static Optional<BlockPosition> requireBlockPosition(CommandSender sender, String x, String y, String z) {
         try {
             int xPos = Integer.parseInt(x);
@@ -154,6 +164,16 @@ public abstract class LlamaCommand implements TabExecutor {
         }
     }
 
+    public static Optional<BlockArea> requireBlockArea(CommandSender sender, String x1, String y1, String z1, String x2, String y2, String z2) {
+        Optional<BlockPosition> position1 = requireBlockPosition(sender, x1, y1, z1);
+        if (position1.isEmpty()) return Optional.empty();
+
+        Optional<BlockPosition> position2 = requireBlockPosition(sender, x2, y2, z2);
+        if (position2.isEmpty()) return Optional.empty();
+
+        return Optional.of(new BlockArea(position1.get(), position2.get()));
+    }
+
     public static Optional<EntityPosition> requireEntityPosition(CommandSender sender, String x, String y, String z) {
         try {
             double xPos = Integer.parseInt(x);
@@ -165,6 +185,19 @@ public abstract class LlamaCommand implements TabExecutor {
             sender.sendMessage(Component.text("This is not a number").color(NamedTextColor.RED));
             return Optional.empty();
         }
+    }
+
+    public static Optional<Material> requireMaterial(CommandSender sender, String name) {
+        Optional<NamespacedKey> key = requireNamespacedKey(sender, name);
+        if (key.isEmpty()) return Optional.empty();
+
+        Material material = Registry.MATERIAL.get(key.get());
+        if (material == null) {
+            sender.sendMessage(Component.text("There is no block or item named %s".formatted(key.get())));
+            return Optional.empty();
+        }
+
+        return Optional.of(material);
     }
 
     public static Optional<Player> requirePlayer(CommandSender sender) {
@@ -210,7 +243,7 @@ public abstract class LlamaCommand implements TabExecutor {
             LlamaGamesPlugin plugin,
             CommandSender sender,
             String worldName,
-            Class<? extends G> gameType
+            Class<G> gameType
     ) {
         Optional<Game<?, ?>> game = requireGame(plugin, sender, worldName);
         if (game.isEmpty()) return Optional.empty();
@@ -225,11 +258,11 @@ public abstract class LlamaCommand implements TabExecutor {
 
     public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createConfigSubCommandBootstrap(
             LlamaGamesPlugin plugin,
-            Class<? extends G> gameType,
-            Function<? super C, String> queryMessageSupplier,
-            BiConsumer<? super C, ? super T> configChangedCallback,
-            Function<? super T, String> configChangedMessageSupplier,
-            Function<? super G, ? extends T> configChangeCommandLogic
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, T> configChangedCallback,
+            Function<T, Component> configChangedMessageSupplier,
+            BiFunction<CommandSender, String[], Optional<T>> configChangeCommandLogic
     ) {
         return (sender, args) -> {
             if (requireArgsAtLeast(sender, args, 1)) return;
@@ -237,15 +270,16 @@ public abstract class LlamaCommand implements TabExecutor {
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
             if (game.isEmpty()) return;
 
-            boolean querySubCommandExecuted = requireArgs(
-                    sender,
-                    args,
-                    Pair.of(1, () -> sender.sendMessage(Component.text(queryMessageSupplier.apply(game.get().getConfig()))))
-            );
+            if (args.length == 1) {
+                sender.sendMessage(queryMessageSupplier.apply(game.get().getConfig()));
+            } else {
+                if (game.get().isRunning()) {
+                    sender.sendMessage(Component.text("Cannot change the config of a game that is currently running", NamedTextColor.RED));
+                    return;
+                }
 
-            if (!querySubCommandExecuted) {
-                T newConfigValue = configChangeCommandLogic.apply(game.get());
-                if (newConfigValue == null) {
+                Optional<T> newConfigValue = configChangeCommandLogic.apply(sender, Arrays.copyOfRange(args, 1, args.length));
+                if (newConfigValue.isEmpty()) {
                     return;
                 }
 
@@ -256,116 +290,129 @@ public abstract class LlamaCommand implements TabExecutor {
                     return;
                 }
 
-                configChangedCallback.accept(game.get().getConfig(), newConfigValue);
-                sender.sendMessage(Component.text(configChangedMessageSupplier.apply(newConfigValue), NamedTextColor.GREEN));
+                configChangedCallback.accept(game.get().getConfig(), newConfigValue.get());
+                sender.sendMessage(configChangedMessageSupplier.apply(newConfigValue.get()).color(NamedTextColor.GREEN));
             }
         };
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBooleanConfigSubCommand(
             LlamaGamesPlugin plugin,
-            Class<? extends G> gameType,
-            Function<? super C, String> queryMessageSupplier,
-            BiConsumer<? super C, ? super Boolean> configChangedCallback,
-            Function<? super Boolean, String> configChangedMessageSupplier
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, Boolean> configChangedCallback,
+            Function<Boolean, Component> configChangedMessageSupplier
     ) {
-        return (sender, args) -> createConfigSubCommandBootstrap(
+        return createConfigSubCommandBootstrap(
                 plugin,
                 gameType,
                 queryMessageSupplier,
                 configChangedCallback,
                 configChangedMessageSupplier,
-                game -> {
-                    if (!requireArgsExact(sender, args, 2)) return null;
-                    return requireBoolean(sender, args[1]).orElse(null);
+                (sender, args) -> {
+                    if (!requireArgsExact(sender, args, 2)) return Optional.empty();
+                    return requireBoolean(sender, args[1]);
                 }
-        ).executeSubCommand(sender, args);
+        );
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createIntegerConfigSubCommand(
             LlamaGamesPlugin plugin,
-            Class<? extends G> gameType,
-            Function<? super C, String> queryMessageSupplier,
-            BiConsumer<? super C, ? super Integer> configChangedCallback,
-            Function<? super Integer, String> configChangedMessageSupplier
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, Integer> configChangedCallback,
+            Function<Integer, Component> configChangedMessageSupplier
     ) {
-        return (sender, args) -> createConfigSubCommandBootstrap(
+        return createConfigSubCommandBootstrap(
                 plugin,
                 gameType,
                 queryMessageSupplier,
                 configChangedCallback,
                 configChangedMessageSupplier,
-                game -> {
-                    if (!requireArgsExact(sender, args, 2)) return null;
-                    return requireInteger(sender, args[1]).orElse(null);
+                (sender, args) -> {
+                    if (!requireArgsExact(sender, args, 1)) return Optional.empty();
+                    return requireInteger(sender, args[0]);
                 }
-        ).executeSubCommand(sender, args);
+        );
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBlockPositionConfigSubCommand(
             LlamaGamesPlugin plugin,
-            Class<? extends G> gameType,
-            Function<? super C, String> queryMessageSupplier,
-            BiConsumer<? super C, ? super BlockPosition> configChangedCallback,
-            Function<? super BlockPosition, String> configChangedMessageSupplier
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, BlockPosition> configChangedCallback,
+            Function<BlockPosition, Component> configChangedMessageSupplier
     ) {
-        return (sender, args) -> createConfigSubCommandBootstrap(
+        return createConfigSubCommandBootstrap(
                 plugin,
                 gameType,
                 queryMessageSupplier,
                 configChangedCallback,
                 configChangedMessageSupplier,
-                game -> {
-                    if (!requireArgsExact(sender, args, 4)) return null;
-                    return requireBlockPosition(sender, args[1], args[2], args[3]).orElse(null);
+                (sender, args) -> {
+                    if (!requireArgsExact(sender, args, 3)) return Optional.empty();
+                    return requireBlockPosition(sender, args[0], args[1], args[2]);
                 }
-        ).executeSubCommand(sender, args);
+        );
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createEntityPositionSubCommand(
             LlamaGamesPlugin plugin,
-            Class<? extends G> gameType,
-            Function<? super C, String> queryMessageSupplier,
-            BiConsumer<? super C, ? super EntityPosition> configChangedCallback,
-            Function<? super EntityPosition, String> configChangedMessageSupplier
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, EntityPosition> configChangedCallback,
+            Function<EntityPosition, Component> configChangedMessageSupplier
     ) {
-        return (sender, args) -> createConfigSubCommandBootstrap(
+        return createConfigSubCommandBootstrap(
                 plugin,
                 gameType,
                 queryMessageSupplier,
                 configChangedCallback,
                 configChangedMessageSupplier,
-                game -> {
-                    if (!requireArgsExact(sender, args, 4)) return null;
-                    return requireEntityPosition(sender, args[1], args[2], args[3]).orElse(null);
+                (sender, args) -> {
+                    if (!requireArgsExact(sender, args, 3)) return Optional.empty();
+                    return requireEntityPosition(sender, args[0], args[1], args[2]);
                 }
-        ).executeSubCommand(sender, args);
+        );
     }
 
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBlockAreaConfigSubCommand(
             LlamaGamesPlugin plugin,
-            Class<? extends G> gameType,
-            Function<? super C, String> queryMessageSupplier,
-            BiConsumer<? super C, ? super BlockArea> configChangedCallback,
-            Function<? super BlockArea, String> configChangedMessageSupplier
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, BlockArea> configChangedCallback,
+            Function<BlockArea, Component> configChangedMessageSupplier
     ) {
-        return (sender, args) -> createConfigSubCommandBootstrap(
+        return createConfigSubCommandBootstrap(
                 plugin,
                 gameType,
                 queryMessageSupplier,
                 configChangedCallback,
                 configChangedMessageSupplier,
-                game -> {
-                    if (requireArgsExact(sender, args, 7)) return null;
-
-                    Optional<BlockPosition> position1 = requireBlockPosition(sender, args[1], args[2], args[3]);
-                    if (position1.isEmpty()) return null;
-
-                    Optional<BlockPosition> position2 = requireBlockPosition(sender, args[4], args[5], args[6]);
-                    if (position2.isEmpty()) return null;
-
-                    return new BlockArea(position1.get(), position2.get());
+                (sender, args) -> {
+                    if (requireArgsExact(sender, args, 6)) return Optional.empty();
+                    return requireBlockArea(sender, args[0], args[1], args[2], args[3], args[4], args[5]);
                 }
-        ).executeSubCommand(sender, args);
+        );
+    }
+
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createMaterialConfigSubCommand(
+            LlamaGamesPlugin plugin,
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, Material> configChangedCallback,
+            Function<Material, Component> configChangedMessageSupplier
+    ) {
+        return createConfigSubCommandBootstrap(
+                plugin,
+                gameType,
+                queryMessageSupplier,
+                configChangedCallback,
+                configChangedMessageSupplier,
+                (sender, args) -> {
+                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
+                    return requireMaterial(sender, args[0]);
+                }
+        );
     }
 }

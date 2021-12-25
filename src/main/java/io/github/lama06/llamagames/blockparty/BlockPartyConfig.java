@@ -6,6 +6,7 @@ import io.github.lama06.llamagames.util.BlockArea;
 import org.bukkit.Material;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class BlockPartyConfig extends GameConfig {
@@ -29,4 +30,8 @@ public class BlockPartyConfig extends GameConfig {
 
     // Gson
     public BlockPartyConfig() { }
+
+    public Optional<Floor> getFloorByName(String name) {
+        return floors.stream().filter(floor -> floor.name.equals(name)).findFirst();
+    }
 }

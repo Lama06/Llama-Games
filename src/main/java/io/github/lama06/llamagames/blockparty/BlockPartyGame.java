@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Duration;
@@ -44,7 +46,29 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     @Override
     public boolean canStart() {
-        return false;
+        return world.getPlayers().size() >= 1;
+    }
+
+    @Override
+    public boolean canContinueAfterPlayerLeft() {
+        return getPlayers().size() >= 1;
+    }
+
+    @EventHandler
+    private void killPlayersThatTouchDeadlyBlocks(PlayerMoveEvent event) {
+        if (!getPlayers().contains(event.getPlayer())) {
+            return;
+        }
+
+        if (event.getTo().clone().add(0, -1, 0).getBlock().getType() != config.deadlyBlock) {
+            return;
+        }
+
+        setSpectator(event.getPlayer(), true);
+
+        if (getPlayers().size() == 0) {
+            endGame(GameEndReason.ENDED);
+        }
     }
 
     private Floor getNextFloor() {
@@ -106,7 +130,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
                 Component.translatable(type),
                 Component.text("Round %d: Stand on ".formatted(round)).append(Component.translatable(type)),
                 Title.Times.of(
-                        Duration.ofMillis(0),
+                        Duration.ZERO,
                         Duration.ofSeconds(roundTime/20),
                         Duration.ofMillis(500)
                 )

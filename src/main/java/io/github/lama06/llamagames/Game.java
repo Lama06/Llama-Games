@@ -22,15 +22,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Game<G extends Game<G, C>, C extends GameConfig> implements Listener {
-    protected LlamaGamesPlugin plugin;
-    protected GameType<G, C> type;
-    protected World world;
-    protected C config;
+    protected final LlamaGamesPlugin plugin;
+    protected final GameType<G, C> type;
+    protected final World world;
+    protected final C config;
     protected boolean running = false;
-    protected Set<UUID> players = new HashSet<>();
-    private BukkitTask countdownTask = null;
     protected final EventCanceler canceler;
     protected final Random random = new Random();
+    private Set<UUID> players = new HashSet<>();
+    private BukkitTask countdownTask = null;
 
     public Game(LlamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
         this.plugin = plugin;
@@ -43,7 +43,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     public final boolean startGame() {
-        if (running || !canStart() || !isConfigComplete()) {
+        if (!canStart()) {
             return false;
         }
 
@@ -111,11 +111,15 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public abstract void handleGameEnded(GameEndReason reason);
 
-    public abstract boolean canStart();
-
     public boolean isConfigComplete() {
         return config.spawnPoint != null;
     }
+
+    public boolean canStart() {
+        return !running && isConfigComplete();
+    }
+
+    public abstract boolean canContinueAfterPlayerLeft();
 
     public void handlePlayerLeft(Player player) { }
 
@@ -136,50 +140,57 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
     }
 
-    private void handlePlayerJoined(Player player) {
-        setSpectator(player, running);
+    protected boolean isSpectator(Player player) {
+        return getPlayers().contains(player);
+    }
 
-        tryToStartAfterCountdown();
+    private void handlePlayerJoinedInternal(Player player) {
+        if (running) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.sendMessage(Component.text("You are now in spectator mode as the game you joined is already running"));
+        } else {
+            tryToStartAfterCountdown();
+        }
 
         player.teleport(config.spawnPoint == null ? world.getSpawnLocation() : config.spawnPoint.asLocation(world));
     }
 
-    @EventHandler
-    public void handlePlayerChangeWorldEvent(PlayerChangedWorldEvent event) {
-        if (event.getFrom().equals(world)) {
-            players.remove(event.getPlayer().getUniqueId());
+    private void handlePlayerLeftInternal(Player player) {
+        if (running && !isSpectator(player)) {
+            players.remove(player.getUniqueId());
+            handlePlayerLeft(player);
 
-            handlePlayerLeft(event.getPlayer());
-
-            if (world.getPlayers().size() == 0) {
+            if (!canContinueAfterPlayerLeft()) {
                 endGame(GameEndReason.MISSING_REQUIREMENTS_TO_CONTINUE);
             }
+        }
+    }
+
+    @EventHandler
+    private void handlePlayerChangeWorldEvent(PlayerChangedWorldEvent event) {
+        if (event.getFrom().equals(world)) {
+            handlePlayerLeftInternal(event.getPlayer());
         } else if (event.getPlayer().getWorld().equals(world)) {
-            handlePlayerJoined(event.getPlayer());
+            handlePlayerJoinedInternal(event.getPlayer());
         }
     }
 
     @EventHandler
-    public void handlePlayerJoinEvent(PlayerJoinEvent event) {
+    private void handlePlayerJoinEvent(PlayerJoinEvent event) {
         if (event.getPlayer().getWorld().equals(world)) {
-            handlePlayerJoined(event.getPlayer());
+            handlePlayerJoinedInternal(event.getPlayer());
         }
     }
 
     @EventHandler
-    public void handlePlayerQuitEvent(PlayerQuitEvent event) {
+    private void handlePlayerQuitEvent(PlayerQuitEvent event) {
         if (players.contains(event.getPlayer().getUniqueId())) {
-            players.remove(event.getPlayer().getUniqueId());
-            handlePlayerLeft(event.getPlayer());
+            handlePlayerLeftInternal(event.getPlayer());
         }
-    }
-
-    private void addAllPlayers() {
-        players.addAll(world.getPlayers().stream().map(Player::getUniqueId).collect(Collectors.toList()));
     }
 
     private void tryToStartAfterCountdown() {
-        if (!running && !canStart() || !isConfigComplete() || countdownTask != null) return;
+        if (!running && !canStart() || (countdownTask != null && !countdownTask.isCancelled())) return;
 
         startAfterCountdown(10);
     }
@@ -187,6 +198,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     private void startAfterCountdown(int countdown) {
         if (countdown == 0) {
             countdownTask = null;
+
             if (!startGame()) {
                 getBroadcastAudience().sendMessage(Component.text("Start failed").color(NamedTextColor.RED));
             }
@@ -198,6 +210,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
                         Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
                 ));
             }
+
             countdownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> startAfterCountdown(countdown - 1), 20);
         }
     }
@@ -228,6 +241,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public Random getRandom() {
         return random;
+    }
+
+    public EventCanceler getEventCanceler() {
+        return canceler;
     }
 
     public Set<Player> getPlayers() {
