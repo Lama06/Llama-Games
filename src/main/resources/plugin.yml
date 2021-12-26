@@ -8,3 +8,5 @@ commands:
     description: The main command of the LlamaGames plugin
   llamasays:
     description: Used to setup LlamaSays games
+  blockparty:
+    description: Used to setup BlockParty games

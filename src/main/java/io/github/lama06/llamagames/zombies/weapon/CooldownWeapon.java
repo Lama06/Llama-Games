@@ -5,6 +5,7 @@ import io.github.lama06.llamagames.zombies.ZombiesGame;
 import io.github.lama06.llamagames.zombies.ZombiesPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 public abstract class CooldownWeapon<T extends CooldownWeapon<T>> extends AbstractWeapon<T> {
     protected int cooldownRemaining = 0;
@@ -24,7 +25,7 @@ public abstract class CooldownWeapon<T extends CooldownWeapon<T>> extends Abstra
     }
 
     @EventHandler
-    public void tickCooldownTimer(ServerTickStartEvent event) {
+    private void tickCooldownTimer(ServerTickStartEvent event) {
         if (cooldownRemaining != 0) {
             cooldownRemaining--;
         }

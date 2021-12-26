@@ -51,6 +51,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         for (Player player : world.getPlayers()) {
             players.add(player.getUniqueId());
             player.teleport(config.spawnPoint.asLocation(world));
+            player.setGameMode(GameMode.SURVIVAL);
         }
 
         running = true;
@@ -85,10 +86,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public final void loadGame() {
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        canceler.registerEvents();
 
         if (!isConfigComplete()) {
             plugin.getLogger().warning("The configuration for the following game is not complete: %s".formatted(world.getName()));
         }
+
 
         handleGameLoaded();
 
@@ -99,6 +102,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         endGame(GameEndReason.UNLOAD);
 
         HandlerList.unregisterAll(this);
+        canceler.unregisterEvents();
 
         handleGameUnloaded();
     }
@@ -190,7 +194,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void tryToStartAfterCountdown() {
-        if (!running && !canStart() || (countdownTask != null && !countdownTask.isCancelled())) return;
+        if (running || !canStart() || isStarting()) return;
 
         startAfterCountdown(10);
     }
@@ -237,6 +241,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public boolean isRunning() {
         return running;
+    }
+
+    public boolean isStarting() {
+        return countdownTask != null && !countdownTask.isCancelled();
     }
 
     public Random getRandom() {

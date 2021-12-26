@@ -31,6 +31,8 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     @Override
     public void handleGameStarted() {
         remainingFloors = new HashSet<>(config.floors);
+
+        startRound(1);
     }
 
     @Override
@@ -46,7 +48,12 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     @Override
     public boolean canStart() {
-        return world.getPlayers().size() >= 1;
+        return super.canStart() && world.getPlayers().size() != 0;
+    }
+
+    @Override
+    public boolean isConfigComplete() {
+        return super.isConfigComplete() && config.deadlyBlock != null && config.floor != null && !config.floors.isEmpty() && config.roundTimes.containsKey(-1);
     }
 
     @Override
@@ -106,11 +113,11 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
         return 40;
     }
 
-    private void removeFloorBlock(Material material) {
+    private void removeFloorBlocks(Material material) {
         for (BlockPosition position : config.floor.getBlocks()) {
             Block block = world.getBlockAt(position.asLocation(world));
 
-            if (block.getType() == material) {
+            if (block.getType() != material) {
                 block.setType(Material.AIR);
             }
         }
@@ -137,7 +144,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
         ));
 
         currentTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            removeFloorBlock(type);
+            removeFloorBlocks(type);
 
             Bukkit.getScheduler().runTaskLater(plugin, this::startNextRound, 40);
         }, roundTime);

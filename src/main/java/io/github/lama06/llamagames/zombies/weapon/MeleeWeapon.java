@@ -6,28 +6,32 @@ import io.github.lama06.llamagames.zombies.zombie.AbstractZombie;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public abstract class ShootingWeapon<T extends ShootingWeapon<T>> extends AmmoWeapon<T> {
-    public ShootingWeapon(ZombiesGame game, ZombiesPlayer player, WeaponType<T> type) {
+public abstract class MeleeWeapon extends CooldownWeapon<MeleeWeapon> {
+    public MeleeWeapon(ZombiesGame game, ZombiesPlayer player, WeaponType<MeleeWeapon> type) {
         super(game, player, type);
     }
+
+    public abstract int getMaxRange();
+
+    public abstract int getDamage();
 
     @Override
     public void onUse(PlayerInteractEvent event) {
         super.onUse(event);
+    }
 
-        Entity targetEntity = event.getPlayer().getTargetEntity(getMaxRange());
+    @Override
+    public boolean canUse() {
+        if (!super.canUse()) {
+            return false;
+        }
+
+        Entity targetEntity = player.getPlayer().getTargetEntity(getMaxRange());
         if (targetEntity == null) {
-            return;
+            return false;
         }
 
         AbstractZombie<?, ?> zombie = game.getZombie(targetEntity);
-        if (zombie == null) {
-            return;
-        }
-        zombie.damage(getDamage());
+        return zombie != null;
     }
-
-    public abstract int getDamage();
-
-    public abstract int getMaxRange();
 }

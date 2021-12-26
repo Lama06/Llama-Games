@@ -9,6 +9,8 @@ import io.github.lama06.llamagames.util.Util;
 import io.github.lama06.llamagames.zombies.weapon.WeaponShop;
 import io.github.lama06.llamagames.zombies.zombie.AbstractZombie;
 import io.github.lama06.llamagames.zombies.zombie.ZombieType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -76,7 +78,12 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
 
     @Override
     public boolean canStart() {
-        return world.getPlayers().size() >= 1;
+        return super.canStart() && world.getPlayers().size() >= 1;
+    }
+
+    @Override
+    public boolean canContinueAfterPlayerLeft() {
+        return getPlayers().size() >= 1;
     }
 
     private void startRound(int round) {
@@ -192,19 +199,34 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
         BlockPosition clickedPosition = new BlockPosition(clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ());
 
         if (config.powerSwitch.position.equals(clickedPosition)) {
-            powerSwitchActivated = true;
+            if (player.pay(config.powerSwitch.price)) {
+                powerSwitchActivated = true;
+                getBroadcastAudience().sendMessage(Component.text("%s activated the power switch".formatted(player.getPlayer().getName())));
+            } else {
+                player.getPlayer().sendMessage(Component.text("You cannot afford this", NamedTextColor.RED));
+            }
+
             return;
         }
 
         for (WeaponShop weaponShop : config.weaponShops) {
             if (weaponShop.activationBlock.equals(clickedPosition)) {
-                player.buyWeapon(weaponShop.weapon, event.getPlayer().getInventory().getHeldItemSlot(), weaponShop.gold);
+                player.onWeaponShopInteraction(weaponShop, player.getPlayer().getInventory().getHeldItemSlot());
                 return;
             }
         }
 
         for (Door door : config.doors) {
             if (door.activationBlock.equals(clickedPosition)) {
+                if (player.pay(door.price)) {
+                    door.open(world);
+                    getBroadcastAudience().sendMessage(Component.text("%s opened a door".formatted(player.getPlayer().getName()), NamedTextColor.YELLOW));
+                    unlockedAreas.add(door.area1);
+                    unlockedAreas.add(door.area2);
+                } else {
+                    player.getPlayer().sendMessage(Component.text("You cannot afford this", NamedTextColor.RED));
+                }
+
                 return;
             }
         }

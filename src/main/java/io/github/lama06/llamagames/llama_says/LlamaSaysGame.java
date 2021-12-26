@@ -23,16 +23,6 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     }
 
     @Override
-    public void handleGameLoaded() {
-        canceler.registerEvents();
-    }
-
-    @Override
-    public void handleGameUnloaded() {
-        canceler.unregisterEvents();
-    }
-
-    @Override
     public void handleGameStarted() {
         remainingRounds = config.numberOfRounds;
         remainingGameTypes = new ArrayList<>(MiniGameType.getTypes());

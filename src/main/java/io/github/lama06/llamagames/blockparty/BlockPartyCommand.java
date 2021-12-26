@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.blockparty;
 
-import io.github.lama06.llamagames.LlamaCommand;
+import io.github.lama06.llamagames.GameCommand;
 import io.github.lama06.llamagames.LlamaGamesPlugin;
 import io.github.lama06.llamagames.util.BlockArea;
 import net.kyori.adventure.text.Component;
@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Optional;
 
-public class BlockPartyCommand extends LlamaCommand {
+public class BlockPartyCommand extends GameCommand {
     public BlockPartyCommand(LlamaGamesPlugin plugin, String name) {
         super(plugin, name);
         addSubCommand("floor", createBlockAreaConfigSubCommand(
@@ -49,6 +49,7 @@ public class BlockPartyCommand extends LlamaCommand {
         }
 
         game.get().getConfig().floors.add(new Floor(name, area.get()));
+        sender.sendMessage(Component.text("The floor was successfully added", NamedTextColor.GREEN));
     }
 
     public void removeFloor(CommandSender sender, String[] args) {

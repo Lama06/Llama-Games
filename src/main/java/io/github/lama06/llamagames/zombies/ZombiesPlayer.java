@@ -2,8 +2,13 @@ package io.github.lama06.llamagames.zombies;
 
 import io.github.lama06.llamagames.zombies.weapon.AbstractWeapon;
 import io.github.lama06.llamagames.zombies.weapon.AmmoWeapon;
+import io.github.lama06.llamagames.zombies.weapon.WeaponShop;
 import io.github.lama06.llamagames.zombies.weapon.WeaponType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 public class ZombiesPlayer {
     private final ZombiesGame game;
@@ -44,13 +49,40 @@ public class ZombiesPlayer {
         updateInventory();
     }
 
-    public <T extends AbstractWeapon<T>> boolean buyWeapon(WeaponType<T> type, int slot, int gold) {
-        if (pay(gold)) {
-            giveWeapon(type, slot);
-            return true;
+    public Optional<Integer> getWeaponSlot(WeaponType<?> type) {
+        for (int i = 0; i < weapons.length; i++) {
+            AbstractWeapon<?> weapon = weapons[i];
+
+            if (weapon.getType().equals(type)) {
+                return Optional.of(i);
+            }
         }
 
-        return false;
+        return Optional.empty();
+    }
+
+    public boolean hasWeapon(WeaponType<?> type) {
+        return getWeaponSlot(type).isPresent();
+    }
+
+    public void onWeaponShopInteraction(WeaponShop shop, int slot) {
+        Optional<Integer> weaponSlot = getWeaponSlot(shop.weapon);
+
+        if (weaponSlot.isEmpty()) {
+            if (pay(gold)) {
+                giveWeapon(shop.weapon, slot);
+                player.sendMessage(Component.text("Successfully bought the weapon", NamedTextColor.GREEN));
+                return;
+            }
+
+            player.sendMessage(Component.text("You cannot afford this", NamedTextColor.RED));
+        } else {
+            if (weapons[weaponSlot.get()] instanceof AmmoWeapon<?> ammoWeapon && pay(shop.refillPrice)) {
+                ammoWeapon.restockAmmo();
+            } else {
+                player.sendMessage(Component.text("You cannot refill this weapon", NamedTextColor.RED));
+            }
+        }
     }
 
     public int getKills() {

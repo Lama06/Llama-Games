@@ -5,6 +5,7 @@ import io.github.lama06.llamagames.GameConfig;
 import io.github.lama06.llamagames.util.BlockArea;
 import org.bukkit.Material;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class BlockPartyConfig extends GameConfig {
             .build();
 
     public BlockArea floor;
-    public Set<Floor> floors;
+    public Set<Floor> floors = new HashSet<>();
     public Map<Integer, Integer> roundTimes = DEFAULT_ROUND_TIMES;
     public Material deadlyBlock;
 

@@ -6,16 +6,14 @@ import io.github.lama06.llamagames.zombies.zombie.AbstractZombie;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public abstract class ShootingWeapon<T extends ShootingWeapon<T>> extends AmmoWeapon<T> {
-    public ShootingWeapon(ZombiesGame game, ZombiesPlayer player, WeaponType<T> type) {
+public class Knife extends CooldownWeapon<Knife> {
+    public Knife(ZombiesGame game, ZombiesPlayer player, WeaponType<Knife> type) {
         super(game, player, type);
     }
 
     @Override
     public void onUse(PlayerInteractEvent event) {
-        super.onUse(event);
-
-        Entity targetEntity = event.getPlayer().getTargetEntity(getMaxRange());
+        Entity targetEntity = event.getPlayer().getTargetEntity(4);
         if (targetEntity == null) {
             return;
         }
@@ -24,10 +22,11 @@ public abstract class ShootingWeapon<T extends ShootingWeapon<T>> extends AmmoWe
         if (zombie == null) {
             return;
         }
-        zombie.damage(getDamage());
+        zombie.damage(3);
     }
 
-    public abstract int getDamage();
-
-    public abstract int getMaxRange();
+    @Override
+    public int getCooldownAfterUse() {
+        return 20;
+    }
 }

@@ -94,7 +94,7 @@ public abstract class LlamaCommand implements TabExecutor {
 
     public static boolean requireArgsExact(CommandSender sender, String[] args, int number) {
         if (args.length != number) {
-            sender.sendMessage(Component.text("This command needs %d args".formatted(number)).color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("This number of arguments that were given to this command is not correct").color(NamedTextColor.RED));
             return true;
         }
         return false;
@@ -102,7 +102,7 @@ public abstract class LlamaCommand implements TabExecutor {
 
     public static boolean requireArgsAtLeast(CommandSender sender, String[] args, int number) {
         if (args.length < number) {
-            sender.sendMessage(Component.text("This command needs at least %d args".formatted(number)).color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("This command needs more arguments").color(NamedTextColor.RED));
             return true;
         }
         return false;
@@ -273,7 +273,7 @@ public abstract class LlamaCommand implements TabExecutor {
             if (args.length == 1) {
                 sender.sendMessage(queryMessageSupplier.apply(game.get().getConfig()));
             } else {
-                if (game.get().isRunning()) {
+                if (game.get().isRunning() || game.get().isStarting()) {
                     sender.sendMessage(Component.text("Cannot change the config of a game that is currently running", NamedTextColor.RED));
                     return;
                 }
@@ -283,6 +283,8 @@ public abstract class LlamaCommand implements TabExecutor {
                     return;
                 }
 
+                configChangedCallback.accept(game.get().getConfig(), newConfigValue.get());
+
                 try {
                     plugin.getGameManager().saveGameConfig();
                 } catch (GameManager.GamesSaveFailedException e) {
@@ -290,7 +292,6 @@ public abstract class LlamaCommand implements TabExecutor {
                     return;
                 }
 
-                configChangedCallback.accept(game.get().getConfig(), newConfigValue.get());
                 sender.sendMessage(configChangedMessageSupplier.apply(newConfigValue.get()).color(NamedTextColor.GREEN));
             }
         };
@@ -310,8 +311,8 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (!requireArgsExact(sender, args, 2)) return Optional.empty();
-                    return requireBoolean(sender, args[1]);
+                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
+                    return requireBoolean(sender, args[0]);
                 }
         );
     }
@@ -330,7 +331,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (!requireArgsExact(sender, args, 1)) return Optional.empty();
+                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
                     return requireInteger(sender, args[0]);
                 }
         );
@@ -350,7 +351,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (!requireArgsExact(sender, args, 3)) return Optional.empty();
+                    if (requireArgsExact(sender, args, 3)) return Optional.empty();
                     return requireBlockPosition(sender, args[0], args[1], args[2]);
                 }
         );
@@ -370,7 +371,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (!requireArgsExact(sender, args, 3)) return Optional.empty();
+                    if (requireArgsExact(sender, args, 3)) return Optional.empty();
                     return requireEntityPosition(sender, args[0], args[1], args[2]);
                 }
         );

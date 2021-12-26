@@ -47,11 +47,15 @@ public abstract class AbstractWeapon<T extends AbstractWeapon<T>> implements Lis
 
     public abstract void onUse(PlayerInteractEvent event);
 
-    public abstract void editItem(ItemStack item);
+    public void editItem(ItemStack item) { }
 
     public ItemStack asItem() {
         ItemStack item = new ItemStack(type.getMaterial());
         editItem(item);
         return item;
+    }
+
+    public WeaponType<T> getType() {
+        return type;
     }
 }

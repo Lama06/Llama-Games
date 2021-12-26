@@ -3,6 +3,7 @@ package io.github.lama06.llamagames.zombies.weapon;
 import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import io.github.lama06.llamagames.zombies.ZombiesGame;
 import io.github.lama06.llamagames.zombies.ZombiesPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +16,7 @@ public abstract class AmmoWeapon<T extends AmmoWeapon<T>> extends CooldownWeapon
 
     public AmmoWeapon(ZombiesGame game, ZombiesPlayer player, WeaponType<T> type) {
         super(game, player, type);
-        refillAmmoNow();
+        restockAmmo();
     }
 
     public abstract int getMaxAmmo();
@@ -23,6 +24,12 @@ public abstract class AmmoWeapon<T extends AmmoWeapon<T>> extends CooldownWeapon
     public abstract int getMaxMagazineAmmo();
 
     public abstract int getAmmoRefillTime();
+
+    public void restockAmmo() {
+        refillTimeLeft = 0;
+        totalAmmoLeft = getMaxAmmo();
+        refillAmmoNow();
+    }
 
     public boolean canRefillAmmo() {
         return totalAmmoLeft > 0;
@@ -36,18 +43,32 @@ public abstract class AmmoWeapon<T extends AmmoWeapon<T>> extends CooldownWeapon
         refillTimeLeft = getAmmoRefillTime();
     }
 
-    public void refillAmmoNow() {
-        currentMagazineAmmoLeft = getMaxMagazineAmmo();
-        totalAmmoLeft = getMaxAmmo()-currentMagazineAmmoLeft;
-        player.updateInventory();
-    }
-
     public boolean isRefillingAmmo() {
         return refillTimeLeft != 0;
     }
 
+    public void stopRefillingAmmo() {
+        refillTimeLeft = 0;
+    }
+
+    public void refillAmmoNow() {
+        if (!canRefillAmmo()) {
+            return;
+        }
+
+        int ammoToRefill = getMaxMagazineAmmo();
+        if (ammoToRefill > totalAmmoLeft) {
+            ammoToRefill = totalAmmoLeft;
+        }
+
+        currentMagazineAmmoLeft = ammoToRefill;
+        totalAmmoLeft = totalAmmoLeft-ammoToRefill;
+
+        player.updateInventory();
+    }
+
     @EventHandler
-    public void tickRefillAmmoCountdown(ServerTickStartEvent event) {
+    private void tickRefillAmmoCountdown(ServerTickStartEvent event) {
         if (refillTimeLeft == 1) {
             refillAmmoNow();
             refillTimeLeft = 0;
@@ -59,7 +80,7 @@ public abstract class AmmoWeapon<T extends AmmoWeapon<T>> extends CooldownWeapon
     }
 
     @EventHandler
-    public void startRefillAmmoOnRightClick(PlayerInteractEvent event) {
+    private void startRefillAmmoOnRightClick(PlayerInteractEvent event) {
         if (!event.getPlayer().equals(player.getPlayer())) {
             return;
         }
@@ -75,9 +96,29 @@ public abstract class AmmoWeapon<T extends AmmoWeapon<T>> extends CooldownWeapon
         startRefillAmmo();
     }
 
+    @EventHandler
+    private void useTotalAmmoLeftAsLevelBar(ServerTickStartEvent event) {
+        Player player = this.player.getPlayer();
+
+        if (player.getLevel() != totalAmmoLeft) {
+            player.setLevel(totalAmmoLeft);
+        }
+    }
+
+    @EventHandler
+    private void useMagazineAmmoLeftAsXp(ServerTickStartEvent event) {
+        Player player = this.player.getPlayer();
+
+        float magazineAmmoAsXp = (float) currentMagazineAmmoLeft / (float) getMaxMagazineAmmo();
+
+        if (player.getExp() != magazineAmmoAsXp) {
+            player.setExp(magazineAmmoAsXp);
+        }
+    }
+
     @Override
     public boolean canUse() {
-        return super.canUse() && currentMagazineAmmoLeft != 0;
+        return super.canUse() && currentMagazineAmmoLeft != 0 && !isRefillingAmmo();
     }
 
     @Override
@@ -93,8 +134,6 @@ public abstract class AmmoWeapon<T extends AmmoWeapon<T>> extends CooldownWeapon
 
     @Override
     public void editItem(ItemStack item) {
-        item.setAmount(Math.min(currentMagazineAmmoLeft, item.getType().getMaxStackSize()));
-
         item.editMeta(Damageable.class, meta -> meta.setDamage((refillTimeLeft / getAmmoRefillTime()) * type.getMaterial().getMaxDurability()));
     }
 

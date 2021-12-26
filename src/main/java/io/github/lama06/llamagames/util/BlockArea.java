@@ -1,5 +1,6 @@
 package io.github.lama06.llamagames.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 
@@ -105,11 +106,11 @@ public class BlockArea {
     }
 
     public int getWidthX() {
-        return getLowerX()-getLowerY() + 1;
+        return getUpperY()-getLowerY() + 1;
     }
 
     public int getWidthZ() {
-        return getLowerZ()-getUpperZ() + 1;
+        return getUpperZ()-getLowerZ() + 1;
     }
 
     public boolean hasSameDimensions(BlockArea other) {
