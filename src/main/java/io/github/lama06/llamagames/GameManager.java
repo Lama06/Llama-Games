@@ -36,7 +36,7 @@ public final class GameManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private Gson createGson(GameType<?, ?> type) {
+    private Gson createGsonForGame(GameType<?, ?> type) {
         GsonBuilder builder = new GsonBuilder().serializeNulls().setPrettyPrinting();
 
         Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
@@ -51,6 +51,10 @@ public final class GameManager implements Listener {
         }
 
         return builder.create();
+    }
+
+    private Gson createRootGson() {
+        return new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     }
 
     private JsonObject loadGamesConfig() throws GamesLoadFailedException {
@@ -88,7 +92,7 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
-        Gson gson = createGson(type);
+        Gson gson = createGsonForGame(type);
 
         C deserializedConfig = gson.fromJson(config, type.getConfigType());
 
@@ -137,7 +141,7 @@ public final class GameManager implements Listener {
         gamesConfig.addProperty("dataVersion", 1);
 
         for (Game<?, ?> game : games) {
-            Gson gson = createGson(game.getType());
+            Gson gson = createGsonForGame(game.getType());
 
             JsonObject gameConfigEntry = new JsonObject();
             gameConfigEntry.addProperty("type", game.getType().getName());
@@ -149,7 +153,7 @@ public final class GameManager implements Listener {
         }
 
         try (FileWriter writer = new FileWriter(configFile)) {
-            new GsonBuilder().setPrettyPrinting().create().toJson(gamesConfig, writer);
+            createRootGson().toJson(gamesConfig, writer);
         } catch (IOException e) {
             throw new GamesSaveFailedException("Failed to write to games.json", e);
         }

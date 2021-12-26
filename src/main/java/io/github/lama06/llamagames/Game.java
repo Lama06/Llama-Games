@@ -256,6 +256,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     public Set<Player> getPlayers() {
+        if (players == null) {
+            return Collections.emptySet();
+        }
+
         Set<Player> result = new HashSet<>(players.size());
 
         Iterator<UUID> iterator = players.iterator();
