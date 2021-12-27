@@ -71,6 +71,11 @@ public class WeaponType<T extends AbstractWeapon<T>> {
         return creator;
     }
 
+    @Override
+    public String toString() {
+        return displayName;
+    }
+
     @FunctionalInterface
     public interface WeaponCreator<T extends AbstractWeapon<T>> {
         T createWeapon(ZombiesGame game, ZombiesPlayer player, WeaponType<T> type);

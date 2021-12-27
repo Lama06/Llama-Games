@@ -7,4 +7,7 @@ import java.util.Map;
 public class SpawnRate {
     public Map<ZombieType<?, ?>, Integer> zombies;
     public int delay;
+
+    // Gson
+    public SpawnRate() { }
 }

@@ -251,7 +251,7 @@ public abstract class LlamaCommand implements TabExecutor {
         return Optional.of((G) game.get());
     }
 
-    public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createConfigSubCommandBootstrap(
+    public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createConfigSubCommand(
             LlamaGamesPlugin plugin,
             Class<G> gameType,
             Function<C, Component> queryMessageSupplier,
@@ -299,7 +299,7 @@ public abstract class LlamaCommand implements TabExecutor {
             BiConsumer<C, Boolean> configChangedCallback,
             Function<Boolean, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -319,7 +319,7 @@ public abstract class LlamaCommand implements TabExecutor {
             BiConsumer<C, Integer> configChangedCallback,
             Function<Integer, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -332,14 +332,14 @@ public abstract class LlamaCommand implements TabExecutor {
         );
     }
 
-    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createStringSubCommand(
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createStringConfigSubCommand(
             LlamaGamesPlugin plugin,
             Class<G> gameType,
             Function<C, Component> queryMessageSupplier,
             BiConsumer<C, String> configChangedCallback,
             Function<String, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -359,7 +359,7 @@ public abstract class LlamaCommand implements TabExecutor {
             BiConsumer<C, BlockPosition> configChangedCallback,
             Function<BlockPosition, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -372,14 +372,14 @@ public abstract class LlamaCommand implements TabExecutor {
         );
     }
 
-    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createEntityPositionSubCommand(
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createEntityPositionConfigSubCommand(
             LlamaGamesPlugin plugin,
             Class<G> gameType,
             Function<C, Component> queryMessageSupplier,
             BiConsumer<C, EntityPosition> configChangedCallback,
             Function<EntityPosition, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -399,7 +399,7 @@ public abstract class LlamaCommand implements TabExecutor {
             BiConsumer<C, BlockArea> configChangedCallback,
             Function<BlockArea, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -419,7 +419,7 @@ public abstract class LlamaCommand implements TabExecutor {
             BiConsumer<C, Material> configChangedCallback,
             Function<Material, Component> configChangedMessageSupplier
     ) {
-        return createConfigSubCommandBootstrap(
+        return createConfigSubCommand(
                 plugin,
                 gameType,
                 queryMessageSupplier,
@@ -432,7 +432,7 @@ public abstract class LlamaCommand implements TabExecutor {
         );
     }
 
-    public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createCollectionSubCommand(
+    public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createCollectionConfigSubCommand(
             LlamaGamesPlugin plugin,
             Class<G> gameType,
             Function<C, Collection<T>> collectionSupplier,
@@ -455,7 +455,7 @@ public abstract class LlamaCommand implements TabExecutor {
             switch (args[1]) {
                 case "list" -> {
                     if (collection.isEmpty()) {
-                        sender.sendMessage(noElementsQueryMessage);
+                        sender.sendMessage(noElementsQueryMessage.color(NamedTextColor.RED));
                         return;
                     }
 
@@ -479,7 +479,7 @@ public abstract class LlamaCommand implements TabExecutor {
                     }
 
                     if (collection.contains(value.get())) {
-                        sender.sendMessage(elementAlreadyExistsMessage);
+                        sender.sendMessage(elementAlreadyExistsMessage.color(NamedTextColor.RED));
                         return;
                     }
 
@@ -487,7 +487,7 @@ public abstract class LlamaCommand implements TabExecutor {
 
                     if (plugin.getGameManager().saveGameConfig(sender)) return;
 
-                    sender.sendMessage(elementAddedMessage);
+                    sender.sendMessage(elementAddedMessage.color(NamedTextColor.GREEN));
                 }
                 case "remove" -> {
                     for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
@@ -501,7 +501,7 @@ public abstract class LlamaCommand implements TabExecutor {
                         if (matchResult.get()) {
                             iterator.remove();
                             if (plugin.getGameManager().saveGameConfig(sender)) return;
-                            sender.sendMessage(elementRemovedMessage);
+                            sender.sendMessage(elementRemovedMessage.color(NamedTextColor.GREEN));
                             return;
                         }
                     }

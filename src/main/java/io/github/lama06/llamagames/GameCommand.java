@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 public abstract class GameCommand extends LlamaCommand {
     public GameCommand(LlamaGamesPlugin plugin, String name) {
         super(plugin, name);
-        addSubCommand("spawn", createEntityPositionSubCommand(
+        addSubCommand("spawn", createEntityPositionConfigSubCommand(
                 plugin,
                 null,
                 config -> Component.text("The spawn is currently at %s".formatted(config.spawnPoint)),
