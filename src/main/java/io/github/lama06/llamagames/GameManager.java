@@ -3,6 +3,9 @@ package io.github.lama06.llamagames;
 import com.google.gson.*;
 import io.github.lama06.llamagames.util.BlockDataTypeAdapter;
 import io.github.lama06.llamagames.util.Pair;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -156,6 +159,16 @@ public final class GameManager implements Listener {
             createRootGson().toJson(gamesConfig, writer);
         } catch (IOException e) {
             throw new GamesSaveFailedException("Failed to write to games.json", e);
+        }
+    }
+
+    public boolean saveGameConfig(Audience errorListener) {
+        try {
+            saveGameConfig();
+            return false;
+        } catch (GamesSaveFailedException e) {
+            errorListener.sendMessage(Component.text("Failed to save the config file", NamedTextColor.RED));
+            return true;
         }
     }
 

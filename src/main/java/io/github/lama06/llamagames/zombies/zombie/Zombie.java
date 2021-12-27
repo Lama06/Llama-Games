@@ -6,8 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
-
 public abstract class Zombie<T extends Zombie<T>> extends PathfinderZombie<T, org.bukkit.entity.Zombie> {
     public Zombie(ZombiesGame game, ZombieType<T, org.bukkit.entity.Zombie> type) {
         super(game, type);

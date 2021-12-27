@@ -8,6 +8,11 @@ import io.github.lama06.llamagames.llama_says.LlamaSaysCommand;
 import io.github.lama06.llamagames.llama_says.LlamaSaysConfig;
 import io.github.lama06.llamagames.llama_says.LlamaSaysGame;
 import io.github.lama06.llamagames.util.Pair;
+import io.github.lama06.llamagames.zombies.WeaponTypeAdapter;
+import io.github.lama06.llamagames.zombies.ZombiesCommand;
+import io.github.lama06.llamagames.zombies.ZombiesConfig;
+import io.github.lama06.llamagames.zombies.ZombiesGame;
+import io.github.lama06.llamagames.zombies.weapon.WeaponType;
 import org.bukkit.World;
 
 import java.util.HashSet;
@@ -34,7 +39,7 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             LlamaSaysConfig.class,
             null,
             LlamaSaysConfig::new,
-            plugin -> new LlamaSaysCommand(plugin, "llamasays"),
+            LlamaSaysCommand::new,
             null
     );
 
@@ -44,7 +49,19 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             BlockPartyConfig.class,
             null,
             BlockPartyConfig::new,
-            plugin -> new BlockPartyCommand(plugin, "blockparty"),
+            BlockPartyCommand::new,
+            null
+    );
+
+    public static final GameType<ZombiesGame, ZombiesConfig> ZOMBIES = new GameType<>(
+            "zombies",
+            ZombiesGame::new,
+            ZombiesConfig.class,
+            Set.of(
+                    Pair.of(WeaponType.class, new WeaponTypeAdapter())
+            ),
+            ZombiesConfig::new,
+            ZombiesCommand::new,
             null
     );
 

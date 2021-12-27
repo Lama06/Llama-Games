@@ -1,9 +1,6 @@
 package io.github.lama06.llamagames;
 
-import io.github.lama06.llamagames.util.BlockArea;
-import io.github.lama06.llamagames.util.BlockPosition;
-import io.github.lama06.llamagames.util.EntityPosition;
-import io.github.lama06.llamagames.util.Pair;
+import io.github.lama06.llamagames.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,9 +12,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.*;
 
 public abstract class LlamaCommand implements TabExecutor {
     protected final LlamaGamesPlugin plugin;
@@ -68,7 +63,7 @@ public abstract class LlamaCommand implements TabExecutor {
 
         Optional<Map.Entry<String, SubCommandExecutor>> subCommand = subCommands.entrySet().stream().filter(s -> s.getKey().equals(args[0])).findFirst();
         if (subCommand.isPresent()) {
-            subCommand.get().getValue().executeSubCommand(sender, Arrays.copyOfRange(args, 1, args.length));
+            subCommand.get().getValue().execute(sender, Arrays.copyOfRange(args, 1, args.length));
         } else {
             sender.sendMessage(Component.text("There is not sub command with this name", NamedTextColor.RED));
         }
@@ -89,7 +84,7 @@ public abstract class LlamaCommand implements TabExecutor {
 
     @FunctionalInterface
     public interface SubCommandExecutor {
-        void executeSubCommand(CommandSender sender, String[] args);
+        void execute(CommandSender sender, String[] args);
     }
 
     public static boolean requireArgsExact(CommandSender sender, String[] args, int number) {
@@ -337,6 +332,26 @@ public abstract class LlamaCommand implements TabExecutor {
         );
     }
 
+    public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createStringSubCommand(
+            LlamaGamesPlugin plugin,
+            Class<G> gameType,
+            Function<C, Component> queryMessageSupplier,
+            BiConsumer<C, String> configChangedCallback,
+            Function<String, Component> configChangedMessageSupplier
+    ) {
+        return createConfigSubCommandBootstrap(
+                plugin,
+                gameType,
+                queryMessageSupplier,
+                configChangedCallback,
+                configChangedMessageSupplier,
+                (sender, args) -> {
+                    if (requireArgsAtLeast(sender, args, 1)) return Optional.empty();
+                    return Optional.of(String.join(" ", args));
+                }
+        );
+    }
+
     public static <G extends Game<G, C>, C extends GameConfig> SubCommandExecutor createBlockPositionConfigSubCommand(
             LlamaGamesPlugin plugin,
             Class<G> gameType,
@@ -415,5 +430,83 @@ public abstract class LlamaCommand implements TabExecutor {
                     return requireMaterial(sender, args[0]);
                 }
         );
+    }
+
+    public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createCollectionSubCommand(
+            LlamaGamesPlugin plugin,
+            Class<G> gameType,
+            Function<C, Collection<T>> collectionSupplier,
+            Component noElementsQueryMessage,
+            Function<T, Component> elementToQueryTextSupplier,
+            BiFunction<CommandSender, String[], Optional<T>> elementCreator,
+            Component elementAlreadyExistsMessage,
+            Component elementAddedMessage,
+            TriFunction<CommandSender, String[], T, Optional<Boolean>> elementRemoveMatcher,
+            Component elementRemovedMessage
+    ) {
+        return (sender, args) -> {
+            if (requireArgsAtLeast(sender, args, 2)) return;
+
+            Optional<G> game = requireGame(plugin, sender, args[0], gameType);
+            if (game.isEmpty()) return;
+
+            Collection<T> collection = collectionSupplier.apply(game.get().getConfig());
+
+            switch (args[1]) {
+                case "list" -> {
+                    if (collection.isEmpty()) {
+                        sender.sendMessage(noElementsQueryMessage);
+                        return;
+                    }
+
+                    TextComponent.Builder builder = Component.text();
+                    boolean first = true;
+                    for (T element : collection) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            builder.append(Component.newline());
+                        }
+                        builder.append(elementToQueryTextSupplier.apply(element));
+                    }
+
+                    sender.sendMessage(builder);
+                }
+                case "add" -> {
+                    Optional<T> value = elementCreator.apply(sender, Arrays.copyOfRange(args, 2, args.length));
+                    if (value.isEmpty()) {
+                        return;
+                    }
+
+                    if (collection.contains(value.get())) {
+                        sender.sendMessage(elementAlreadyExistsMessage);
+                        return;
+                    }
+
+                    collection.add(value.get());
+
+                    if (plugin.getGameManager().saveGameConfig(sender)) return;
+
+                    sender.sendMessage(elementAddedMessage);
+                }
+                case "remove" -> {
+                    for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
+                        T element = iterator.next();
+
+                        Optional<Boolean> matchResult = elementRemoveMatcher.apply(sender, Arrays.copyOfRange(args, 2, args.length), element);
+                        if (matchResult.isEmpty()) {
+                            return;
+                        }
+
+                        if (matchResult.get()) {
+                            iterator.remove();
+                            if (plugin.getGameManager().saveGameConfig(sender)) return;
+                            sender.sendMessage(elementRemovedMessage);
+                            return;
+                        }
+                    }
+                }
+            }
+        };
     }
 }

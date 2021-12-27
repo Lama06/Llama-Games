@@ -4,15 +4,13 @@ import io.github.lama06.llamagames.GameCommand;
 import io.github.lama06.llamagames.LlamaGamesPlugin;
 import io.github.lama06.llamagames.util.BlockArea;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.CommandSender;
 
 import java.util.Optional;
 
 public class BlockPartyCommand extends GameCommand {
-    public BlockPartyCommand(LlamaGamesPlugin plugin, String name) {
-        super(plugin, name);
+    public BlockPartyCommand(LlamaGamesPlugin plugin) {
+        super(plugin, "blockparty");
         addSubCommand("floor", createBlockAreaConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
@@ -27,72 +25,29 @@ public class BlockPartyCommand extends GameCommand {
                 (config, material) -> config.deadlyBlock = material,
                 material -> Component.text("The deadly block is now set to ").append(Component.translatable(material))
         ));
-        addSubCommand("addFloor", this::addFloor);
-        addSubCommand("removeFloor", this::removeFloor);
-        addSubCommand("listFloors", this::listFloors);
-    }
+        addSubCommand("floors", createCollectionSubCommand(
+                plugin,
+                BlockPartyGame.class,
+                config -> config.floors,
+                Component.text("There are no floors", NamedTextColor.RED),
+                floor -> Component.text("%s: %s".formatted(floor.name, floor.area)),
+                (sender, args) -> {
+                    if (requireArgsExact(sender, args, 7)) return Optional.empty();
+                    String name = args[0];
 
-    public void addFloor(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 8)) return;
+                    Optional<BlockArea> area = requireBlockArea(sender, args[1], args[2], args[3], args[4], args[5], args[6]);
+                    if (area.isEmpty()) return Optional.empty();
 
-        Optional<BlockPartyGame> game = requireGame(plugin, sender, args[0], BlockPartyGame.class);
-        if (game.isEmpty()) return;
-
-        String name = args[1];
-
-        Optional<BlockArea> area = requireBlockArea(sender, args[2], args[3], args[4], args[5], args[6], args[7]);
-        if (area.isEmpty()) return;
-
-        if (game.get().getConfig().getFloorByName(name).isPresent()) {
-            sender.sendMessage(Component.text("A floor with that name already exists", NamedTextColor.RED));
-            return;
-        }
-
-        game.get().getConfig().floors.add(new Floor(name, area.get()));
-        sender.sendMessage(Component.text("The floor was successfully added", NamedTextColor.GREEN));
-    }
-
-    public void removeFloor(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 2)) return;
-
-        Optional<BlockPartyGame> game = requireGame(plugin, sender, args[0], BlockPartyGame.class);
-        if (game.isEmpty()) return;
-
-        String name = args[1];
-
-        Optional<Floor> floor = game.get().getConfig().getFloorByName(name);
-        if (floor.isEmpty()) {
-            sender.sendMessage(Component.text("No floor with this name exists", NamedTextColor.RED));
-            return;
-        }
-
-        game.get().getConfig().floors.remove(floor.get());
-        sender.sendMessage(Component.text("The floor was removed", NamedTextColor.GREEN));
-    }
-
-    public void listFloors(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 1)) return;
-
-        Optional<BlockPartyGame> game = requireGame(plugin, sender, args[0], BlockPartyGame.class);
-        if (game.isEmpty()) return;
-
-        if (game.get().getConfig().floors.isEmpty()) {
-            sender.sendMessage("There are no floors");
-            return;
-        }
-
-        TextComponent.Builder text = Component.text();
-        boolean first = true;
-        for (Floor floor : game.get().getConfig().floors) {
-            if (first) {
-                first = false;
-            } else {
-                text.append(Component.newline());
-            }
-
-            text.append(Component.text("%s: %s".formatted(floor.name, floor.area)));
-        }
-
-        sender.sendMessage(text);
+                    return Optional.of(new Floor(name, area.get()));
+                },
+                Component.text("A floor with this name already exists", NamedTextColor.RED),
+                Component.text("Floor successfully added", NamedTextColor.GREEN),
+                (sender, args, floor) -> {
+                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
+                    String name = args[0];
+                    return Optional.of(floor.name.equals(name));
+                },
+                Component.text("Floor successfully removed", NamedTextColor.GREEN)
+        ));
     }
 }

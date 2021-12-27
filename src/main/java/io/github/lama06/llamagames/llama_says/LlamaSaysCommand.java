@@ -6,8 +6,8 @@ import io.github.lama06.llamagames.LlamaGamesPlugin;
 import net.kyori.adventure.text.Component;
 
 public class LlamaSaysCommand extends GameCommand {
-    public LlamaSaysCommand(LlamaGamesPlugin plugin, String name) {
-        super(plugin, name);
+    public LlamaSaysCommand(LlamaGamesPlugin plugin) {
+        super(plugin, "llamasays");
 
         addSubCommand("floorCenter", LlamaCommand.createBlockPositionConfigSubCommand(
                 plugin,

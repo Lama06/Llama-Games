@@ -120,7 +120,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     public boolean canStart() {
-        return !running && isConfigComplete();
+        return !running && isConfigComplete() && !isStarting();
     }
 
     public abstract boolean canContinueAfterPlayerLeft();
@@ -194,7 +194,9 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void tryToStartAfterCountdown() {
-        if (running || !canStart() || isStarting()) return;
+        if (!canStart()) {
+            return;
+        }
 
         startAfterCountdown(10);
     }
