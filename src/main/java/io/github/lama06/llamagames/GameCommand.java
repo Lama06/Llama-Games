@@ -8,17 +8,17 @@ public abstract class GameCommand extends LlamaCommand {
         addSubCommand("spawn", createEntityPositionConfigSubCommand(
                 plugin,
                 null,
-                config -> Component.text("The spawn is currently at %s".formatted(config.spawnPoint)),
-                (config, position) -> config.spawnPoint = position,
+                config -> Component.text("The spawn is currently at %s".formatted(config.getSpawnPoint())),
+                GameConfig::setSpawnPoint,
                 position -> Component.text("Spawn point successfully changed to %s".formatted(position))
         ));
         addSubCommand("cancelEvents", createBooleanConfigSubCommand(
                 plugin,
                 null,
-                config -> config.cancelEvents ?
+                config -> config.isCancelEvents() ?
                         Component.text("All events in this game world are being canceled") :
                         Component.text("Events are not being canceled in this game world"),
-                (config, flag) -> config.cancelEvents = flag,
+                GameConfig::setCancelEvents,
                 flag -> flag ?
                         Component.text("Events in this world are being canceled") :
                         Component.text("Events in this world are not being canceled")

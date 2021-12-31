@@ -62,7 +62,7 @@ public class EventCanceler implements Listener {
     }
 
     private boolean shouldCancel(World world) {
-        return world.equals(game.getWorld()) && game.getConfig().cancelEvents;
+        return world.equals(game.getWorld()) && game.getConfig().isCancelEvents();
     }
 
     @EventHandler

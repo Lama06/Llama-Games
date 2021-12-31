@@ -50,7 +50,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         players = new HashSet<>();
         for (Player player : world.getPlayers()) {
             players.add(player.getUniqueId());
-            player.teleport(config.spawnPoint.asLocation(world));
+            player.teleport(config.getSpawnPoint().asLocation(world));
             player.setGameMode(GameMode.SURVIVAL);
         }
 
@@ -116,7 +116,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     public abstract void handleGameEnded(GameEndReason reason);
 
     public boolean isConfigComplete() {
-        return config.spawnPoint != null;
+        return config.getSpawnPoint() != null;
     }
 
     public boolean canStart() {
@@ -156,7 +156,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             tryToStartAfterCountdown();
         }
 
-        player.teleport(config.spawnPoint == null ? world.getSpawnLocation() : config.spawnPoint.asLocation(world));
+        player.teleport(config.getSpawnPoint() == null ? world.getSpawnLocation() : config.getSpawnPoint().asLocation(world));
     }
 
     private void handlePlayerLeftInternal(Player player) {

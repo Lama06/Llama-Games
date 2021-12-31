@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class InsertMusicDiscMiniGame extends CompeteMiniGame<InsertMusicDiscMiniGame> {
+public class InsertMusicDiscMiniGame extends MiniGame {
     private static final Map<Material, String> MUSIC_DISCS = ImmutableMap.<Material, String>builder()
             .put(Material.MUSIC_DISC_PIGSTEP, "Pigstep")
             .put(Material.MUSIC_DISC_11, "Never gonna give you up")
@@ -28,12 +28,15 @@ public class InsertMusicDiscMiniGame extends CompeteMiniGame<InsertMusicDiscMini
             .put(Material.MUSIC_DISC_STRAD, "Rick Astley Compilation")
             .build();
 
-    private final List<Material> musicDiscs;
-    private final Material disc;
+    private List<Material> musicDiscs;
+    private Material disc;
 
-    public InsertMusicDiscMiniGame(LlamaSaysGame game, Consumer<InsertMusicDiscMiniGame> callback) {
-        super(game, callback);
+    public InsertMusicDiscMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
+    }
 
+    @Override
+    public void init() {
         musicDiscs = Util.pickRandomElements(MUSIC_DISCS.keySet(), 9, game.getRandom());
         disc = musicDiscs.get(game.getRandom().nextInt(musicDiscs.size()));
     }
@@ -79,9 +82,9 @@ public class InsertMusicDiscMiniGame extends CompeteMiniGame<InsertMusicDiscMini
         event.setCancelled(true);
 
         if (event.getItem() != null && event.getItem().getType() != disc) {
-            addFailedPlayer(event.getPlayer());
+            result.addFailedPlayer(event.getPlayer());
         } else {
-            addSuccessfulPlayer(event.getPlayer());
+            result.addSuccessfulPlayer(event.getPlayer());
         }
     }
 }

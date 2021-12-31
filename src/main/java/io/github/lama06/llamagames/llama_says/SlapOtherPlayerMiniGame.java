@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SlapOtherPlayerMiniGame extends CompeteMiniGame<SlapOtherPlayerMiniGame> {
+public class SlapOtherPlayerMiniGame extends MiniGame {
     private static final List<Material> ITEMS = List.of(
             Material.MELON,
             Material.COOKIE,
@@ -23,11 +23,14 @@ public class SlapOtherPlayerMiniGame extends CompeteMiniGame<SlapOtherPlayerMini
             Material.BAKED_POTATO
     );
 
-    private final Material item;
+    private Material item;
 
-    public SlapOtherPlayerMiniGame(LlamaSaysGame game, Consumer<SlapOtherPlayerMiniGame> callback) {
-        super(game, callback);
+    public SlapOtherPlayerMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
+    }
 
+    @Override
+    public void init() {
         item = ITEMS.get(game.getRandom().nextInt(ITEMS.size()));
     }
 
@@ -53,9 +56,9 @@ public class SlapOtherPlayerMiniGame extends CompeteMiniGame<SlapOtherPlayerMini
 
         if (event.getPlayer().getTargetEntity(5) != null) {
             if (event.getPlayer().getInventory().getItemInMainHand().getType() == item) {
-                addSuccessfulPlayer(event.getPlayer());
+                result.addSuccessfulPlayer(event.getPlayer());
             } else {
-                addFailedPlayer(event.getPlayer());
+                result.addFailedPlayer(event.getPlayer());
             }
         }
     }

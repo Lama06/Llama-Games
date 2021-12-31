@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class WriteToChatMiniGame extends CompeteMiniGame<WriteToChatMiniGame> {
+public class WriteToChatMiniGame extends MiniGame {
     private static final List<String> WORDS = List.of(
             "Gouverneur",
             "President",
@@ -21,10 +21,14 @@ public class WriteToChatMiniGame extends CompeteMiniGame<WriteToChatMiniGame> {
             "Goat"
     );
 
-    private final String word;
+    private String word;
 
-    public WriteToChatMiniGame(LlamaSaysGame game, Consumer<WriteToChatMiniGame> callback) {
-        super(game, callback);
+    public WriteToChatMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
+    }
+
+    @Override
+    public void init() {
         word = WORDS.get(game.getRandom().nextInt(WORDS.size()));
     }
 
@@ -37,7 +41,7 @@ public class WriteToChatMiniGame extends CompeteMiniGame<WriteToChatMiniGame> {
     public void handlePlayerChatEvent(AsyncChatEvent event) {
         Bukkit.getScheduler().runTask(game.getPlugin(), () -> {
             if (PaperComponents.plainSerializer().serialize(event.message()).trim().equalsIgnoreCase(word)) {
-                addSuccessfulPlayer(event.getPlayer());
+                result.addSuccessfulPlayer(event.getPlayer());
             }
         });
     }

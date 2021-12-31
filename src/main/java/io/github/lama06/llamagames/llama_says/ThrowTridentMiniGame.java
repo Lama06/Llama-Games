@@ -10,9 +10,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
-public class ThrowTridentMiniGame extends CompleteMiniGame<ThrowTridentMiniGame> {
-    public ThrowTridentMiniGame(LlamaSaysGame game, Consumer<ThrowTridentMiniGame> callback) {
-        super(game, callback);
+public class ThrowTridentMiniGame extends MiniGame {
+    public ThrowTridentMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new CompleteResult(), callback);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class ThrowTridentMiniGame extends CompleteMiniGame<ThrowTridentMiniGame>
                 event.getHitEntity() instanceof Player defender &&
                 trident.getShooter() != null &&
                 trident.getShooter() instanceof Player attacker) {
-            addSuccessfulPlayer(attacker);
-            addFailedPlayer(defender);
+            result.addSuccessfulPlayer(attacker);
+            result.addFailedPlayer(defender);
         }
     }
 }

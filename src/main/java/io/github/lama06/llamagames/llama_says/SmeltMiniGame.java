@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
+public class SmeltMiniGame extends MiniGame {
     private static final List<Pair<Material, Material>> INGREDIENTS = List.of(
             Pair.of(Material.RAW_COPPER, Material.COPPER_INGOT),
             Pair.of(Material.RAW_IRON, Material.IRON_INGOT),
@@ -25,10 +25,14 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
             Material.SMOKER
     );
 
-    private final Pair<Material, Material> ingredient;
+    private Pair<Material, Material> ingredient;
 
-    public SmeltMiniGame(LlamaSaysGame game, Consumer<SmeltMiniGame> callback) {
-        super(game, callback);
+    public SmeltMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
+    }
+
+    @Override
+    public void init() {
         ingredient = INGREDIENTS.get(game.getRandom().nextInt(INGREDIENTS.size()));
         game.getEventCanceler().setCancelInventoryEvents(false);
     }
@@ -81,9 +85,9 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
         }
 
         if (event.getItemType() == ingredient.getRight()) {
-            addSuccessfulPlayer(event.getPlayer());
+            result.addSuccessfulPlayer(event.getPlayer());
         } else {
-            addFailedPlayer(event.getPlayer());
+            result.addFailedPlayer(event.getPlayer());
         }
     }
 }

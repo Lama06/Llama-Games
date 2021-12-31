@@ -10,9 +10,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
-public class ShootYourselfWithAnArrowMiniGame extends CompeteMiniGame<ShootYourselfWithAnArrowMiniGame> {
-    public ShootYourselfWithAnArrowMiniGame(LlamaSaysGame game, Consumer<ShootYourselfWithAnArrowMiniGame> callback) {
-        super(game, callback);
+public class ShootYourselfWithAnArrowMiniGame extends MiniGame {
+    public ShootYourselfWithAnArrowMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ShootYourselfWithAnArrowMiniGame extends CompeteMiniGame<ShootYours
         if (event.getHitEntity() instanceof Player player &&
                 event.getEntity() instanceof Arrow arrow &&
                 player.equals(arrow.getShooter())) {
-            addSuccessfulPlayer(player);
+            result.addSuccessfulPlayer(player);
         }
     }
 }

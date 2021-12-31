@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class EatUntilYouAreFullMiniGame extends CompeteMiniGame<EatUntilYouAreFullMiniGame> {
+public class EatUntilYouAreFullMiniGame extends MiniGame {
     private static final Set<Material> FOOD_ITEMS = Set.of(
             Material.BREAD,
             Material.SWEET_BERRIES,
@@ -26,10 +26,14 @@ public class EatUntilYouAreFullMiniGame extends CompeteMiniGame<EatUntilYouAreFu
             Material.DRIED_KELP
     );
 
-    private final List<Material> items;
+    private List<Material> items;
 
-    public EatUntilYouAreFullMiniGame(LlamaSaysGame game, Consumer<EatUntilYouAreFullMiniGame> callback) {
-        super(game, callback);
+    public EatUntilYouAreFullMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
+    }
+
+    @Override
+    public void init() {
         items = Util.pickRandomElements(FOOD_ITEMS, 9, game.getRandom());
         game.getEventCanceler().setCancelItemConsummation(false);
     }
@@ -59,7 +63,7 @@ public class EatUntilYouAreFullMiniGame extends CompeteMiniGame<EatUntilYouAreFu
     @EventHandler
     public void handleFoodLevelChangeEvent(FoodLevelChangeEvent event) {
         if (event.getFoodLevel() == 20 && event.getEntity() instanceof Player player) {
-            addFailedPlayer(player);
+            result.addFailedPlayer(player);
         }
     }
 }

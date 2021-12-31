@@ -15,7 +15,7 @@ import java.util.List;
 public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     private int remainingRounds;
     private List<MiniGameType<?>> remainingGameTypes;
-    private MiniGame<?> currentMiniGame;
+    private MiniGame currentMiniGame;
     private Map<UUID, Integer> points;
 
     public LlamaSaysGame(LlamaGamesPlugin plugin, World world, LlamaSaysConfig config, GameType<LlamaSaysGame, LlamaSaysConfig> type) {
@@ -26,10 +26,12 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     public void handleGameStarted() {
         remainingRounds = config.getNumberOfRounds();
         remainingGameTypes = new ArrayList<>(MiniGameType.getTypes());
+
         points = new HashMap<>();
         for (Player player : getPlayers()) {
             points.put(player.getUniqueId(), 0);
         }
+
         startNextRound();
     }
 
@@ -47,18 +49,12 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
         currentMiniGame = type.getCreator().createMiniGame(this, game -> {
             canceler.disallowAll();
 
-            if (game instanceof CompeteMiniGame<?> compete) {
-                List<UUID> ranking = compete.getRanking();
+            MiniGameResult result = game.getResult();
 
-                if (ranking.size() >= 1) points.put(ranking.get(0), points.get(ranking.get(0)) + 3);
-                if (ranking.size() >= 2) points.put(ranking.get(1), points.get(ranking.get(1)) + 2);
-                if (ranking.size() >= 3) points.put(ranking.get(2), points.get(ranking.get(2)) + 1);
-            } else if (game instanceof CompleteMiniGame<?> complete) {
-                Set<UUID> successfulPlayers = complete.getSuccessfulPlayers();
-
-                for (UUID successfulPlayer : successfulPlayers) {
-                    points.put(successfulPlayer, points.get(successfulPlayer) + 1);
-                }
+            for (Player player : getPlayers()) {
+                int currentPoints = points.get(player.getUniqueId());
+                int newPoints = currentPoints + result.getPointsForPlayer(player);
+                points.put(player.getUniqueId(), newPoints);
             }
 
             if (remainingRounds == 0) {

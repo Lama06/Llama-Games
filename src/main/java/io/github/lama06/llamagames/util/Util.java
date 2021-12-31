@@ -5,11 +5,11 @@ import java.util.*;
 public class Util {
     private static final Random RANDOM = new Random();
 
-    public static <T> List<T> pickRandomElements(Collection<T> source, int amount, Random random) {
+    public static <T> List<T> pickRandomElements(Collection<T> source, int limit, Random random) {
         List<T> sourceCopy = new ArrayList<>(source);
         List<T> result = new ArrayList<>();
 
-        while (result.size() < amount && !sourceCopy.isEmpty()) {
+        while (result.size() < limit && !sourceCopy.isEmpty()) {
             T randomElement = pickRandomElement(sourceCopy, random);
             sourceCopy.remove(randomElement);
             result.add(randomElement);
@@ -18,8 +18,8 @@ public class Util {
         return result;
     }
 
-    public static <T> List<T> pickRandomElements(Collection<T> source, int amount) {
-        return pickRandomElements(source, amount, RANDOM);
+    public static <T> List<T> pickRandomElements(Collection<T> source, int limit) {
+        return pickRandomElements(source, limit, RANDOM);
     }
 
     public static <T> T pickRandomElement(Set<T> source, Random random) {

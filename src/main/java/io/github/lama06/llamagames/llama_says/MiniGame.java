@@ -13,13 +13,15 @@ import org.bukkit.scheduler.BukkitTask;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener permits CompeteMiniGame, CompleteMiniGame {
+public abstract class MiniGame implements Listener {
     protected final LlamaSaysGame game;
-    private final Consumer<T> callback;
+    protected final MiniGameResult result;
+    private final Consumer<MiniGame> callback;
     private BukkitTask timeoutTask;
 
-    public MiniGame(LlamaSaysGame game, Consumer<T> callback) {
+    public MiniGame(LlamaSaysGame game, MiniGameResult result, Consumer<MiniGame> callback) {
         this.game = game;
+        this.result = result;
         this.callback = callback;
     }
 
@@ -29,35 +31,39 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
         return 200;
     }
 
+    public void init() { }
+
     public void handleGameStarted() { }
 
     public void handleGameEnded() { }
 
     public final void startGame() {
-        Bukkit.getPluginManager().registerEvents(this, game.getPlugin());
+        init();
 
         for (Player player : game.getWorld().getPlayers()) {
-            player.teleport(game.getConfig().spawnPoint.asLocation(game.getWorld()));
+            player.teleport(game.getConfig().getSpawnPoint().asLocation(game.getWorld()));
         }
 
         Component title = getTitle();
 
         game.getBroadcastAudience().sendMessage(title.color(NamedTextColor.YELLOW));
-
-        for (Player player : game.getPlayers()) {
-            player.showTitle(Title.title(
-                    title.color(NamedTextColor.YELLOW),
-                    Component.empty(),
-                    Title.Times.of(Duration.ofMillis(500), Duration.ofSeconds(2), Duration.ofMillis(500))
-            ));
-        }
+        game.getBroadcastAudience().showTitle(Title.title(
+                title.color(NamedTextColor.YELLOW),
+                Component.empty(),
+                Title.Times.of(
+                        Duration.ZERO,
+                        Duration.ofSeconds(3),
+                        Duration.ofSeconds(1)
+                )
+        ));
 
         timeoutTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> endGame(true), getTimeoutDelay());
 
         handleGameStarted();
+
+        Bukkit.getPluginManager().registerEvents(this, game.getPlugin());
     }
 
-    @SuppressWarnings("unchecked")
     public final void endGame(boolean callCallback) {
         if (timeoutTask != null) {
             timeoutTask.cancel();
@@ -77,7 +83,11 @@ public abstract sealed class MiniGame<T extends MiniGame<T>> implements Listener
         }
 
         if (callCallback) {
-            callback.accept((T) this);
+            callback.accept(this);
         }
+    }
+
+    public MiniGameResult getResult() {
+        return result;
     }
 }

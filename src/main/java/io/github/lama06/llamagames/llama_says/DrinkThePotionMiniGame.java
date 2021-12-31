@@ -16,12 +16,17 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGame> {
+public class DrinkThePotionMiniGame extends MiniGame {
     private static final List<PotionType> POTION_TYPES_WITH_EFFECT = Arrays.stream(PotionType.values()).filter(p -> p.getEffectType() != null).collect(Collectors.toList());
-    private final PotionType potionType;
 
-    public DrinkThePotionMiniGame(LlamaSaysGame game, Consumer<DrinkThePotionMiniGame> callback) {
-        super(game, callback);
+    private PotionType potionType;
+
+    public DrinkThePotionMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
+    }
+
+    @Override
+    public void init() {
         potionType = POTION_TYPES_WITH_EFFECT.get(game.getRandom().nextInt(POTION_TYPES_WITH_EFFECT.size()));
         game.getEventCanceler().setCancelItemConsummation(false);
     }
@@ -79,9 +84,9 @@ public class DrinkThePotionMiniGame extends CompeteMiniGame<DrinkThePotionMiniGa
         PotionType type = meta.getBasePotionData().getType();
 
         if (type == potionType) {
-            addSuccessfulPlayer(event.getPlayer());
+            result.addSuccessfulPlayer(event.getPlayer());
         } else {
-            addFailedPlayer(event.getPlayer());
+            result.addFailedPlayer(event.getPlayer());
         }
     }
 

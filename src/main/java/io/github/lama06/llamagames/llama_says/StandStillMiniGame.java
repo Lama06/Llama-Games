@@ -9,13 +9,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.function.Consumer;
 
-public class StandStillMiniGame extends CompleteMiniGame<StandStillMiniGame> {
+public class StandStillMiniGame extends MiniGame {
     private boolean checkForMovement = false;
-    private final BukkitTask enableMovementCheckingTask;
+    private BukkitTask enableMovementCheckingTask;
 
-    public StandStillMiniGame(LlamaSaysGame game, Consumer<StandStillMiniGame> callback) {
-        super(game, callback);
-        enableMovementCheckingTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> checkForMovement = true, 40);
+    public StandStillMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new CompleteResult(), callback);
     }
 
     @Override
@@ -24,17 +23,25 @@ public class StandStillMiniGame extends CompleteMiniGame<StandStillMiniGame> {
     }
 
     @Override
+    public void handleGameStarted() {
+        enableMovementCheckingTask = Bukkit.getScheduler().runTaskLater(game.getPlugin(), () -> checkForMovement = true, 40);
+    }
+
+    @Override
     public void handleGameEnded() {
         for (Player player : game.getPlayers()) {
-            addSuccessfulPlayer(player);
+            result.addSuccessfulPlayer(player);
         }
-        enableMovementCheckingTask.cancel();
+
+        if (enableMovementCheckingTask != null) {
+            enableMovementCheckingTask.cancel();
+        }
     }
 
     @EventHandler
     public void handlePlayerMoveEvent(PlayerMoveEvent event) {
         if (checkForMovement && event.hasChangedPosition()) {
-            addFailedPlayer(event.getPlayer());
+            result.addFailedPlayer(event.getPlayer());
         }
     }
 }

@@ -14,9 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMiniGame> {
-    public GetIntoMinecartMiniGame(LlamaSaysGame game, Consumer<GetIntoMinecartMiniGame> callback) {
-        super(game, callback);
+public class GetIntoMinecartMiniGame extends MiniGame {
+    public GetIntoMinecartMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
+        super(game, new RankedResult(), callback);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMin
             return;
         }
 
-        addSuccessfulPlayer(player);
+        result.addSuccessfulPlayer(player);
     }
 
     @EventHandler

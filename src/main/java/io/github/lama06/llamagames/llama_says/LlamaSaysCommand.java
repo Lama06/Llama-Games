@@ -13,21 +13,21 @@ public class LlamaSaysCommand extends GameCommand {
                 plugin,
                 LlamaSaysGame.class,
                 config -> Component.text("The floor center is currently at %s".formatted(config.getFloorCenter())),
-                (config, position) -> config.setFloorCenter(position),
+                LlamaSaysConfig::setFloorCenter,
                 position -> Component.text("Floor center successfully changed to %s".formatted(position))
         ));
         addSubCommand("numberOfRounds", createIntegerConfigSubCommand(
                 plugin,
                 LlamaSaysGame.class,
                 config -> Component.text("The game will end after %d rounds".formatted(config.getNumberOfRounds())),
-                (config, rounds) -> config.setNumberOfRounds(rounds),
+                LlamaSaysConfig::setNumberOfRounds,
                 rounds -> Component.text("Number of rounds successfully changed to %d".formatted(rounds))
         ));
         addSubCommand("floor", createBlockAreaConfigSubCommand(
                 plugin,
                 LlamaSaysGame.class,
                 config -> Component.text("The floor is currently at %s".formatted(config.getFloor())),
-                (config, floor) -> config.setFloor(floor),
+                LlamaSaysConfig::setFloor,
                 floor -> Component.text("The position of the floor was successfully changed to %s".formatted(floor))
         ));
     }
