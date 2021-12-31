@@ -2,7 +2,6 @@ package io.github.lama06.llamagames;
 
 import com.google.gson.*;
 import io.github.lama06.llamagames.util.BlockDataTypeAdapter;
-import io.github.lama06.llamagames.util.Pair;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,11 +23,12 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class GameManager implements Listener {
-    private static final Set<Pair<Class<?>, TypeAdapter<?>>> DEFAULT_TYPE_ADAPTERS = Set.of(
-            Pair.of(BlockData.class, new BlockDataTypeAdapter())
+    private static final Map<Class<?>, TypeAdapter<?>> DEFAULT_TYPE_ADAPTERS = Map.ofEntries(
+            Map.entry(BlockData.class, new BlockDataTypeAdapter())
     );
 
     private final LlamaGamesPlugin plugin;
+    private final Gson gson = createGson();
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
 
@@ -39,25 +39,26 @@ public final class GameManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private Gson createGsonForGame(GameType<?, ?> type) {
-        GsonBuilder builder = new GsonBuilder().serializeNulls().setPrettyPrinting();
+    private Gson createGson() {
+        GsonBuilder builder = new GsonBuilder().setPrettyPrinting().serializeNulls();
 
-        Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters = type.getTypeAdapters();
-        if (typeAdapters != null) {
-            for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters) {
-                builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+        for (GameType<?, ?> type : GameType.getValues()) {
+            Map<Class<?>, TypeAdapter<?>> typeAdapters = type.getTypeAdapters();
+
+            if (typeAdapters == null) {
+                continue;
+            }
+
+            for (Map.Entry<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters.entrySet()) {
+                builder.registerTypeAdapter(typeAdapter.getKey(), typeAdapter.getValue());
             }
         }
 
-        for (Pair<Class<?>, TypeAdapter<?>> typeAdapter : DEFAULT_TYPE_ADAPTERS) {
-            builder.registerTypeAdapter(typeAdapter.getLeft(), typeAdapter.getRight());
+        for (Map.Entry<Class<?>, TypeAdapter<?>> typeAdapter : DEFAULT_TYPE_ADAPTERS.entrySet()) {
+            builder.registerTypeAdapter(typeAdapter.getKey(), typeAdapter.getValue());
         }
 
         return builder.create();
-    }
-
-    private Gson createRootGson() {
-        return new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     }
 
     private JsonObject loadGamesConfig() throws GamesLoadFailedException {
@@ -95,9 +96,14 @@ public final class GameManager implements Listener {
     }
 
     private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
-        Gson gson = createGsonForGame(type);
+        C deserializedConfig;
 
-        C deserializedConfig = gson.fromJson(config, type.getConfigType());
+        try {
+            deserializedConfig = gson.fromJson(config, type.getConfigType());
+        } catch (JsonSyntaxException e) {
+            plugin.getLogger().warning("Failed to parse the config of the game in the world %s".formatted(world.getName()));
+            return;
+        }
 
         G game = type.getCreator().createGame(plugin, world, deserializedConfig, type);
         games.add(game);
@@ -144,8 +150,6 @@ public final class GameManager implements Listener {
         gamesConfig.addProperty("dataVersion", 1);
 
         for (Game<?, ?> game : games) {
-            Gson gson = createGsonForGame(game.getType());
-
             JsonObject gameConfigEntry = new JsonObject();
             gameConfigEntry.addProperty("type", game.getType().getName());
 
@@ -156,7 +160,7 @@ public final class GameManager implements Listener {
         }
 
         try (FileWriter writer = new FileWriter(configFile)) {
-            createRootGson().toJson(gamesConfig, writer);
+            gson.toJson(gamesConfig, writer);
         } catch (IOException e) {
             throw new GamesSaveFailedException("Failed to write to games.json", e);
         }
@@ -175,8 +179,9 @@ public final class GameManager implements Listener {
     public void unloadGames() {
         for (Game<?, ?> game : games) {
             game.unloadGame();
-            games.remove(game);
         }
+
+        games.clear();
     }
 
     public Optional<Game<?, ?>> getGameForWorld(World world) {

@@ -41,6 +41,23 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
             .put(Material.PINK_WOOL, TextColor.color(243, 140, 170))
             .put(Material.PURPLE_WOOL, TextColor.color(137, 50, 183))
             .put(Material.YELLOW_WOOL, NamedTextColor.YELLOW)
+
+            .put(Material.WHITE_CONCRETE, NamedTextColor.WHITE)
+            .put(Material.BLACK_CONCRETE, NamedTextColor.BLACK)
+            .put(Material.RED_CONCRETE, NamedTextColor.RED)
+            .put(Material.BLUE_CONCRETE, NamedTextColor.BLUE)
+            .put(Material.BROWN_CONCRETE, TextColor.color(130, 84, 50))
+            .put(Material.CYAN_CONCRETE, TextColor.color(22, 156, 157))
+            .put(Material.GRAY_CONCRETE, NamedTextColor.GRAY)
+            .put(Material.GREEN_CONCRETE, NamedTextColor.GREEN)
+            .put(Material.LIGHT_BLUE_CONCRETE, TextColor.color(58, 179, 218))
+            .put(Material.LIGHT_GRAY_CONCRETE, TextColor.color(156, 157, 151))
+            .put(Material.LIME_CONCRETE, TextColor.color(128, 199, 31))
+            .put(Material.MAGENTA_CONCRETE, TextColor.color(198, 79, 189))
+            .put(Material.ORANGE_CONCRETE, TextColor.color(249, 128, 29))
+            .put(Material.PINK_CONCRETE, TextColor.color(243, 140, 170))
+            .put(Material.PURPLE_CONCRETE, TextColor.color(137, 50, 183))
+            .put(Material.YELLOW_CONCRETE, NamedTextColor.YELLOW)
             .build();
 
     private int currentRound;
@@ -53,7 +70,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     @Override
     public void handleGameStarted() {
-        remainingFloors = new HashSet<>(config.floors);
+        remainingFloors = new HashSet<>(config.getFloors());
 
         startRound(1);
     }
@@ -76,7 +93,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     @Override
     public boolean isConfigComplete() {
-        return super.isConfigComplete() && config.deadlyBlock != null && config.floor != null && !config.floors.isEmpty() && config.roundTimes.containsKey(-1);
+        return super.isConfigComplete() && config.getDeadlyBlock() != null && config.getFloor() != null && !config.getFloors().isEmpty() && config.getRoundTimes().containsKey(-1);
     }
 
     @Override
@@ -90,7 +107,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
             return;
         }
 
-        if (event.getTo().clone().add(0, -1, 0).getBlock().getType() != config.deadlyBlock) {
+        if (event.getTo().clone().add(0, -1, 0).getBlock().getType() != config.getDeadlyBlock()) {
             return;
         }
 
@@ -103,7 +120,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     private Floor getNextFloor() {
         if (remainingFloors.isEmpty()) {
-            return Util.pickRandomElement(config.floors, random);
+            return Util.pickRandomElement(config.getFloors(), random);
         }
 
         Floor floor = Util.pickRandomElement(remainingFloors);
@@ -114,7 +131,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     private Set<Material> getBlockTypes(Floor floor) {
         Set<Material> result = new HashSet<>();
 
-        for (BlockPosition position : floor.area.getBlocks()) {
+        for (BlockPosition position : floor.getArea().getBlocks()) {
             Block block = world.getBlockAt(position.asLocation(world));
             if (!block.getType().isAir()) {
                 result.add(block.getType());
@@ -125,19 +142,19 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     }
 
     private int getRoundTime(int round) {
-        if (config.roundTimes.containsKey(round)) {
-            return config.roundTimes.get(round);
+        if (config.getRoundTimes().containsKey(round)) {
+            return config.getRoundTimes().get(round);
         }
 
-        if (config.roundTimes.containsKey(-1)) {
-            return config.roundTimes.get(-1);
+        if (config.getRoundTimes().containsKey(-1)) {
+            return config.getRoundTimes().get(-1);
         }
 
         return 40;
     }
 
     private void removeFloorBlocks(Material material) {
-        for (BlockPosition position : config.floor.getBlocks()) {
+        for (BlockPosition position : config.getFloor().getBlocks()) {
             Block block = world.getBlockAt(position.asLocation(world));
 
             if (block.getType() != material) {
@@ -179,10 +196,10 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     }
 
     private void setFloor(Floor floor) {
-        floor.area.clone(world, config.floor);
+        floor.getArea().clone(world, config.getFloor());
     }
 
     private void clearFloor() {
-        config.floor.fill(world, Material.AIR.createBlockData());
+        config.getFloor().fill(world, Material.AIR.createBlockData());
     }
 }

@@ -24,15 +24,47 @@ public class BlockPartyConfig extends GameConfig {
             .put(-1, 40)
             .build();
 
-    public BlockArea floor;
-    public Set<Floor> floors = new HashSet<>();
-    public Map<Integer, Integer> roundTimes = DEFAULT_ROUND_TIMES;
-    public Material deadlyBlock;
+    private BlockArea floor;
+    private Set<Floor> floors = new HashSet<>();
+    private Map<Integer, Integer> roundTimes = DEFAULT_ROUND_TIMES;
+    private Material deadlyBlock;
 
     // Gson
     public BlockPartyConfig() { }
 
     public Optional<Floor> getFloorByName(String name) {
-        return floors.stream().filter(floor -> floor.name.equals(name)).findFirst();
+        return getFloors().stream().filter(floor -> floor.getName().equals(name)).findFirst();
+    }
+
+    public BlockArea getFloor() {
+        return floor;
+    }
+
+    public void setFloor(BlockArea floor) {
+        this.floor = floor;
+    }
+
+    public Set<Floor> getFloors() {
+        return floors;
+    }
+
+    public void setFloors(Set<Floor> floors) {
+        this.floors = floors;
+    }
+
+    public Map<Integer, Integer> getRoundTimes() {
+        return roundTimes;
+    }
+
+    public void setRoundTimes(Map<Integer, Integer> roundTimes) {
+        this.roundTimes = roundTimes;
+    }
+
+    public Material getDeadlyBlock() {
+        return deadlyBlock;
+    }
+
+    public void setDeadlyBlock(Material deadlyBlock) {
+        this.deadlyBlock = deadlyBlock;
     }
 }

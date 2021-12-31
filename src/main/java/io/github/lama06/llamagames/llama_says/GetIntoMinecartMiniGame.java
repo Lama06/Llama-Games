@@ -27,7 +27,7 @@ public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMin
     @Override
     public void handleGameStarted() {
         int numberOfMinecarts = getNumberOfMinecarts();
-        BlockArea floor = game.getConfig().floor;
+        BlockArea floor = game.getConfig().getFloor();
         Set<BlockPosition> minecartPositions = new HashSet<>();
 
         for (int i = 1; i <= numberOfMinecarts; i++) {
@@ -63,8 +63,7 @@ public class GetIntoMinecartMiniGame extends CompleteMiniGame<GetIntoMinecartMin
     public void handleVehicleEnterEvent(VehicleEnterEvent event) {
         if (!event.getVehicle().getWorld().equals(game.getWorld()) ||
                 ! (event.getVehicle() instanceof RideableMinecart) ||
-                !(event.getEntered() instanceof Player player)
-        ) {
+                !(event.getEntered() instanceof Player player)) {
             return;
         }
 

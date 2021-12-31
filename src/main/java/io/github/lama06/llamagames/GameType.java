@@ -7,15 +7,10 @@ import io.github.lama06.llamagames.blockparty.BlockPartyGame;
 import io.github.lama06.llamagames.llama_says.LlamaSaysCommand;
 import io.github.lama06.llamagames.llama_says.LlamaSaysConfig;
 import io.github.lama06.llamagames.llama_says.LlamaSaysGame;
-import io.github.lama06.llamagames.util.Pair;
-import io.github.lama06.llamagames.zombies.WeaponTypeAdapter;
-import io.github.lama06.llamagames.zombies.ZombiesCommand;
-import io.github.lama06.llamagames.zombies.ZombiesConfig;
-import io.github.lama06.llamagames.zombies.ZombiesGame;
-import io.github.lama06.llamagames.zombies.weapon.WeaponType;
 import org.bukkit.World;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -53,22 +48,10 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             null
     );
 
-    public static final GameType<ZombiesGame, ZombiesConfig> ZOMBIES = new GameType<>(
-            "zombies",
-            ZombiesGame::new,
-            ZombiesConfig.class,
-            Set.of(
-                    Pair.of(WeaponType.class, new WeaponTypeAdapter())
-            ),
-            ZombiesConfig::new,
-            ZombiesCommand::new,
-            null
-    );
-
     private final String name;
     private final GameCreator<G, C> creator;
     private final Class<C> configType;
-    private final Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters;
+    private final Map<Class<?>, TypeAdapter<?>> typeAdapters;
     private final Supplier<C> defaultConfigCreator;
     private final Consumer<LlamaGamesPlugin> pluginEnableCallback;
     private final Consumer<LlamaGamesPlugin> pluginDisableCallback;
@@ -77,7 +60,7 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             String name,
             GameCreator<G, C> creator,
             Class<C> configType,
-            Set<Pair<Class<?>, TypeAdapter<?>>> typeAdapters,
+            Map<Class<?>, TypeAdapter<?>> typeAdapters,
             Supplier<C> defaultConfigCreator,
             Consumer<LlamaGamesPlugin> pluginEnableCallback,
             Consumer<LlamaGamesPlugin> pluginDisableCallback
@@ -105,7 +88,7 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
         return configType;
     }
 
-    public Set<Pair<Class<?>, TypeAdapter<?>>> getTypeAdapters() {
+    public Map<Class<?>, TypeAdapter<?>> getTypeAdapters() {
         return typeAdapters;
     }
 

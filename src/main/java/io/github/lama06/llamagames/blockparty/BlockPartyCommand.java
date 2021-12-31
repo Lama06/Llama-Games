@@ -13,23 +13,23 @@ public class BlockPartyCommand extends GameCommand {
         addSubCommand("floor", createBlockAreaConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
-                config -> Component.text("The floor is currently at %s".formatted(config.floor)),
-                (config, floor) -> config.floor = floor,
+                config -> Component.text("The floor is currently at %s".formatted(config.getFloor())),
+                (config, floor) -> config.setFloor(floor),
                 floor -> Component.text("The floor is now at %s".formatted(floor))
         ));
         addSubCommand("deadlyBlock", createMaterialConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
-                config -> Component.text("The deadly block is currently set to ").append(Component.translatable(config.deadlyBlock)),
-                (config, material) -> config.deadlyBlock = material,
+                config -> Component.text("The deadly block is currently set to ").append(Component.translatable(config.getDeadlyBlock())),
+                (config, material) -> config.setDeadlyBlock(material),
                 material -> Component.text("The deadly block is now set to ").append(Component.translatable(material))
         ));
         addSubCommand("floors", createCollectionConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
-                config -> config.floors,
+                config -> config.getFloors(),
                 Component.text("There are no floors"),
-                floor -> Component.text("%s: %s".formatted(floor.name, floor.area)),
+                floor -> Component.text("%s: %s".formatted(floor.getName(), floor.getArea())),
                 (sender, args) -> {
                     if (requireArgsExact(sender, args, 7)) return Optional.empty();
                     String name = args[0];
@@ -44,7 +44,7 @@ public class BlockPartyCommand extends GameCommand {
                 (sender, args, floor) -> {
                     if (requireArgsExact(sender, args, 1)) return Optional.empty();
                     String name = args[0];
-                    return Optional.of(floor.name.equals(name));
+                    return Optional.of(floor.getName().equals(name));
                 },
                 Component.text("Floor successfully removed")
         ));

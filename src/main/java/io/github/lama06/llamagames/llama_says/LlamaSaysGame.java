@@ -24,7 +24,7 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
 
     @Override
     public void handleGameStarted() {
-        remainingRounds = config.numberOfRounds;
+        remainingRounds = config.getNumberOfRounds();
         remainingGameTypes = new ArrayList<>(MiniGameType.getTypes());
         points = new HashMap<>();
         for (Player player : getPlayers()) {
@@ -103,11 +103,11 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     public boolean isConfigComplete() {
         boolean result = super.isConfigComplete();
 
-        if (config.floor == null || config.floor.getPosition1() == null || config.floor.getPosition2() == null) {
+        if (config.getFloor() == null || config.getFloor().getPosition1() == null || config.getFloor().getPosition2() == null) {
             result = false;
         }
 
-        if (config.floorCenter == null) {
+        if (config.getFloorCenter() == null) {
             result = false;
         }
 

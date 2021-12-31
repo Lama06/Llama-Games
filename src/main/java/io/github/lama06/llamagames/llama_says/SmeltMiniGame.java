@@ -42,7 +42,7 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
     public void handleGameStarted() {
         for (int i = 0; i < FURNACE_TYPES.size(); i++) {
             Material furnaceType = FURNACE_TYPES.get(i);
-            game.getWorld().setBlockData(game.getConfig().floorCenter.asLocation().add(0, 1 + i, 0), furnaceType.createBlockData());
+            game.getWorld().setBlockData(game.getConfig().getFloorCenter().asLocation().add(0, 1 + i, 0), furnaceType.createBlockData());
         }
 
         for (Player player : game.getPlayers()) {
@@ -57,7 +57,7 @@ public class SmeltMiniGame extends CompeteMiniGame<SmeltMiniGame> {
     @Override
     public void handleGameEnded() {
         for (int i = 0; i < FURNACE_TYPES.size(); i++) {
-            game.getWorld().setBlockData(game.getConfig().floorCenter.asLocation().add(0, 1 + i, 0), Material.AIR.createBlockData());
+            game.getWorld().setBlockData(game.getConfig().getFloorCenter().asLocation().add(0, 1 + i, 0), Material.AIR.createBlockData());
         }
     }
 

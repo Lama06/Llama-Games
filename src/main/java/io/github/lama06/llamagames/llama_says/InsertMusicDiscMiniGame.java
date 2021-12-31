@@ -63,7 +63,7 @@ public class InsertMusicDiscMiniGame extends CompeteMiniGame<InsertMusicDiscMini
     }
 
     private void setJukeboxBlock(BlockData state) {
-        game.getWorld().setBlockData(game.getConfig().floorCenter.asLocation(game.getWorld()).add(0, 1, 0), state);
+        game.getWorld().setBlockData(game.getConfig().getFloorCenter().asLocation(game.getWorld()).add(0, 1, 0), state);
     }
 
     @EventHandler
