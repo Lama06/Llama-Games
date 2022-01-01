@@ -5,6 +5,7 @@ import io.github.lama06.llamagames.util.EntityPosition;
 public class GameConfig {
     private EntityPosition spawnPoint;
     private boolean cancelEvents = true;
+    private boolean doNotCancelOpEvents = true;
 
     public EntityPosition getSpawnPoint() {
         return spawnPoint;
@@ -20,5 +21,13 @@ public class GameConfig {
 
     public void setCancelEvents(boolean cancelEvents) {
         this.cancelEvents = cancelEvents;
+    }
+
+    public boolean isDoNotCancelOpEvents() {
+        return doNotCancelOpEvents;
+    }
+
+    public void setDoNotCancelOpEvents(boolean doNotCancelOpEvents) {
+        this.doNotCancelOpEvents = doNotCancelOpEvents;
     }
 }

@@ -53,7 +53,7 @@ public class GetIntoMinecartMiniGame extends MiniGame {
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         for (RideableMinecart minecart : game.getWorld().getEntitiesByClass(RideableMinecart.class)) {
             minecart.remove();
         }

@@ -36,4 +36,16 @@ public class ShootYourselfWithAnArrowMiniGame extends MiniGame {
             result.addSuccessfulPlayer(player);
         }
     }
+
+    @Override
+    public void cleanupPlayer(Player player) {
+        player.setArrowsInBody(0);
+    }
+
+    @Override
+    public void cleanupWorld() {
+        for (Arrow arrow : game.getWorld().getEntitiesByClass(Arrow.class)) {
+            arrow.remove();
+        }
+    }
 }

@@ -32,7 +32,10 @@ public class StandStillMiniGame extends MiniGame {
         for (Player player : game.getPlayers()) {
             result.addSuccessfulPlayer(player);
         }
+    }
 
+    @Override
+    public void cleanup() {
         if (enableMovementCheckingTask != null) {
             enableMovementCheckingTask.cancel();
         }

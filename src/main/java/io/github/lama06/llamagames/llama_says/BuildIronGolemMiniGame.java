@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -39,14 +40,18 @@ public class BuildIronGolemMiniGame extends MiniGame {
         for (Player player : game.getPlayers()) {
             PlayerInventory inventory = player.getInventory();
             inventory.setItem(0, new ItemStack(Material.IRON_BLOCK, 4));
-            inventory.setItem(1, new ItemStack(Material.PUMPKIN, 1));
+            inventory.setItem(1, new ItemStack(Material.CARVED_PUMPKIN, 1));
         }
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         for (BlockPosition block : blocks) {
             game.getWorld().getBlockAt(block.asLocation(game.getWorld())).setBlockData(Material.AIR.createBlockData());
+        }
+
+        for (IronGolem ironGolem : game.getWorld().getEntitiesByClass(IronGolem.class)) {
+            ironGolem.remove();
         }
     }
 
@@ -60,11 +65,13 @@ public class BuildIronGolemMiniGame extends MiniGame {
 
         if (isBuildingIronGolem(event)) {
             result.addSuccessfulPlayer(event.getPlayer());
+        } else if (event.getBlock().getType() == Material.CARVED_PUMPKIN) {
+            result.addFailedPlayer(event.getPlayer());
         }
     }
 
     private static boolean isBuildingIronGolem(BlockPlaceEvent event) {
-        if (event.getBlock().getType() != Material.PUMPKIN) {
+        if (event.getBlock().getType() != Material.CARVED_PUMPKIN) {
             return false;
         }
 

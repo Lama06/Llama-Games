@@ -28,7 +28,7 @@ public class ThrowTridentMiniGame extends MiniGame {
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         for (Trident trident : game.getWorld().getEntitiesByClass(Trident.class)) {
             trident.remove();
         }

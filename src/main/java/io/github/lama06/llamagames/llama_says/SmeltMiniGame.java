@@ -59,7 +59,7 @@ public class SmeltMiniGame extends MiniGame {
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         for (int i = 0; i < FURNACE_TYPES.size(); i++) {
             game.getWorld().setBlockData(game.getConfig().getFloorCenter().asLocation().add(0, 1 + i, 0), Material.AIR.createBlockData());
         }

@@ -16,6 +16,7 @@ public class LlamaSaysCommand extends GameCommand {
                 LlamaSaysConfig::setFloorCenter,
                 position -> Component.text("Floor center successfully changed to %s".formatted(position))
         ));
+
         addSubCommand("numberOfRounds", createIntegerConfigSubCommand(
                 plugin,
                 LlamaSaysGame.class,
@@ -23,6 +24,7 @@ public class LlamaSaysCommand extends GameCommand {
                 LlamaSaysConfig::setNumberOfRounds,
                 rounds -> Component.text("Number of rounds successfully changed to %d".formatted(rounds))
         ));
+
         addSubCommand("floor", createBlockAreaConfigSubCommand(
                 plugin,
                 LlamaSaysGame.class,

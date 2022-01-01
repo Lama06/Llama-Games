@@ -35,6 +35,13 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
         startNextRound();
     }
 
+    @Override
+    public void handlePlayerLeft(Player player) {
+        if (currentMiniGame != null) {
+            currentMiniGame.handlePlayerLeft(player);
+        }
+    }
+
     private void startNextRound() {
         remainingRounds--;
 
@@ -71,6 +78,7 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     public void handleGameEnded(GameEndReason reason) {
         if (currentMiniGame != null) {
             currentMiniGame.endGame(false);
+            currentMiniGame = null;
         }
 
         TextComponent.Builder builder = Component.text();

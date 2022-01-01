@@ -2,6 +2,7 @@ package io.github.lama06.llamagames.llama_says;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "ClassCanBeRecord"})
@@ -10,6 +11,10 @@ public final class MiniGameType<T extends MiniGame> {
 
     public static List<MiniGameType<?>> getTypes() {
         return types;
+    }
+
+    public static Optional<MiniGameType<?>> byName(String name) {
+        return types.stream().filter(type -> type.getName().equals(name)).findFirst();
     }
 
     public static final MiniGameType<DrinkThePotionMiniGame> DRINK_THE_POTION = new MiniGameType<>(
@@ -62,7 +67,7 @@ public final class MiniGameType<T extends MiniGame> {
             ShootYourselfWithAnArrowMiniGame::new
     );
 
-    public static final MiniGameType<BuildIronGolemMiniGame> BUIld_IRON_GOLEM = new MiniGameType<>(
+    public static final MiniGameType<BuildIronGolemMiniGame> BUIlD_IRON_GOLEM = new MiniGameType<>(
             "build_iron_golem",
             BuildIronGolemMiniGame::new
     );
@@ -75,6 +80,11 @@ public final class MiniGameType<T extends MiniGame> {
     public static final MiniGameType<PutOnArmorStand> PUT_ON_ARMOR_STAND = new MiniGameType<>(
             "put_on_armor_stand",
             PutOnArmorStand::new
+    );
+
+    public static final MiniGameType<RemoveFromInventoryMiniGame> REMOVE_FROM_INVENTORY = new MiniGameType<>(
+            "remove_from_inventory",
+            RemoveFromInventoryMiniGame::new
     );
 
     private final String name;

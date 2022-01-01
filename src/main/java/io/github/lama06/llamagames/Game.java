@@ -92,7 +92,6 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             plugin.getLogger().warning("The configuration for the following game is not complete: %s".formatted(world.getName()));
         }
 
-
         handleGameLoaded();
 
         tryToStartAfterCountdown();
@@ -145,7 +144,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     protected boolean isSpectator(Player player) {
-        return getPlayers().contains(player);
+        return !getPlayers().contains(player);
     }
 
     private void handlePlayerJoinedInternal(Player player) {
@@ -171,7 +170,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     @EventHandler
-    private void handlePlayerChangeWorldEvent(PlayerChangedWorldEvent event) {
+    public void handlePlayerChangeWorldEvent(PlayerChangedWorldEvent event) {
         if (event.getFrom().equals(world)) {
             handlePlayerLeftInternal(event.getPlayer());
         } else if (event.getPlayer().getWorld().equals(world)) {
@@ -180,15 +179,15 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     @EventHandler
-    private void handlePlayerJoinEvent(PlayerJoinEvent event) {
+    public void handlePlayerJoinEvent(PlayerJoinEvent event) {
         if (event.getPlayer().getWorld().equals(world)) {
             handlePlayerJoinedInternal(event.getPlayer());
         }
     }
 
     @EventHandler
-    private void handlePlayerQuitEvent(PlayerQuitEvent event) {
-        if (players.contains(event.getPlayer().getUniqueId())) {
+    public void handlePlayerQuitEvent(PlayerQuitEvent event) {
+        if (getPlayers().contains(event.getPlayer())) {
             handlePlayerLeftInternal(event.getPlayer());
         }
     }

@@ -49,13 +49,6 @@ public class EatUntilYouAreFullMiniGame extends MiniGame {
     }
 
     @Override
-    public void handleGameEnded() {
-        for (Player player : game.getPlayers()) {
-            player.setFoodLevel(20);
-        }
-    }
-
-    @Override
     public Component getTitle() {
         return Component.text("Eat until you are full");
     }

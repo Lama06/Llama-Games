@@ -7,9 +7,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -36,45 +35,47 @@ public class FeedAnimal extends MiniGame {
     public void init() {
         entityType = Util.pickRandomElement(ENTITY_TYPES_TO_FOOD.keySet(), game.getRandom());
         food = ENTITY_TYPES_TO_FOOD.get(entityType);
+
+        game.getEventCanceler().setCancelItemDrops(false);
+        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @Override
     public Component getTitle() {
-        return Component.text("Feed the ").append(Component.translatable(entityType));
+        return Component.text("Drop the ").append(Component.translatable(entityType)).append(Component.text(" food"));
     }
 
     @Override
     public void handleGameStarted() {
-        entity = game.getWorld().spawnEntity(game.getConfig().getFloorCenter().asLocation(game.getWorld()), entityType);
+        entity = game.getWorld().spawnEntity(game.getConfig().getFloorCenter().asLocation(game.getWorld()).add(0, 1, 0), entityType);
 
         List<Material> foodItems = Util.pickRandomElements(ENTITY_TYPES_TO_FOOD.values(), 9, game.getRandom());
 
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < foodItems.size(); i++) {
-                player.getInventory().setItem(i, new ItemStack(foodItems.get(i), 1));
+                player.getInventory().setItem(i, new ItemStack(foodItems.get(i)));
             }
         }
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         entity.remove();
     }
 
     @EventHandler
-    public void handlePlayerInteractEvent(PlayerInteractEvent event) {
+    public void handlePlayerItemDropEvent(PlayerDropItemEvent event) {
         if (!game.getPlayers().contains(event.getPlayer())) {
             return;
         }
 
-        Entity targetEntity = event.getPlayer().getTargetEntity(5);
+        Entity targetEntity = event.getPlayer().getTargetEntity(5);;
         if (targetEntity == null || !targetEntity.equals(entity)) {
             return;
         }
 
-        if (event.getPlayer().getInventory().getItemInMainHand().getType() == food) {
+        if (event.getItemDrop().getItemStack().getType() == food) {
             result.addSuccessfulPlayer(event.getPlayer());
-            event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.AIR, 1));
         } else {
             result.addFailedPlayer(event.getPlayer());
         }

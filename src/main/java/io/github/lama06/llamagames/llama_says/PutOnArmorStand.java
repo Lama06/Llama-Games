@@ -4,11 +4,9 @@ import io.github.lama06.llamagames.util.Util;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -47,37 +45,34 @@ public class PutOnArmorStand extends MiniGame {
 
     @Override
     public void handleGameStarted() {
-        armorStand = game.getWorld().spawn(game.getConfig().getFloorCenter().asLocation(game.getWorld()), ArmorStand.class);
+        armorStand = game.getWorld().spawn(game.getConfig().getFloorCenter().asLocation(game.getWorld()).add(0, 1, 0), ArmorStand.class);
 
         List<Material> items = Util.pickRandomElements(ITEMS, 9, game.getRandom());
 
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < items.size(); i++) {
-                player.getInventory().setItem(i, new ItemStack(items.get(i), i));
+                player.getInventory().setItem(i, new ItemStack(items.get(i)));
             }
         }
     }
 
     @EventHandler
-    public void handlePlayerInteractEvent(PlayerInteractEvent event) {
+    public void handlePlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
         if (!game.getPlayers().contains(event.getPlayer())) {
             return;
         }
 
-        Entity targetEntity = event.getPlayer().getTargetEntity(5);
-        if (targetEntity == null || targetEntity.getType() != EntityType.ARMOR_STAND) {
-            return;
-        }
-
-        if (event.getPlayer().getInventory().getItemInMainHand().getType() == item) {
+        if (event.getPlayerItem().getType() == item) {
             result.addSuccessfulPlayer(event.getPlayer());
         } else {
             result.addFailedPlayer(event.getPlayer());
         }
+
+        event.setCancelled(true);
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         armorStand.remove();
     }
 }

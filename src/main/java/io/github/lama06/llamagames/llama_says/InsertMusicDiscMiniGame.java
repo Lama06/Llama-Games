@@ -61,7 +61,7 @@ public class InsertMusicDiscMiniGame extends MiniGame {
     }
 
     @Override
-    public void handleGameEnded() {
+    public void cleanupWorld() {
         setJukeboxBlock(Material.AIR.createBlockData());
     }
 
@@ -85,6 +85,7 @@ public class InsertMusicDiscMiniGame extends MiniGame {
             result.addFailedPlayer(event.getPlayer());
         } else {
             result.addSuccessfulPlayer(event.getPlayer());
+            event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.AIR));
         }
     }
 }

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -36,6 +37,36 @@ public abstract class MiniGame implements Listener {
     public void handleGameStarted() { }
 
     public void handleGameEnded() { }
+
+    public void cleanupPlayer(Player player) { }
+
+    public void cleanupWorld() { }
+
+    public void cleanup() { }
+
+    private void cleanupPlayerInternal(Player player) {
+        System.out.println(player.getName());
+        player.getInventory().clear();
+
+        player.setFoodLevel(20);
+        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        player.setLevel(0);
+        player.setExp(0);
+
+        for (PotionEffect activePotionEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(activePotionEffect.getType());
+        }
+
+        cleanupPlayer(player);
+    }
+
+    private void cleanupWorldInternal() {
+        cleanupWorld();
+    }
+
+    public final void handlePlayerLeft(Player player) {
+        cleanupPlayerInternal(player);
+    }
 
     public final void startGame() {
         init();
@@ -72,15 +103,15 @@ public abstract class MiniGame implements Listener {
 
         HandlerList.unregisterAll(this);
 
-        handleGameEnded();
-
         for (Player player : game.getPlayers()) {
-            player.getInventory().clear();
-
-            for (PotionEffect activePotionEffect : player.getActivePotionEffects()) {
-                player.removePotionEffect(activePotionEffect.getType());
-            }
+            cleanupPlayerInternal(player);
         }
+
+        cleanupWorldInternal();
+
+        cleanup();
+
+        handleGameEnded();
 
         if (callCallback) {
             callback.accept(this);
