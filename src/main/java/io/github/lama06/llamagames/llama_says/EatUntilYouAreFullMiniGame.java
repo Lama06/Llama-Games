@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.llamagames.util.Util;
+import io.github.lama06.llamagames.util.CollectionUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,7 +34,7 @@ public class EatUntilYouAreFullMiniGame extends MiniGame {
 
     @Override
     public void init() {
-        items = Util.pickRandomElements(FOOD_ITEMS, 9, game.getRandom());
+        items = CollectionUtil.pickRandomElements(FOOD_ITEMS, 9, game.getRandom());
         game.getEventCanceler().setCancelItemConsummation(false);
     }
 

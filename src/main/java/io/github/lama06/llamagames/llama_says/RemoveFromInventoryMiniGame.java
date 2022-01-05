@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.llamagames.util.Util;
+import io.github.lama06.llamagames.util.CollectionUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -29,7 +29,7 @@ public class RemoveFromInventoryMiniGame extends MiniGame {
 
     @Override
     public void init() {
-        targetMaterial = Util.pickRandomElement(POSSIBLE_ITEMS);
+        targetMaterial = CollectionUtil.pickRandomElement(POSSIBLE_ITEMS);
         game.getEventCanceler().setCancelItemDrops(false);
         game.getEventCanceler().setCancelInventoryEvents(false);
     }
@@ -60,7 +60,7 @@ public class RemoveFromInventoryMiniGame extends MiniGame {
                 continue;
             }
 
-            items.set(i, Util.pickRandomElement(possibleItems));
+            items.set(i, CollectionUtil.pickRandomElement(possibleItems));
         }
 
         for (Player player : game.getPlayers()) {

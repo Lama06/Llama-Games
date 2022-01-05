@@ -72,14 +72,14 @@ public final class MiniGameType<T extends MiniGame> {
             BuildIronGolemMiniGame::new
     );
 
-    public static final MiniGameType<FeedAnimal> FEED_ANIMAL = new MiniGameType<>(
+    public static final MiniGameType<FeedAnimalMiniGame> FEED_ANIMAL = new MiniGameType<>(
             "feed_animal",
-            FeedAnimal::new
+            FeedAnimalMiniGame::new
     );
 
-    public static final MiniGameType<PutOnArmorStand> PUT_ON_ARMOR_STAND = new MiniGameType<>(
+    public static final MiniGameType<PutOnArmorStandMiniGame> PUT_ON_ARMOR_STAND = new MiniGameType<>(
             "put_on_armor_stand",
-            PutOnArmorStand::new
+            PutOnArmorStandMiniGame::new
     );
 
     public static final MiniGameType<RemoveFromInventoryMiniGame> REMOVE_FROM_INVENTORY = new MiniGameType<>(

@@ -1,7 +1,7 @@
 package io.github.lama06.llamagames.util;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 
 import java.util.HashSet;
@@ -69,6 +69,17 @@ public class BlockArea {
         return blocks;
     }
 
+    public boolean containsBlock(BlockPosition position) {
+        BlockPosition lowerCorner = getLowerCorner();
+        BlockPosition upperCorner = getUpperCorner();
+
+        boolean x = position.getX() >= lowerCorner.getX() && position.getX() <= upperCorner.getX();
+        boolean y = position.getY() >= lowerCorner.getY() && position.getY() <= upperCorner.getY();
+        boolean z = position.getZ() >= lowerCorner.getZ() && position.getZ() <= upperCorner.getZ();
+
+        return x && y && z;
+    }
+
     public void clone(World world, BlockArea destination) {
         if (!hasSameDimensions(destination)) {
             return;
@@ -115,6 +126,24 @@ public class BlockArea {
 
     public boolean hasSameDimensions(BlockArea other) {
         return getHeight() == other.getHeight() && getWidthX() == other.getWidthX() && getWidthZ() == other.getWidthZ();
+    }
+
+    public boolean is2d() {
+        return getHeight() == 1 || getWidthX() == 1 || getLowerZ() == 1;
+    }
+
+    private final Set<BlockFace> directionsToCheck = Set.of(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
+
+    public Set<BlockFace> getDirectNeighborBlocksInArea(BlockPosition position) {
+        Set<BlockFace> result = new HashSet<>();
+
+        for (BlockFace face : directionsToCheck) {
+            if (containsBlock(position.getRelative(face))) {
+                result.add(face);
+            }
+        }
+
+        return result;
     }
 
     public BlockPosition getPosition1() {

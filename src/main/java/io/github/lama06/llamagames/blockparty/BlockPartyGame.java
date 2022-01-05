@@ -1,14 +1,12 @@
 package io.github.lama06.llamagames.blockparty;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.lama06.llamagames.Game;
 import io.github.lama06.llamagames.GameType;
 import io.github.lama06.llamagames.LlamaGamesPlugin;
 import io.github.lama06.llamagames.util.BlockPosition;
-import io.github.lama06.llamagames.util.Util;
+import io.github.lama06.llamagames.util.CollectionUtil;
+import io.github.lama06.llamagames.util.MinecraftColor;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,46 +18,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Duration;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
-    private static final Map<Material, TextColor> MATERIAL_TO_COLOR = ImmutableMap.<Material, TextColor>builder()
-            .put(Material.WHITE_WOOL, NamedTextColor.WHITE)
-            .put(Material.BLACK_WOOL, NamedTextColor.BLACK)
-            .put(Material.RED_WOOL, NamedTextColor.RED)
-            .put(Material.BLUE_WOOL, NamedTextColor.BLUE)
-            .put(Material.BROWN_WOOL, TextColor.color(130, 84, 50))
-            .put(Material.CYAN_WOOL, TextColor.color(22, 156, 157))
-            .put(Material.GRAY_WOOL, NamedTextColor.GRAY)
-            .put(Material.GREEN_WOOL, NamedTextColor.GREEN)
-            .put(Material.LIGHT_BLUE_WOOL, TextColor.color(58, 179, 218))
-            .put(Material.LIGHT_GRAY_WOOL, TextColor.color(156, 157, 151))
-            .put(Material.LIME_WOOL, TextColor.color(128, 199, 31))
-            .put(Material.MAGENTA_WOOL, TextColor.color(198, 79, 189))
-            .put(Material.ORANGE_WOOL, TextColor.color(249, 128, 29))
-            .put(Material.PINK_WOOL, TextColor.color(243, 140, 170))
-            .put(Material.PURPLE_WOOL, TextColor.color(137, 50, 183))
-            .put(Material.YELLOW_WOOL, NamedTextColor.YELLOW)
-
-            .put(Material.WHITE_CONCRETE, NamedTextColor.WHITE)
-            .put(Material.BLACK_CONCRETE, NamedTextColor.BLACK)
-            .put(Material.RED_CONCRETE, NamedTextColor.RED)
-            .put(Material.BLUE_CONCRETE, NamedTextColor.BLUE)
-            .put(Material.BROWN_CONCRETE, TextColor.color(130, 84, 50))
-            .put(Material.CYAN_CONCRETE, TextColor.color(22, 156, 157))
-            .put(Material.GRAY_CONCRETE, NamedTextColor.GRAY)
-            .put(Material.GREEN_CONCRETE, NamedTextColor.GREEN)
-            .put(Material.LIGHT_BLUE_CONCRETE, TextColor.color(58, 179, 218))
-            .put(Material.LIGHT_GRAY_CONCRETE, TextColor.color(156, 157, 151))
-            .put(Material.LIME_CONCRETE, TextColor.color(128, 199, 31))
-            .put(Material.MAGENTA_CONCRETE, TextColor.color(198, 79, 189))
-            .put(Material.ORANGE_CONCRETE, TextColor.color(249, 128, 29))
-            .put(Material.PINK_CONCRETE, TextColor.color(243, 140, 170))
-            .put(Material.PURPLE_CONCRETE, TextColor.color(137, 50, 183))
-            .put(Material.YELLOW_CONCRETE, NamedTextColor.YELLOW)
-            .build();
-
     private int currentRound;
     private Set<Floor> remainingFloors = new HashSet<>();
     private BukkitTask currentTask;
@@ -120,10 +81,10 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     private Floor getNextFloor() {
         if (remainingFloors.isEmpty()) {
-            return Util.pickRandomElement(config.getFloors(), random);
+            return CollectionUtil.pickRandomElement(config.getFloors(), random);
         }
 
-        Floor floor = Util.pickRandomElement(remainingFloors);
+        Floor floor = CollectionUtil.pickRandomElement(remainingFloors);
         remainingFloors.remove(floor);
         return floor;
     }
@@ -171,12 +132,15 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
         Floor floor = getNextFloor();
         setFloor(floor);
 
-        Material type = Util.pickRandomElement(getBlockTypes(floor));
-        TextColor color = MATERIAL_TO_COLOR.getOrDefault(type, NamedTextColor.WHITE);
+        Material type = CollectionUtil.pickRandomElement(getBlockTypes(floor));
+        MinecraftColor color = MinecraftColor.getColorOfMaterial(type);
+        if (color == null) {
+            color = MinecraftColor.WHITE;
+        }
 
         getBroadcastAudience().showTitle(Title.title(
-                Component.translatable(type).color(color),
-                Component.text("Round %d: Stand on ".formatted(round)).append(Component.translatable(type)).color(color),
+                Component.translatable(type).color(color.getTextColor()),
+                Component.text("Round %d: Stand on ".formatted(round)).append(Component.translatable(type)).color(color.getTextColor()),
                 Title.Times.of(
                         Duration.ZERO,
                         Duration.ofSeconds(roundTime/20),

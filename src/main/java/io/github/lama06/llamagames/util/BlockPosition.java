@@ -2,6 +2,8 @@ package io.github.lama06.llamagames.util;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -49,6 +51,14 @@ public final class BlockPosition {
     public Distance getDistanceTo(BlockPosition other) {
         BlockArea area = new BlockArea(this, other);
         return new Distance(area.getWidthX(), area.getHeight(), area.getWidthZ());
+    }
+
+    public BlockPosition add(int x, int y, int z) {
+        return new BlockPosition(this.x+x, this.y+y, this.z+z);
+    }
+
+    public BlockPosition getRelative(BlockFace face) {
+        return new BlockPosition(x+face.getModX(), y+face.getModY(), z+face.getModZ());
     }
 
     @Override

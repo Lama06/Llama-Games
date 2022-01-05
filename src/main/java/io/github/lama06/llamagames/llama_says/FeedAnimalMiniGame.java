@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.llamagames.util.Util;
+import io.github.lama06.llamagames.util.CollectionUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class FeedAnimal extends MiniGame {
+public class FeedAnimalMiniGame extends MiniGame {
     private static final Map<EntityType, Material> ENTITY_TYPES_TO_FOOD = Map.ofEntries(
             Map.entry(EntityType.SHEEP, Material.WHEAT),
             Map.entry(EntityType.PIG, Material.CARROT),
@@ -27,13 +27,13 @@ public class FeedAnimal extends MiniGame {
     private Material food;
     private Entity entity;
 
-    public FeedAnimal(LlamaSaysGame game, Consumer<MiniGame> callback) {
+    public FeedAnimalMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
         super(game, new CompleteResult(), callback);
     }
 
     @Override
     public void init() {
-        entityType = Util.pickRandomElement(ENTITY_TYPES_TO_FOOD.keySet(), game.getRandom());
+        entityType = CollectionUtil.pickRandomElement(ENTITY_TYPES_TO_FOOD.keySet(), game.getRandom());
         food = ENTITY_TYPES_TO_FOOD.get(entityType);
 
         game.getEventCanceler().setCancelItemDrops(false);
@@ -49,7 +49,7 @@ public class FeedAnimal extends MiniGame {
     public void handleGameStarted() {
         entity = game.getWorld().spawnEntity(game.getConfig().getFloorCenter().asLocation(game.getWorld()).add(0, 1, 0), entityType);
 
-        List<Material> foodItems = Util.pickRandomElements(ENTITY_TYPES_TO_FOOD.values(), 9, game.getRandom());
+        List<Material> foodItems = CollectionUtil.pickRandomElements(ENTITY_TYPES_TO_FOOD.values(), 9, game.getRandom());
 
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < foodItems.size(); i++) {

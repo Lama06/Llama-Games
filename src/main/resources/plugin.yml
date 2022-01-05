@@ -10,5 +10,5 @@ commands:
     description: Used to setup LlamaSays games
   blockparty:
     description: Used to setup BlockParty games
-  zombies:
-    description: Used to setup Zombies games
+  drawit:
+    description: Used to setup DrawIt games

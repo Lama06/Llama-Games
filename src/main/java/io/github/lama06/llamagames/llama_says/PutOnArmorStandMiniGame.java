@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.llamagames.util.Util;
+import io.github.lama06.llamagames.util.CollectionUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class PutOnArmorStand extends MiniGame {
+public class PutOnArmorStandMiniGame extends MiniGame {
     private static final Set<Material> ITEMS = Set.of(
             Material.LEATHER_CHESTPLATE,
             Material.LEATHER_BOOTS,
@@ -29,13 +29,13 @@ public class PutOnArmorStand extends MiniGame {
     private Material item;
     private ArmorStand armorStand;
 
-    public PutOnArmorStand(LlamaSaysGame game, Consumer<MiniGame> callback) {
+    public PutOnArmorStandMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
         super(game, new RankedResult(), callback);
     }
 
     @Override
     public void init() {
-        item = Util.pickRandomElement(ITEMS, game.getRandom());
+        item = CollectionUtil.pickRandomElement(ITEMS, game.getRandom());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PutOnArmorStand extends MiniGame {
     public void handleGameStarted() {
         armorStand = game.getWorld().spawn(game.getConfig().getFloorCenter().asLocation(game.getWorld()).add(0, 1, 0), ArmorStand.class);
 
-        List<Material> items = Util.pickRandomElements(ITEMS, 9, game.getRandom());
+        List<Material> items = CollectionUtil.pickRandomElements(ITEMS, 9, game.getRandom());
 
         for (Player player : game.getPlayers()) {
             for (int i = 0; i < items.size(); i++) {

@@ -1,7 +1,7 @@
 package io.github.lama06.llamagames.llama_says;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.lama06.llamagames.util.Util;
+import io.github.lama06.llamagames.util.CollectionUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -37,7 +37,7 @@ public class InsertMusicDiscMiniGame extends MiniGame {
 
     @Override
     public void init() {
-        musicDiscs = Util.pickRandomElements(MUSIC_DISCS.keySet(), 9, game.getRandom());
+        musicDiscs = CollectionUtil.pickRandomElements(MUSIC_DISCS.keySet(), 9, game.getRandom());
         disc = musicDiscs.get(game.getRandom().nextInt(musicDiscs.size()));
     }
 

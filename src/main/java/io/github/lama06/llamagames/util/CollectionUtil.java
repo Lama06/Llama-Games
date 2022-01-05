@@ -2,10 +2,14 @@ package io.github.lama06.llamagames.util;
 
 import java.util.*;
 
-public class Util {
+public class CollectionUtil {
     private static final Random RANDOM = new Random();
 
     public static <T> List<T> pickRandomElements(Collection<T> source, int limit, Random random) {
+        if (source.isEmpty()) {
+            return null;
+        }
+
         List<T> sourceCopy = new ArrayList<>(source);
         List<T> result = new ArrayList<>();
 
@@ -23,6 +27,10 @@ public class Util {
     }
 
     public static <T> T pickRandomElement(Set<T> source, Random random) {
+        if (source.isEmpty()) {
+            return null;
+        }
+
         int targetIndex = random.nextInt(source.size());
         int currentIndex = 0;
 
@@ -42,6 +50,10 @@ public class Util {
     }
 
     public static <T> T pickRandomElement(List<T> source, Random random) {
+        if (source.isEmpty()) {
+            return null;
+        }
+
         return source.get(random.nextInt(source.size()));
     }
 
