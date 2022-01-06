@@ -9,8 +9,13 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class CompleteResult implements MiniGameResult {
+    private final LlamaSaysGame game;
     private final Set<UUID> successfulPlayers = new HashSet<>();
     private final Set<UUID> failedPlayers = new HashSet<>();
+
+    public CompleteResult(LlamaSaysGame game) {
+        this.game = game;
+    }
 
     @Override
     public void addFailedPlayer(Player player) {
@@ -26,6 +31,11 @@ public final class CompleteResult implements MiniGameResult {
             successfulPlayers.add(player.getUniqueId());
             player.sendMessage(Component.text("Success").color(NamedTextColor.GREEN));
         }
+    }
+
+    @Override
+    public void handleGameEnded() {
+        game.getPlayers().stream().filter(player -> !failedPlayers.contains(player.getUniqueId())).forEach(this::addFailedPlayer);
     }
 
     @Override

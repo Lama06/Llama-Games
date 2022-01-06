@@ -14,12 +14,7 @@ public class LlamaGamesPlugin extends JavaPlugin {
         }
 
         gameManager = new GameManager(this);
-        try {
-            gameManager.loadGames();
-        } catch (GameManager.GamesLoadFailedException e) {
-            e.printStackTrace();
-            return;
-        }
+        gameManager.loadGames();
 
         new LlamaGamesCommand(this, "llamagames");
 

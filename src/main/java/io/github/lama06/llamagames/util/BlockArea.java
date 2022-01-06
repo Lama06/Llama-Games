@@ -4,9 +4,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class BlockArea {
     private BlockPosition position1;
@@ -132,18 +130,26 @@ public class BlockArea {
         return getHeight() == 1 || getWidthX() == 1 || getLowerZ() == 1;
     }
 
-    private final Set<BlockFace> directionsToCheck = Set.of(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
+    private static final Set<BlockFace> neighborDirectionsToCheck = Set.of(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
 
     public Set<BlockFace> getDirectNeighborBlocksInArea(BlockPosition position) {
         Set<BlockFace> result = new HashSet<>();
 
-        for (BlockFace face : directionsToCheck) {
+        for (BlockFace face : neighborDirectionsToCheck) {
             if (containsBlock(position.getRelative(face))) {
                 result.add(face);
             }
         }
 
         return result;
+    }
+
+    public List<BlockPosition> pickRandomBlocks(int limit, Random random) {
+        return CollectionUtil.pickRandomElements(getBlocks(), limit, random);
+    }
+
+    public BlockPosition pickRandomBlock(Random random) {
+        return CollectionUtil.pickRandomElement(getBlocks(), random);
     }
 
     public BlockPosition getPosition1() {

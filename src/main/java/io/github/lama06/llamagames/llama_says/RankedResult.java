@@ -7,8 +7,13 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public final class RankedResult implements MiniGameResult {
+    private final LlamaSaysGame game;
     private final List<UUID> ranking = new ArrayList<>();
     private final Set<UUID> failedPlayers = new HashSet<>();
+
+    public RankedResult(LlamaSaysGame game) {
+        this.game = game;
+    }
 
     @Override
     public void addSuccessfulPlayer(Player player) {
@@ -16,6 +21,11 @@ public final class RankedResult implements MiniGameResult {
             ranking.add(player.getUniqueId());
             player.sendMessage(Component.text("You got %d".formatted(ranking.size())).color(NamedTextColor.GREEN));
         }
+    }
+
+    @Override
+    public void handleGameEnded() {
+        game.getPlayers().stream().filter(player -> !ranking.contains(player.getUniqueId())).forEach(this::addFailedPlayer);
     }
 
     @Override

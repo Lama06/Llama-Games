@@ -24,7 +24,7 @@ public class WriteToChatMiniGame extends MiniGame {
     private String word;
 
     public WriteToChatMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class WriteToChatMiniGame extends MiniGame {
     @EventHandler
     public void handlePlayerChatEvent(AsyncChatEvent event) {
         Bukkit.getScheduler().runTask(game.getPlugin(), () -> {
-            if (PaperComponents.plainSerializer().serialize(event.message()).trim().equalsIgnoreCase(word)) {
+            if (PaperComponents.plainTextSerializer().serialize(event.message()).trim().equalsIgnoreCase(word)) {
                 result.addSuccessfulPlayer(event.getPlayer());
             }
         });

@@ -30,7 +30,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     }
 
     @Override
-    public void handleGameStarted() {
+    public void handleGameStarted(String[] args) {
         remainingFloors = new HashSet<>(config.getFloors());
 
         startRound(1);

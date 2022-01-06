@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public class ShootYourselfWithAnArrowMiniGame extends MiniGame {
     public ShootYourselfWithAnArrowMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class EatUntilYouAreFullMiniGame extends MiniGame {
     private List<Material> items;
 
     public EatUntilYouAreFullMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class EatUntilYouAreFullMiniGame extends MiniGame {
     @EventHandler
     public void handleFoodLevelChangeEvent(FoodLevelChangeEvent event) {
         if (event.getFoodLevel() == 20 && event.getEntity() instanceof Player player) {
-            result.addFailedPlayer(player);
+            result.addSuccessfulPlayer(player);
         }
     }
 }

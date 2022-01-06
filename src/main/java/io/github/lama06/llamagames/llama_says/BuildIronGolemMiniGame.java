@@ -20,14 +20,14 @@ public class BuildIronGolemMiniGame extends MiniGame {
     private Set<BlockPosition> blocks;
 
     public BuildIronGolemMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override
     public void init() {
         blocks = new HashSet<>();
 
-        game.getEventCanceler().setCancelBlockPlacement(false);
+        game.getEventCanceler().setCancelPlayerBlockPlacement(false);
     }
 
     @Override

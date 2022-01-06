@@ -1,6 +1,5 @@
 package io.github.lama06.llamagames.llama_says;
 
-import io.github.lama06.llamagames.util.BlockArea;
 import io.github.lama06.llamagames.util.BlockPosition;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.EntityType;
@@ -10,13 +9,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class GetIntoMinecartMiniGame extends MiniGame {
     public GetIntoMinecartMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override
@@ -27,27 +25,9 @@ public class GetIntoMinecartMiniGame extends MiniGame {
     @Override
     public void handleGameStarted() {
         int numberOfMinecarts = getNumberOfMinecarts();
-        BlockArea floor = game.getConfig().getFloor();
-        Set<BlockPosition> minecartPositions = new HashSet<>();
+        List<BlockPosition> positions = game.getConfig().getFloor().pickRandomBlocks(numberOfMinecarts, game.getRandom());
 
-        for (int i = 1; i <= numberOfMinecarts; i++) {
-            BlockPosition position;
-            while (true) {
-                BlockPosition randomBlockPosition = new BlockPosition(
-                        game.getRandom().nextInt(floor.getLowerX(), floor.getUpperX()+1),
-                        game.getRandom().nextInt(floor.getLowerY(), floor.getUpperY()+1),
-                        game.getRandom().nextInt(floor.getLowerZ(), floor.getUpperZ()+1)
-                );
-
-                if (minecartPositions.contains(randomBlockPosition)) {
-                    continue;
-                }
-
-                position = randomBlockPosition;
-                minecartPositions.add(position);
-                break;
-            }
-
+        for (BlockPosition position : positions) {
             game.getWorld().spawnEntity(position.asLocation(game.getWorld()).add(0, 1, 0), EntityType.MINECART);
         }
     }

@@ -6,10 +6,6 @@ public class CollectionUtil {
     private static final Random RANDOM = new Random();
 
     public static <T> List<T> pickRandomElements(Collection<T> source, int limit, Random random) {
-        if (source.isEmpty()) {
-            return null;
-        }
-
         List<T> sourceCopy = new ArrayList<>(source);
         List<T> result = new ArrayList<>();
 

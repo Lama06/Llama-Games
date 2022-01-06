@@ -45,7 +45,6 @@ public abstract class MiniGame implements Listener {
     public void cleanup() { }
 
     private void cleanupPlayerInternal(Player player) {
-        System.out.println(player.getName());
         player.getInventory().clear();
 
         player.setFoodLevel(20);
@@ -61,6 +60,8 @@ public abstract class MiniGame implements Listener {
     }
 
     private void cleanupWorldInternal() {
+        game.getConfig().getFloor().fill(game.getWorld(), game.getConfig().getFloorMaterial().createBlockData());
+
         cleanupWorld();
     }
 
@@ -112,6 +113,8 @@ public abstract class MiniGame implements Listener {
         cleanup();
 
         handleGameEnded();
+
+        result.handleGameEnded();
 
         if (callCallback) {
             callback.accept(this);

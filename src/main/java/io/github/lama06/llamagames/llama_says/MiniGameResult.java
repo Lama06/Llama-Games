@@ -10,6 +10,8 @@ public sealed interface MiniGameResult permits CompleteResult, RankedResult {
 
     void addSuccessfulPlayer(Player player);
 
+    void handleGameEnded();
+
     int getPointsForPlayer(Player player);
 
     Collection<UUID> getSuccessfulPlayers();

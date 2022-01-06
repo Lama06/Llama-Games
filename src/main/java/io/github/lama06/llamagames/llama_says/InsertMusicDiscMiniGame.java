@@ -32,7 +32,7 @@ public class InsertMusicDiscMiniGame extends MiniGame {
     private Material disc;
 
     public InsertMusicDiscMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override

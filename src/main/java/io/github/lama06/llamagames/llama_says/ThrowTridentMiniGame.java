@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public class ThrowTridentMiniGame extends MiniGame {
     public ThrowTridentMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new CompleteResult(), callback);
+        super(game, new CompleteResult(game), callback);
     }
 
     @Override

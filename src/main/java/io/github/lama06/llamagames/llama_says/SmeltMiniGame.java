@@ -28,7 +28,7 @@ public class SmeltMiniGame extends MiniGame {
     private Pair<Material, Material> ingredient;
 
     public SmeltMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override

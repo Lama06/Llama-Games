@@ -14,7 +14,7 @@ public class StandStillMiniGame extends MiniGame {
     private BukkitTask enableMovementCheckingTask;
 
     public StandStillMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new CompleteResult(), callback);
+        super(game, new CompleteResult(game), callback);
     }
 
     @Override

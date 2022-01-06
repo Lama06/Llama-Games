@@ -30,7 +30,7 @@ public class PutOnArmorStandMiniGame extends MiniGame {
     private ArmorStand armorStand;
 
     public PutOnArmorStandMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override

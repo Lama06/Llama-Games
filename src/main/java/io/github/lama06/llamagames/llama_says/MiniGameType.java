@@ -87,6 +87,11 @@ public final class MiniGameType<T extends MiniGame> {
             RemoveFromInventoryMiniGame::new
     );
 
+    public static final MiniGameType<DoNotGetKilledByTntMiniGame> DO_NOT_GET_KILLED_BY_TNT = new MiniGameType<>(
+            "avoid_tnt",
+            DoNotGetKilledByTntMiniGame::new
+    );
+
     private final String name;
     private final MiniGameCreator<T> creator;
 

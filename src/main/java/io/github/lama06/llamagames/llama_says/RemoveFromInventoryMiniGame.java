@@ -24,7 +24,7 @@ public class RemoveFromInventoryMiniGame extends MiniGame {
     private Material targetMaterial;
 
     public RemoveFromInventoryMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new RankedResult(), callback);
+        super(game, new RankedResult(game), callback);
     }
 
     @Override

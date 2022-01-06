@@ -32,5 +32,13 @@ public class LlamaSaysCommand extends GameCommand {
                 LlamaSaysConfig::setFloor,
                 floor -> Component.text("The position of the floor was successfully changed to %s".formatted(floor))
         ));
+
+        addSubCommand("floorBlock", createMaterialConfigSubCommand(
+                plugin,
+                LlamaSaysGame.class,
+                config -> Component.text("The floor is currently made of ").append(Component.translatable(config.getFloorMaterial())),
+                LlamaSaysConfig::setFloorMaterial,
+                material -> Component.text("The floor is now made of ").append(Component.translatable(material))
+        ));
     }
 }

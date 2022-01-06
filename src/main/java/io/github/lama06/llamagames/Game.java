@@ -42,7 +42,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         canceler.disallowAll();
     }
 
-    public final boolean startGame() {
+    public final boolean startGame(String[] args) {
         if (!canStart()) {
             return false;
         }
@@ -56,9 +56,13 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
         running = true;
 
-        handleGameStarted();
+        handleGameStarted(args);
 
         return true;
+    }
+
+    public final boolean startGame() {
+        return startGame(null);
     }
 
     public final boolean endGame(GameEndReason reason) {
@@ -110,7 +114,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public void handleGameUnloaded() { }
 
-    public abstract void handleGameStarted();
+    public abstract void handleGameStarted(String[] args);
 
     public abstract void handleGameEnded(GameEndReason reason);
 

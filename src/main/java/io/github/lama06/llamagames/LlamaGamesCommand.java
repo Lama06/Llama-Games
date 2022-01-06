@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 public class LlamaGamesCommand extends LlamaCommand {
@@ -81,12 +82,12 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void start(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 1)) return;
+        if (requireArgsAtLeast(sender, args, 1)) return;
 
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
 
-        if (game.get().startGame()) {
+        if (game.get().startGame(Arrays.copyOfRange(args, 1, args.length))) {
             sender.sendMessage(Component.text("The game was successfully started").color(NamedTextColor.GREEN));
         } else {
             sender.sendMessage(Component.text("Failed to start the game").color(NamedTextColor.RED));

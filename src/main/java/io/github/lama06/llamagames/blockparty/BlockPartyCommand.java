@@ -14,20 +14,20 @@ public class BlockPartyCommand extends GameCommand {
                 plugin,
                 BlockPartyGame.class,
                 config -> Component.text("The floor is currently at %s".formatted(config.getFloor())),
-                (config, floor) -> config.setFloor(floor),
+                BlockPartyConfig::setFloor,
                 floor -> Component.text("The floor is now at %s".formatted(floor))
         ));
         addSubCommand("deadlyBlock", createMaterialConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
                 config -> Component.text("The deadly block is currently set to ").append(Component.translatable(config.getDeadlyBlock())),
-                (config, material) -> config.setDeadlyBlock(material),
+                BlockPartyConfig::setDeadlyBlock,
                 material -> Component.text("The deadly block is now set to ").append(Component.translatable(material))
         ));
         addSubCommand("floors", createCollectionConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
-                config -> config.getFloors(),
+                BlockPartyConfig::getFloors,
                 Component.text("There are no floors"),
                 floor -> Component.text("%s: %s".formatted(floor.getName(), floor.getArea())),
                 (sender, args) -> {

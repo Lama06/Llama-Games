@@ -23,7 +23,15 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     }
 
     @Override
-    public void handleGameStarted() {
+    public void handleGameStarted(String[] args) {
+        MiniGameType<?> type = null;
+        if (args != null && args.length == 1) {
+            Optional<MiniGameType<?>> result = MiniGameType.byName(args[0]);
+            if (result.isPresent()) {
+                type = result.get();
+            }
+        }
+
         remainingRounds = config.getNumberOfRounds();
         remainingGameTypes = new ArrayList<>(MiniGameType.getTypes());
 
@@ -32,7 +40,7 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
             points.put(player.getUniqueId(), 0);
         }
 
-        startNextRound();
+        startNextRound(type);
     }
 
     @Override
@@ -42,15 +50,16 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
         }
     }
 
-    private void startNextRound() {
+    private void startNextRound(MiniGameType<?> type) {
         remainingRounds--;
 
-        MiniGameType<?> type;
-        if (remainingGameTypes.isEmpty()) {
-            type = MiniGameType.getTypes().get(random.nextInt(MiniGameType.getTypes().size()));
-        } else {
-            type = remainingGameTypes.get(random.nextInt(remainingGameTypes.size()));
-            remainingGameTypes.remove(type);
+        if (type == null) {
+            if (remainingGameTypes.isEmpty()) {
+                type = MiniGameType.getTypes().get(random.nextInt(MiniGameType.getTypes().size()));
+            } else {
+                type = remainingGameTypes.get(random.nextInt(remainingGameTypes.size()));
+                remainingGameTypes.remove(type);
+            }
         }
 
         currentMiniGame = type.getCreator().createMiniGame(this, game -> {
@@ -67,7 +76,7 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
             if (remainingRounds == 0) {
                 endGame(GameEndReason.ENDED);
             } else {
-                startNextRound();
+                startNextRound(null);
             }
         });
 
@@ -111,7 +120,7 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
             result = false;
         }
 
-        if (config.getFloorCenter() == null) {
+        if (config.getFloorCenter() == null || config.getFloorMaterial() == null) {
             result = false;
         }
 

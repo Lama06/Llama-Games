@@ -2,38 +2,42 @@ package io.github.lama06.llamagames;
 
 import com.google.gson.*;
 import io.github.lama06.llamagames.util.BlockDataTypeAdapter;
+import io.github.lama06.llamagames.util.MaterialTypeAdapter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public final class GameManager implements Listener {
     private static final Map<Class<?>, TypeAdapter<?>> DEFAULT_TYPE_ADAPTERS = Map.ofEntries(
-            Map.entry(BlockData.class, new BlockDataTypeAdapter())
+            Map.entry(BlockData.class, new BlockDataTypeAdapter()),
+            Map.entry(Material.class, new MaterialTypeAdapter())
     );
 
     private final LlamaGamesPlugin plugin;
+    private final Logger logger;
     private final Gson gson = createGson();
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
+    private final Map<String, JsonObject> invalidGames = new HashMap<>();
 
     public GameManager(LlamaGamesPlugin plugin) {
         this.plugin = plugin;
+        logger = plugin.getSLF4JLogger();
         this.configFile = new File(plugin.getDataFolder(), "games.json");
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -61,13 +65,14 @@ public final class GameManager implements Listener {
         return builder.create();
     }
 
-    private JsonObject loadGamesConfig() throws GamesLoadFailedException {
+    private JsonObject loadGamesConfig() {
         boolean created;
 
         try {
             created = configFile.createNewFile();
         } catch (IOException e) {
-            throw new GamesLoadFailedException("Failed to create the config file", e);
+            logger.error("Failed to create the config file: %s".formatted(e.getMessage()));
+            return null;
         }
 
         if (created) {
@@ -76,7 +81,8 @@ public final class GameManager implements Listener {
 
                 return new JsonObject();
             } catch (IOException e) {
-                throw new GamesLoadFailedException("Failed to write to the config file", e);
+                logger.error("Failed to write to the config file: %s".formatted(e));
+                return null;
             }
         }
 
@@ -84,24 +90,28 @@ public final class GameManager implements Listener {
             JsonElement gamesConfig = JsonParser.parseReader(reader);
 
             if (!gamesConfig.isJsonObject()) {
-                throw new GamesLoadFailedException("The games config file does not contain a root object");
+                logger.error("The games config file does not contain a root object");
+                return null;
             }
 
             return gamesConfig.getAsJsonObject();
         } catch (IOException e) {
-            throw new GamesLoadFailedException("Failed to load games config file", e);
+            logger.error("Failed to load games config file: %s".formatted(e));
+            return null;
         } catch (JsonParseException e) {
-            throw new GamesLoadFailedException("Failed to parse games config file", e);
+            logger.error("Failed to parse games config file: %s".formatted(e));
+            return null;
         }
     }
 
-    private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config) {
+    private <G extends Game<G, C>, C extends GameConfig> void loadGame(GameType<G, C> type, World world, JsonObject config, JsonObject gameConfigRoot) {
         C deserializedConfig;
 
         try {
             deserializedConfig = gson.fromJson(config, type.getConfigType());
         } catch (JsonSyntaxException e) {
-            plugin.getLogger().warning("Failed to parse the config of the game in the world %s".formatted(world.getName()));
+            logger.error("Failed to parse the config of the game in the world %s: %s".formatted(world.getName(), e));
+            invalidGames.put(world.getName(), gameConfigRoot);
             return;
         }
 
@@ -111,37 +121,54 @@ public final class GameManager implements Listener {
         game.loadGame();
     }
 
-    public void loadGames() throws GamesLoadFailedException {
+    public void loadGames() {
         JsonObject gamesConfig = loadGamesConfig();
+        if (gamesConfig == null) {
+            return;
+        }
 
         for (Map.Entry<String, JsonElement> gameEntry : gamesConfig.entrySet()) {
-            String worldName = gameEntry.getKey();
-            World world = Bukkit.getWorld(worldName);
-            if (world == null) {
+            if (gameEntry.getKey().equals("dataVersion")) {
                 continue;
             }
 
             if (!gameEntry.getValue().isJsonObject()) {
-                throw new GamesLoadFailedException("The games config file has an invalid format");
+                logger.error("The games config file has an invalid format");
+                continue;
+            }
+            JsonObject gameConfigRoot = gameEntry.getValue().getAsJsonObject();
+
+            String worldName = gameEntry.getKey();
+            World world = Bukkit.getWorld(worldName);
+            if (world == null) {
+                logger.error("Cannot find a world named %s".formatted(worldName));
+                invalidGames.put(gameEntry.getKey(), gameConfigRoot);
+                continue;
             }
 
-            if (!gameEntry.getValue().getAsJsonObject().has("type") ||
-                    !gameEntry.getValue().getAsJsonObject().get("type").isJsonPrimitive() ||
-                    !gameEntry.getValue().getAsJsonObject().get("type").getAsJsonPrimitive().isString()) {
-                throw new GamesLoadFailedException("The games config file contains a game without a type attribute");
+            if (!gameConfigRoot.has("type") ||
+                    !gameConfigRoot.get("type").isJsonPrimitive() ||
+                    !gameConfigRoot.get("type").getAsJsonPrimitive().isString()) {
+                logger.error("The games config file contains a game without a type attribute");
+                invalidGames.put(gameEntry.getKey(), gameConfigRoot);
+                continue;
             }
             String gameTypeName = gameEntry.getValue().getAsJsonObject().get("type").getAsString();
             Optional<GameType<?, ?>> type = GameType.getByName(gameTypeName);
             if (type.isEmpty()) {
-                throw new GamesLoadFailedException(String.format("Could not find game type: %s", gameTypeName));
+                logger.error(String.format("Could not find game type: %s", gameTypeName));
+                invalidGames.put(gameEntry.getKey(), gameConfigRoot);
+                continue;
             }
 
-            if (!gameEntry.getValue().getAsJsonObject().has("config") || !gameEntry.getValue().getAsJsonObject().get("config").isJsonObject()) {
-                throw new GamesLoadFailedException("The game config file contains a game without a config attribute");
+            if (!gameConfigRoot.has("config") || !gameConfigRoot.get("config").isJsonObject()) {
+                logger.error("The game config file contains a game without a config attribute");
+                invalidGames.put(gameEntry.getKey(), gameConfigRoot);
+                continue;
             }
             JsonObject gameConfig = gameEntry.getValue().getAsJsonObject().get("config").getAsJsonObject();
 
-            loadGame(type.get(), world, gameConfig);
+            loadGame(type.get(), world, gameConfig, gameConfigRoot);
         }
     }
 
@@ -157,6 +184,10 @@ public final class GameManager implements Listener {
             gameConfigEntry.add("config", gameConfig);
 
             gamesConfig.add(game.getWorld().getName(), gameConfigEntry);
+        }
+
+        for (Map.Entry<String, JsonObject> entry : invalidGames.entrySet()) {
+            gamesConfig.add(entry.getKey(), entry.getValue());
         }
 
         try (FileWriter writer = new FileWriter(configFile)) {
@@ -219,16 +250,6 @@ public final class GameManager implements Listener {
 
     public Set<Game<?, ?>> getGames() {
         return games;
-    }
-
-    public static class GamesLoadFailedException extends Exception {
-        public GamesLoadFailedException(String msg, Throwable cause) {
-            super(msg, cause);
-        }
-
-        public GamesLoadFailedException(String msg) {
-            super(msg);
-        }
     }
 
     public static class GamesSaveFailedException extends Exception {

@@ -2,6 +2,8 @@ name: Llama-Games
 api-version: 1.17
 main: io.github.lama06.llamagames.LlamaGamesPlugin
 version: 1.0.0
+softdepend:
+  - Multiverse-Core
 
 commands:
   llamagames:
@@ -10,5 +12,3 @@ commands:
     description: Used to setup LlamaSays games
   blockparty:
     description: Used to setup BlockParty games
-  drawit:
-    description: Used to setup DrawIt games

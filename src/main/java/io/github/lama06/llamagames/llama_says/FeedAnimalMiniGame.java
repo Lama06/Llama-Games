@@ -28,7 +28,7 @@ public class FeedAnimalMiniGame extends MiniGame {
     private Entity entity;
 
     public FeedAnimalMiniGame(LlamaSaysGame game, Consumer<MiniGame> callback) {
-        super(game, new CompleteResult(), callback);
+        super(game, new CompleteResult(game), callback);
     }
 
     @Override
