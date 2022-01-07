@@ -1,7 +1,6 @@
 package io.github.lama06.llamagames.util;
 
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 
 import java.util.*;
@@ -128,20 +127,6 @@ public class BlockArea {
 
     public boolean is2d() {
         return getHeight() == 1 || getWidthX() == 1 || getLowerZ() == 1;
-    }
-
-    private static final Set<BlockFace> neighborDirectionsToCheck = Set.of(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
-
-    public Set<BlockFace> getDirectNeighborBlocksInArea(BlockPosition position) {
-        Set<BlockFace> result = new HashSet<>();
-
-        for (BlockFace face : neighborDirectionsToCheck) {
-            if (containsBlock(position.getRelative(face))) {
-                result.add(face);
-            }
-        }
-
-        return result;
     }
 
     public List<BlockPosition> pickRandomBlocks(int limit, Random random) {

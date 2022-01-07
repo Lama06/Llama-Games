@@ -31,7 +31,7 @@ public class EventCanceler implements Listener {
     private boolean cancelItemConsummation;
     private boolean cancelInventoryEvents;
     private boolean cancelItemDrops;
-    private boolean cancelHunger;
+    private boolean cancelFoodLevelChange;
 
     public EventCanceler(LlamaGamesPlugin plugin, Game<?, ?> game) {
         this.plugin = plugin;
@@ -55,10 +55,11 @@ public class EventCanceler implements Listener {
         setCancelItemConsummation(flag);
         setCancelInventoryEvents(flag);
         setCancelItemDrops(flag);
-        setCancelHunger(flag);
+        setCancelFoodLevelChange(flag);
 
         setCancelTime(flag);
         setCancelWeather(flag);
+        setCancelNaturalMobSpawns(flag);
     }
 
     public void allowAll() {
@@ -148,8 +149,8 @@ public class EventCanceler implements Listener {
     }
 
     @EventHandler
-    private void cancelHunger(FoodLevelChangeEvent event) {
-        if (shouldCancel(event.getEntity(), cancelHunger) && event.getEntity().getFoodLevel() > event.getFoodLevel()) {
+    private void cancelFoodLevelChange(FoodLevelChangeEvent event) {
+        if (shouldCancel(event.getEntity(), cancelFoodLevelChange)) {
             event.setCancelled(true);
         }
     }
@@ -200,8 +201,8 @@ public class EventCanceler implements Listener {
         this.cancelItemDrops = cancelItemDrops;
     }
 
-    public void setCancelHunger(boolean cancelHunger) {
-        this.cancelHunger = cancelHunger;
+    public void setCancelFoodLevelChange(boolean cancelFoodLevelChange) {
+        this.cancelFoodLevelChange = cancelFoodLevelChange;
     }
 
     public void setCancelTime(boolean cancelTime) {
@@ -210,5 +211,9 @@ public class EventCanceler implements Listener {
 
     public void setCancelWeather(boolean cancelWeather) {
         game.getWorld().setGameRule(GameRule.DO_WEATHER_CYCLE, !cancelWeather);
+    }
+
+    public void setCancelNaturalMobSpawns(boolean cancelNaturalMobSpawns) {
+        game.getWorld().setGameRule(GameRule.DO_MOB_SPAWNING, !cancelNaturalMobSpawns);
     }
 }

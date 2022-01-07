@@ -92,6 +92,16 @@ public final class MiniGameType<T extends MiniGame> {
             DoNotGetKilledByTntMiniGame::new
     );
 
+    public static final MiniGameType<DoNotStandOnIceMiniGame> DO_NOT_STAND_ON_ICE = new MiniGameType<>(
+            "do_not_stand_on_ice",
+            DoNotStandOnIceMiniGame::new
+    );
+
+    public static final MiniGameType<JumpIntoWaterMiniGame> JUMP_INTO_WATER = new MiniGameType<>(
+            "jump_into_water",
+            JumpIntoWaterMiniGame::new
+    );
+
     private final String name;
     private final MiniGameCreator<T> creator;
 

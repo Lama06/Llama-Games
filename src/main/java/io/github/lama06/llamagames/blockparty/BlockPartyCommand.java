@@ -10,6 +10,7 @@ import java.util.Optional;
 public class BlockPartyCommand extends GameCommand {
     public BlockPartyCommand(LlamaGamesPlugin plugin) {
         super(plugin, "blockparty");
+
         addSubCommand("floor", createBlockAreaConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
@@ -17,6 +18,7 @@ public class BlockPartyCommand extends GameCommand {
                 BlockPartyConfig::setFloor,
                 floor -> Component.text("The floor is now at %s".formatted(floor))
         ));
+
         addSubCommand("deadlyBlock", createMaterialConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,
@@ -24,6 +26,7 @@ public class BlockPartyCommand extends GameCommand {
                 BlockPartyConfig::setDeadlyBlock,
                 material -> Component.text("The deadly block is now set to ").append(Component.translatable(material))
         ));
+
         addSubCommand("floors", createCollectionConfigSubCommand(
                 plugin,
                 BlockPartyGame.class,

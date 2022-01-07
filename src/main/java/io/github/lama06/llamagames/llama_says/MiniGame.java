@@ -104,6 +104,8 @@ public abstract class MiniGame implements Listener {
 
         HandlerList.unregisterAll(this);
 
+        handleGameEnded();
+
         for (Player player : game.getPlayers()) {
             cleanupPlayerInternal(player);
         }
@@ -111,8 +113,6 @@ public abstract class MiniGame implements Listener {
         cleanupWorldInternal();
 
         cleanup();
-
-        handleGameEnded();
 
         result.handleGameEnded();
 

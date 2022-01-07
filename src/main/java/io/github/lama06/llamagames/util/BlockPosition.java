@@ -2,6 +2,7 @@ package io.github.lama06.llamagames.util;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,10 @@ public final class BlockPosition {
 
     public BlockPosition getRelative(BlockFace face) {
         return new BlockPosition(x+face.getModX(), y+face.getModY(), z+face.getModZ());
+    }
+
+    public Block getBlock(World world) {
+        return world.getBlockAt(x, y, z);
     }
 
     @Override
