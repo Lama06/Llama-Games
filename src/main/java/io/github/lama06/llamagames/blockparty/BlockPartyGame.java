@@ -151,7 +151,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
         currentTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
             removeFloorBlocks(type);
 
-            Bukkit.getScheduler().runTaskLater(plugin, this::startNextRound, 40);
+            currentTask = Bukkit.getScheduler().runTaskLater(plugin, this::startNextRound, 40);
         }, roundTime);
     }
 

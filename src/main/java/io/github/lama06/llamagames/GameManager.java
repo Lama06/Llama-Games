@@ -1,5 +1,6 @@
 package io.github.lama06.llamagames;
 
+import com.google.common.io.Files;
 import com.google.gson.*;
 import io.github.lama06.llamagames.util.BlockDataTypeAdapter;
 import io.github.lama06.llamagames.util.MaterialTypeAdapter;
@@ -20,6 +21,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public final class GameManager implements Listener {
@@ -34,6 +37,7 @@ public final class GameManager implements Listener {
     private final File configFile;
     private final Set<Game<?, ?>> games = new HashSet<>();
     private final Map<String, JsonObject> invalidGames = new HashMap<>();
+    private boolean configCorrectlyLoaded = false;
 
     public GameManager(LlamaGamesPlugin plugin) {
         this.plugin = plugin;
@@ -63,6 +67,45 @@ public final class GameManager implements Listener {
         }
 
         return builder.create();
+    }
+
+    private File getConfigBackupFolder() {
+        File folder = new File(plugin.getDataFolder(), "backups");
+        if (folder.exists() && !folder.isDirectory()) {
+            logger.error("Failed to backup the game config file because there is a file named backup in the config directory. No Backups will be created!");
+            return null;
+        }
+
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        return folder;
+    }
+
+    public void backupConfigFile() {
+        File backupFolder = getConfigBackupFolder();
+        if (backupFolder == null) {
+            return;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm.ss");
+        String time = formatter.format(LocalDateTime.now());
+        File backupFile = new File(backupFolder, "Backup (%s).json".formatted(time));
+        if (backupFile.exists()) {
+            return;
+        }
+
+        try {
+            if (!backupFile.exists()) {
+                backupFile.createNewFile();
+            }
+
+            Files.copy(configFile, backupFile);
+        } catch (IOException e) {
+            logger.error("Failed to backup the config file: %s".formatted(e));
+            e.printStackTrace();
+        }
     }
 
     private JsonObject loadGamesConfig() {
@@ -121,10 +164,10 @@ public final class GameManager implements Listener {
         game.loadGame();
     }
 
-    public void loadGames() {
+    public boolean loadGames() {
         JsonObject gamesConfig = loadGamesConfig();
         if (gamesConfig == null) {
-            return;
+            return false;
         }
 
         for (Map.Entry<String, JsonElement> gameEntry : gamesConfig.entrySet()) {
@@ -166,13 +209,20 @@ public final class GameManager implements Listener {
                 invalidGames.put(gameEntry.getKey(), gameConfigRoot);
                 continue;
             }
-            JsonObject gameConfig = gameEntry.getValue().getAsJsonObject().get("config").getAsJsonObject();
+            JsonObject gameConfig = gameConfigRoot.get("config").getAsJsonObject();
 
             loadGame(type.get(), world, gameConfig, gameConfigRoot);
         }
+
+        configCorrectlyLoaded = true;
+        return true;
     }
 
     public void saveGameConfig() throws GamesSaveFailedException {
+        if (!configCorrectlyLoaded) {
+            return;
+        }
+
         JsonObject gamesConfig = new JsonObject();
         gamesConfig.addProperty("dataVersion", 1);
 

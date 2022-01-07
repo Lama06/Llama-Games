@@ -1,5 +1,6 @@
 package io.github.lama06.llamagames;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.function.Consumer;
@@ -14,7 +15,15 @@ public class LlamaGamesPlugin extends JavaPlugin {
         }
 
         gameManager = new GameManager(this);
-        gameManager.loadGames();
+
+        gameManager.backupConfigFile();
+
+        boolean loadResult = gameManager.loadGames();
+        if (!loadResult) {
+            getLog4JLogger().error("Failed to load the games from the game config file! Disabling the plugin!");
+            Bukkit.getScheduler().runTask(this, () -> Bukkit.getPluginManager().disablePlugin(this));
+            return;
+        }
 
         new LlamaGamesCommand(this, "llamagames");
 
