@@ -5,10 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -195,6 +192,23 @@ public abstract class LlamaCommand implements TabExecutor {
         return Optional.of(material);
     }
 
+    private static final Component noPermissionMsg = Component.text("You don't have the permission to execute this command", NamedTextColor.RED);
+
+    public static boolean requireOp(CommandSender sender) {
+        if (sender instanceof ConsoleCommandSender) {
+            return true;
+        } else if (sender instanceof Player player) {
+            if (!player.isOp()) {
+                player.sendMessage(noPermissionMsg);
+            }
+
+            return player.isOp();
+        } else {
+            sender.sendMessage(noPermissionMsg);
+            return false;
+        }
+    }
+
     public static Optional<Player> requirePlayer(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(Component.text("This command can only be used by players").color(NamedTextColor.RED));
@@ -260,6 +274,8 @@ public abstract class LlamaCommand implements TabExecutor {
             BiFunction<CommandSender, String[], Optional<T>> configChangeCommandLogic
     ) {
         return (sender, args) -> {
+            if (!requireOp(sender)) return;
+
             if (requireArgsAtLeast(sender, args, 1)) return;
 
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
@@ -280,10 +296,8 @@ public abstract class LlamaCommand implements TabExecutor {
 
                 configChangedCallback.accept(game.get().getConfig(), newConfigValue.get());
 
-                try {
-                    plugin.getGameManager().saveGameConfig();
-                } catch (GameManager.GamesSaveFailedException e) {
-                    sender.sendMessage(Component.text("Failed to save the game config", NamedTextColor.RED));
+                boolean failed = plugin.getGameManager().saveGameConfig(sender);
+                if (failed) {
                     return;
                 }
 
@@ -445,6 +459,8 @@ public abstract class LlamaCommand implements TabExecutor {
             Component elementRemovedMessage
     ) {
         return (sender, args) -> {
+            if (!requireOp(sender)) return;
+
             if (requireArgsAtLeast(sender, args, 2)) return;
 
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);

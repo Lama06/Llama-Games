@@ -84,6 +84,10 @@ public final class GameManager implements Listener {
     }
 
     public void backupConfigFile() {
+        if (!configFile.exists()) {
+            return;
+        }
+
         File backupFolder = getConfigBackupFolder();
         if (backupFolder == null) {
             return;
@@ -97,14 +101,13 @@ public final class GameManager implements Listener {
         }
 
         try {
-            if (!backupFile.exists()) {
-                backupFile.createNewFile();
-            }
+            backupFile.createNewFile();
 
             Files.copy(configFile, backupFile);
+
+            logger.info("A backup of the config file was successfully created");
         } catch (IOException e) {
             logger.error("Failed to backup the config file: %s".formatted(e));
-            e.printStackTrace();
         }
     }
 
@@ -218,9 +221,9 @@ public final class GameManager implements Listener {
         return true;
     }
 
-    public void saveGameConfig() throws GamesSaveFailedException {
+    public boolean saveGameConfig() {
         if (!configCorrectlyLoaded) {
-            return;
+            return false;
         }
 
         JsonObject gamesConfig = new JsonObject();
@@ -243,18 +246,18 @@ public final class GameManager implements Listener {
         try (FileWriter writer = new FileWriter(configFile)) {
             gson.toJson(gamesConfig, writer);
         } catch (IOException e) {
-            throw new GamesSaveFailedException("Failed to write to games.json", e);
+            return false;
         }
+
+        return true;
     }
 
     public boolean saveGameConfig(Audience errorListener) {
-        try {
-            saveGameConfig();
-            return false;
-        } catch (GamesSaveFailedException e) {
+        boolean successful = saveGameConfig();
+        if (!successful) {
             errorListener.sendMessage(Component.text("Failed to save the config file", NamedTextColor.RED));
-            return true;
         }
+        return !successful;
     }
 
     public void unloadGames() {
@@ -270,7 +273,7 @@ public final class GameManager implements Listener {
     }
 
     public <G extends Game<G, C>, C extends GameConfig> void createGame(World world, GameType<G, C> type) {
-        if (games.stream().anyMatch(game -> game.getWorld().equals(world))) {
+        if (getGameForWorld(world).isPresent()) {
             return;
         }
 
@@ -282,7 +285,7 @@ public final class GameManager implements Listener {
     }
 
     public boolean deleteGame(World world) {
-        Optional<Game<?, ?>> game = games.stream().filter(g -> g.getWorld().equals(world)).findFirst();
+        Optional<Game<?, ?>> game = getGameForWorld(world);
         if (game.isPresent()) {
             games.remove(game.get());
             game.get().unloadGame();
@@ -300,11 +303,5 @@ public final class GameManager implements Listener {
 
     public Set<Game<?, ?>> getGames() {
         return games;
-    }
-
-    public static class GamesSaveFailedException extends Exception {
-        public GamesSaveFailedException(String msg, Throwable cause) {
-            super(msg, cause);
-        }
     }
 }

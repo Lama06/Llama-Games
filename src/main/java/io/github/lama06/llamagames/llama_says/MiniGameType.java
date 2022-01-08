@@ -102,6 +102,16 @@ public final class MiniGameType<T extends MiniGame> {
             JumpIntoWaterMiniGame::new
     );
 
+    public static final MiniGameType<EnchantMiniGame> ENCHANT_ITEM = new MiniGameType<>(
+            "enchant_item",
+            EnchantMiniGame::new
+    );
+
+    public static final MiniGameType<AddEnchantmentMiniGame> ADD_ENCHANTMENT = new MiniGameType<>(
+            "add_enchantment",
+            AddEnchantmentMiniGame::new
+    );
+
     private final String name;
     private final MiniGameCreator<T> creator;
 

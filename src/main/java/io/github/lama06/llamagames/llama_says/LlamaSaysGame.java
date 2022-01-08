@@ -126,4 +126,8 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
 
         return result;
     }
+
+    public MiniGame getCurrentMiniGame() {
+        return currentMiniGame;
+    }
 }

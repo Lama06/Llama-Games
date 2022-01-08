@@ -22,7 +22,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void create(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 2)) return;
+        if (requireArgsExact(sender, args, 2) || !requireOp(sender)) return;
 
         Optional<World> world = requireWorld(sender, args[0]);
         if (world.isEmpty()) return;
@@ -47,7 +47,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void delete(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 1)) return;
+        if (requireArgsExact(sender, args, 1) || !requireOp(sender)) return;
 
         Optional<World> world = requireWorld(sender, args[0]);
         if (world.isEmpty()) return;
@@ -58,14 +58,12 @@ public class LlamaGamesCommand extends LlamaCommand {
             sender.sendMessage(Component.text("Failed to delete the game").color(NamedTextColor.RED));
         }
 
-        try {
-            plugin.getGameManager().saveGameConfig();
-        } catch (GameManager.GamesSaveFailedException e) {
-            sender.sendMessage(Component.text("Internal error while saving the config file").color(NamedTextColor.RED));
-        }
+        plugin.getGameManager().saveGameConfig();
     }
 
     public void list(CommandSender sender, String[] args) {
+        if (!requireOp(sender)) return;
+
         if (plugin.getGameManager().getGames().isEmpty()) {
             sender.sendMessage(Component.text("There are no games on the server"));
             return;
@@ -82,7 +80,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void start(CommandSender sender, String[] args) {
-        if (requireArgsAtLeast(sender, args, 1)) return;
+        if (requireArgsAtLeast(sender, args, 1) || !requireOp(sender)) return;
 
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
@@ -95,7 +93,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void stop(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 1)) return;
+        if (requireArgsExact(sender, args, 1) || !requireOp(sender)) return;
 
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
@@ -108,13 +106,10 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void saveConfig(CommandSender sender, String[] args) {
-        try {
-            plugin.getGameManager().saveGameConfig();
-        } catch (GameManager.GamesSaveFailedException e) {
-            sender.sendMessage(Component.text("Failed to save the config", NamedTextColor.RED));
-            return;
-        }
+        if (!requireOp(sender)) return;
 
-        sender.sendMessage(Component.text("Saved the config file", NamedTextColor.GREEN));
+        if (plugin.getGameManager().saveGameConfig()) {
+            sender.sendMessage(Component.text("Saved the config file", NamedTextColor.GREEN));
+        }
     }
 }

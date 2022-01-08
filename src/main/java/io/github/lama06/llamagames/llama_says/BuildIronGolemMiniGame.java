@@ -26,8 +26,6 @@ public class BuildIronGolemMiniGame extends MiniGame {
     @Override
     public void init() {
         blocks = new HashSet<>();
-
-        game.getEventCanceler().setCancelPlayerBlockPlacement(false);
     }
 
     @Override
@@ -42,6 +40,8 @@ public class BuildIronGolemMiniGame extends MiniGame {
             inventory.setItem(0, new ItemStack(Material.IRON_BLOCK, 4));
             inventory.setItem(1, new ItemStack(Material.CARVED_PUMPKIN, 1));
         }
+
+        game.getEventCanceler().setCancelPlayerBlockPlacement(false);
     }
 
     @Override

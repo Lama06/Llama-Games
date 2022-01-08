@@ -34,7 +34,6 @@ public class SmeltMiniGame extends MiniGame {
     @Override
     public void init() {
         ingredient = INGREDIENTS.get(game.getRandom().nextInt(INGREDIENTS.size()));
-        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @Override
@@ -56,6 +55,8 @@ public class SmeltMiniGame extends MiniGame {
                 player.getInventory().setItem(slot, new ItemStack(INGREDIENTS.get(ingredient).getLeft()));
             }
         }
+
+        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @Override

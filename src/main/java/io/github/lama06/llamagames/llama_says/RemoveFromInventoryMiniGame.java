@@ -30,8 +30,6 @@ public class RemoveFromInventoryMiniGame extends MiniGame {
     @Override
     public void init() {
         targetMaterial = CollectionUtil.pickRandomElement(POSSIBLE_ITEMS);
-        game.getEventCanceler().setCancelItemDrops(false);
-        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @Override
@@ -68,6 +66,9 @@ public class RemoveFromInventoryMiniGame extends MiniGame {
                 player.getInventory().setItem(i, new ItemStack(items.get(i)));
             }
         }
+
+        game.getEventCanceler().setCancelItemDrops(false);
+        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @EventHandler

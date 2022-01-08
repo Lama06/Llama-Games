@@ -35,9 +35,6 @@ public class FeedAnimalMiniGame extends MiniGame {
     public void init() {
         entityType = CollectionUtil.pickRandomElement(ENTITY_TYPES_TO_FOOD.keySet(), game.getRandom());
         food = ENTITY_TYPES_TO_FOOD.get(entityType);
-
-        game.getEventCanceler().setCancelItemDrops(false);
-        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @Override
@@ -56,6 +53,9 @@ public class FeedAnimalMiniGame extends MiniGame {
                 player.getInventory().setItem(i, new ItemStack(foodItems.get(i)));
             }
         }
+
+        game.getEventCanceler().setCancelItemDrops(false);
+        game.getEventCanceler().setCancelInventoryEvents(false);
     }
 
     @Override

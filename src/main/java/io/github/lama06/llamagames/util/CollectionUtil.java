@@ -1,6 +1,8 @@
 package io.github.lama06.llamagames.util;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CollectionUtil {
     private static final Random RANDOM = new Random();
@@ -9,7 +11,7 @@ public class CollectionUtil {
         List<T> sourceCopy = new ArrayList<>(source);
         List<T> result = new ArrayList<>();
 
-        while (result.size() < limit && !sourceCopy.isEmpty()) {
+        while ((result.size() < limit || limit == -1) && !sourceCopy.isEmpty()) {
             T randomElement = pickRandomElement(sourceCopy, random);
             sourceCopy.remove(randomElement);
             result.add(randomElement);
@@ -55,5 +57,10 @@ public class CollectionUtil {
 
     public static <T> T pickRandomElement(List<T> list) {
         return pickRandomElement(list, RANDOM);
+    }
+
+    @SafeVarargs
+    public static <T> Set<T> combineSets(Set<T>... sets) {
+        return Stream.of(sets).flatMap(Set::stream).collect(Collectors.toSet());
     }
 }

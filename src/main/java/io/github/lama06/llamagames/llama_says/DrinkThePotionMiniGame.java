@@ -28,7 +28,6 @@ public class DrinkThePotionMiniGame extends MiniGame {
     @Override
     public void init() {
         potionType = POTION_TYPES_WITH_EFFECT.get(game.getRandom().nextInt(POTION_TYPES_WITH_EFFECT.size()));
-        game.getEventCanceler().setCancelItemConsummation(false);
     }
 
     @Override
@@ -67,6 +66,8 @@ public class DrinkThePotionMiniGame extends MiniGame {
                 player.getInventory().setItem(i, wrongPotion);
             }
         }
+
+        game.getEventCanceler().setCancelItemConsummation(false);
     }
 
     @EventHandler

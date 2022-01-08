@@ -35,8 +35,6 @@ public class EatUntilYouAreFullMiniGame extends MiniGame {
     @Override
     public void init() {
         items = CollectionUtil.pickRandomElements(FOOD_ITEMS, 9, game.getRandom());
-        game.getEventCanceler().setCancelItemConsummation(false);
-        game.getEventCanceler().setCancelFoodLevelChange(false);
     }
 
     @Override
@@ -47,6 +45,9 @@ public class EatUntilYouAreFullMiniGame extends MiniGame {
                 player.getInventory().setItem(i, new ItemStack(items.get(i)));
             }
         }
+
+        game.getEventCanceler().setCancelItemConsummation(false);
+        game.getEventCanceler().setCancelFoodLevelChange(false);
     }
 
     @Override
