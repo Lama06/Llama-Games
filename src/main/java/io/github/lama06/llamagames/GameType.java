@@ -7,6 +7,13 @@ import io.github.lama06.llamagames.blockparty.BlockPartyGame;
 import io.github.lama06.llamagames.llama_says.LlamaSaysCommand;
 import io.github.lama06.llamagames.llama_says.LlamaSaysConfig;
 import io.github.lama06.llamagames.llama_says.LlamaSaysGame;
+import io.github.lama06.llamagames.zombies.ZombiesCommand;
+import io.github.lama06.llamagames.zombies.ZombiesConfig;
+import io.github.lama06.llamagames.zombies.ZombiesGame;
+import io.github.lama06.llamagames.zombies.monster.MonsterType;
+import io.github.lama06.llamagames.zombies.monster.MonsterTypeAdapter;
+import io.github.lama06.llamagames.zombies.weapon.WeaponType;
+import io.github.lama06.llamagames.zombies.weapon.WeaponTypeAdapter;
 import org.bukkit.World;
 
 import java.util.HashSet;
@@ -45,6 +52,19 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             null,
             BlockPartyConfig::new,
             BlockPartyCommand::new,
+            null
+    );
+
+    public static final GameType<ZombiesGame, ZombiesConfig> ZOMBIES = new GameType<>(
+            "zombies",
+            ZombiesGame::new,
+            ZombiesConfig.class,
+            Map.ofEntries(
+                    Map.entry(MonsterType.class, new MonsterTypeAdapter()),
+                    Map.entry(WeaponType.class, new WeaponTypeAdapter())
+            ),
+            ZombiesConfig::new,
+            ZombiesCommand::new,
             null
     );
 

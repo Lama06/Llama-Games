@@ -24,7 +24,7 @@ public class LlamaGamesPlugin extends JavaPlugin {
 
         boolean loadResult = gameManager.loadGames();
         if (!loadResult) {
-            getLog4JLogger().error("Failed to load the games from the game config file! Disabling the plugin!");
+            logger.error("Failed to load the games from the game config file! Disabling the plugin!");
             Bukkit.getScheduler().runTask(this, () -> Bukkit.getPluginManager().disablePlugin(this));
             return;
         }

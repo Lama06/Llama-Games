@@ -49,6 +49,10 @@ public final class BlockPosition {
         return new Location(world, x, y, z);
     }
 
+    public EntityPosition asEntityPosition() {
+        return new EntityPosition(x, y, z);
+    }
+
     public Distance getDistanceTo(BlockPosition other) {
         BlockArea area = new BlockArea(this, other);
         return new Distance(area.getWidthX(), area.getHeight(), area.getWidthZ());

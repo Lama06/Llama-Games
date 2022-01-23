@@ -1,6 +1,5 @@
 package io.github.lama06.llamagames;
 
-import io.github.lama06.llamagames.util.EventCanceler;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -168,7 +167,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             handlePlayerLeft(player);
 
             if (!canContinueAfterPlayerLeft()) {
-                endGame(GameEndReason.MISSING_REQUIREMENTS_TO_CONTINUE);
+                endGame(GameEndReason.PLAYER_LEFT);
             }
         }
     }
@@ -287,7 +286,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     public enum GameEndReason {
         UNLOAD(false),
         COMMAND(false),
-        MISSING_REQUIREMENTS_TO_CONTINUE(false),
+        PLAYER_LEFT(false),
         ENDED(true);
 
         private final boolean shouldAttemptToStartNextGame;

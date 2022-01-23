@@ -1,7 +1,5 @@
-package io.github.lama06.llamagames.util;
+package io.github.lama06.llamagames;
 
-import io.github.lama06.llamagames.Game;
-import io.github.lama06.llamagames.LlamaGamesPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;

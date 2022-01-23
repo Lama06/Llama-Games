@@ -1,5 +1,6 @@
 name: Llama-Games
-api-version: 1.17
+author: Lama06
+api-version: 1.18
 main: io.github.lama06.llamagames.LlamaGamesPlugin
 version: 1.0.0
 softdepend:
@@ -12,3 +13,5 @@ commands:
     description: Used to setup LlamaSays games
   blockparty:
     description: Used to setup BlockParty games
+  zombies:
+    description: Used to setup Zombies games

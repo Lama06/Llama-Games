@@ -48,7 +48,7 @@ public final class GameManager implements Listener {
     }
 
     private Gson createGson() {
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting().serializeNulls();
+        GsonBuilder builder = new GsonBuilder().setPrettyPrinting().serializeNulls().enableComplexMapKeySerialization();
 
         for (GameType<?, ?> type : GameType.getValues()) {
             Map<Class<?>, TypeAdapter<?>> typeAdapters = type.getTypeAdapters();
@@ -58,12 +58,12 @@ public final class GameManager implements Listener {
             }
 
             for (Map.Entry<Class<?>, TypeAdapter<?>> typeAdapter : typeAdapters.entrySet()) {
-                builder.registerTypeAdapter(typeAdapter.getKey(), typeAdapter.getValue());
+                builder.registerTypeHierarchyAdapter(typeAdapter.getKey(), typeAdapter.getValue());
             }
         }
 
         for (Map.Entry<Class<?>, TypeAdapter<?>> typeAdapter : DEFAULT_TYPE_ADAPTERS.entrySet()) {
-            builder.registerTypeAdapter(typeAdapter.getKey(), typeAdapter.getValue());
+            builder.registerTypeHierarchyAdapter(typeAdapter.getKey(), typeAdapter.getValue());
         }
 
         return builder.create();

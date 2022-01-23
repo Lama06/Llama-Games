@@ -25,7 +25,7 @@ public final class RankedResult implements MiniGameResult {
 
     @Override
     public void handleGameEnded() {
-        game.getPlayers().stream().filter(player -> !ranking.contains(player.getUniqueId())).forEach(this::addFailedPlayer);
+        game.getPlayers().forEach(this::addFailedPlayer);
     }
 
     @Override
