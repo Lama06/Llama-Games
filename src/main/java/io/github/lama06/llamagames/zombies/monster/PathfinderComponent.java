@@ -2,26 +2,31 @@ package io.github.lama06.llamagames.zombies.monster;
 
 import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import io.github.lama06.llamagames.util.EntityPosition;
+import io.github.lama06.llamagames.zombies.MonsterSpawEvent;
 import io.github.lama06.llamagames.zombies.ZombiesGame;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
-public class PathfinderComponent {
-    public Player currentTarget;
+import java.util.Optional;
 
+public class PathfinderComponent {
     public static class PathfinderSystem extends MonsterSystem {
         public PathfinderSystem(ZombiesGame game) {
             super(game);
         }
 
-        private static Player searchNearestTarget(Monster<?, ?> monster, ZombiesGame game) {
-            return game.getPlayers().stream().min((p1, p2) -> {
-                EntityPosition position = new EntityPosition(monster.getEntity().getLocation());
-                EntityPosition.Distance distance1 = new EntityPosition(p1.getLocation()).getDistanceTo(position);
-                EntityPosition.Distance distance2 = new EntityPosition(p2.getLocation()).getDistanceTo(position);
-                return distance1.compareTo(distance2);
-            }).orElse(null);
+        private Optional<Player> searchNearestTarget(Monster<?, ?> monster) {
+            return game.getPlayers().stream()
+                    .filter(game.getPlayers()::contains)
+                    .min((p1, p2) -> {
+                        EntityPosition position = new EntityPosition(monster.getEntity().getLocation());
+                        EntityPosition.Distance distance1 = new EntityPosition(p1.getLocation()).getDistanceTo(position);
+                        EntityPosition.Distance distance2 = new EntityPosition(p2.getLocation()).getDistanceTo(position);
+                        return distance1.compareTo(distance2);
+                    });
         }
 
         @EventHandler
@@ -38,23 +43,33 @@ public class PathfinderComponent {
                     continue;
                 }
 
-                if (component.currentTarget == null) {
-                    Player newTarget = searchNearestTarget(monster, game);
-                    if (newTarget == null) {
-                        continue;
-                    }
-                    component.currentTarget = newTarget;
+                Optional<Player> player = searchNearestTarget(monster);
+                if (player.isEmpty()) {
+                    return;
                 }
 
-                entity.lookAt(component.currentTarget);
-
-                if (!entity.getPathfinder().hasPath()) {
-                    boolean foundPath = entity.getPathfinder().moveTo(entity);
-                    if (!foundPath) {
-                        component.currentTarget = null;
-                    }
-                }
+                entity.getPathfinder().moveTo(player.get());
             }
+        }
+
+        @EventHandler
+        public void removeVanillaGoals(MonsterSpawEvent event) {
+            if (!event.getGame().equals(game)) {
+                return;
+            }
+
+            Monster<?, ?> monster = event.getMonster();
+
+            if (!monster.getComponents().hasComponent(PathfinderComponent.class)) {
+                return;
+            }
+
+            Entity entity = monster.getEntity();
+            if (!(entity instanceof Mob mob)) {
+                return;
+            }
+
+            Bukkit.getMobGoals().removeAllGoals(mob);
         }
     }
 }

@@ -19,8 +19,8 @@ public class MeleeAttackPlayerComponent {
         this.attackCooldown = attackCooldown;
     }
 
-    public static class AttackPlayerSystem extends MonsterSystem {
-        public AttackPlayerSystem(ZombiesGame game) {
+    public static class MeleeAttackPlayerSystem extends MonsterSystem {
+        public MeleeAttackPlayerSystem(ZombiesGame game) {
             super(game);
         }
 

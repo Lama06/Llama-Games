@@ -14,12 +14,8 @@ public record MonsterSystemType<T extends MonsterSystem>(Function<ZombiesGame, T
         return TYPES;
     }
 
-    public static MonsterSystemType<MeleeAttackPlayerComponent.AttackPlayerSystem> ATTACK_PLAYER = new MonsterSystemType<>(
-            MeleeAttackPlayerComponent.AttackPlayerSystem::new
-    );
-
-    public static MonsterSystemType<EquipmentComponent.SyncEquipmentSystem> SYNC_EQUIPMENT = new MonsterSystemType<>(
-            EquipmentComponent.SyncEquipmentSystem::new
+    public static MonsterSystemType<MeleeAttackPlayerComponent.MeleeAttackPlayerSystem> MELEE_ATTACK_PLAYER = new MonsterSystemType<>(
+            MeleeAttackPlayerComponent.MeleeAttackPlayerSystem::new
     );
 
     public static MonsterSystemType<HealthComponent.RemoveDeadZombiesSystem> REMOVE_DEAD_ZOMBIES = new MonsterSystemType<>(

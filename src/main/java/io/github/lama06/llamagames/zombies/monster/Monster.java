@@ -2,7 +2,9 @@ package io.github.lama06.llamagames.zombies.monster;
 
 import io.github.lama06.llamagames.util.EntityPosition;
 import io.github.lama06.llamagames.util.ComponentContainer;
+import io.github.lama06.llamagames.zombies.MonsterSpawEvent;
 import io.github.lama06.llamagames.zombies.ZombiesGame;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
@@ -18,18 +20,17 @@ public abstract class Monster<T extends Monster<T, E>, E extends Entity> {
 
         initComponents();
 
-        entity = world.spawn(position.asLocation(world), type.getEntityType(), this::onSpawn);
+        entity = world.spawn(position.asLocation(world), type.getEntityType());
+
+        Bukkit.getPluginManager().callEvent(new MonsterSpawEvent(game, this));
+        onSpawned();
     }
 
     public abstract void initComponents();
 
-    public void onSpawn(E entity) { }
-
-    public void onRemove() { }
+    public void onSpawned() { }
 
     public void remove() {
-        onRemove();
-
         entity.remove();
     }
 

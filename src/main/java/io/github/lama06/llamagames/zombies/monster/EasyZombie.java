@@ -17,13 +17,13 @@ public class EasyZombie extends Monster<EasyZombie, Zombie> {
     @Override
     public void initComponents() {
         components.addComponent(new HealthComponent(10));
-        components.addComponent(new EquipmentComponent(new ItemStack(Material.LEATHER_HELMET), null, null, null, null));
         components.addComponent(new MeleeAttackPlayerComponent(2, 3, 30));
         components.addComponent(new PathfinderComponent());
     }
 
     @Override
-    public void onSpawn(Zombie entity) {
+    public void onSpawned() {
         entity.setAdult();
+        entity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
     }
 }
