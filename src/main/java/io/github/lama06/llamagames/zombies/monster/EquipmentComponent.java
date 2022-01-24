@@ -30,7 +30,7 @@ public class EquipmentComponent {
 
         private static void syncEquipment(EntityEquipment equipment, EquipmentSlot slot, ItemStack item) {
             ItemStack currentItem = equipment.getItem(slot);
-            if (currentItem != item) {
+            if (!currentItem.equals(item)) {
                 equipment.setItem(slot, item, true);
             }
         }

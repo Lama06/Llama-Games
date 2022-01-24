@@ -336,7 +336,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
             return;
         }
 
-        if (event.getTickNumber() % 15 == 0) {
+        if (event.getTickNumber() % 20 == 0) {
             for (ZombiesPlayer zombiesPlayer : zombiesPlayers) {
                 zombiesPlayer.heal(1);
             }

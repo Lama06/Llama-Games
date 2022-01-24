@@ -18,7 +18,7 @@ public class EasyZombie extends Monster<EasyZombie, Zombie> {
     public void initComponents() {
         components.addComponent(new HealthComponent(10));
         components.addComponent(new EquipmentComponent(new ItemStack(Material.LEATHER_HELMET), null, null, null, null));
-        components.addComponent(new MeleeAttackPlayerComponent(1, 3, 40));
+        components.addComponent(new MeleeAttackPlayerComponent(2, 3, 30));
         components.addComponent(new PathfinderComponent());
     }
 

@@ -1,6 +1,6 @@
 package io.github.lama06.llamagames.zombies;
 
-import io.github.lama06.llamagames.zombies.weapon.ItemComponent;
+import io.github.lama06.llamagames.zombies.weapon.Knife;
 import io.github.lama06.llamagames.zombies.weapon.Weapon;
 import io.github.lama06.llamagames.zombies.weapon.WeaponType;
 import net.kyori.adventure.text.Component;
@@ -22,7 +22,7 @@ public class ZombiesPlayer {
         this.game = game;
         this.player = player;
 
-        weapons.add(null);
+        weapons.add(new Knife(game, this, WeaponType.KNIFE));
         weapons.add(null);
         weapons.add(null);
     }
@@ -39,13 +39,13 @@ public class ZombiesPlayer {
 
     public void giveGold(int amount) {
         gold += amount;
+        player.sendMessage(Component.text("You earned %d coins".formatted(amount)));
     }
 
     public <T extends Weapon<T>> boolean giveWeapon(WeaponType<T> type) {
         for (int i = 0; i < weapons.size(); i++) {
             if (weapons.get(i) == null) {
                 weapons.set(i, type.getCreator().createWeapon(game, this, type));
-                updateInventory();
                 return true;
             }
         }
@@ -68,25 +68,6 @@ public class ZombiesPlayer {
         }
 
         giveWeapon(shop.weapon);
-    }
-
-    public void updateInventory() {
-        for (int i = 0; i < weapons.size(); i++) {
-            Weapon<?> weapon = weapons.get(i);
-            if (weapon == null) {
-                player.getInventory().setItem(i, null);
-                continue;
-            }
-
-            ItemComponent component = weapon.getComponents().getComponent(ItemComponent.class);
-            if (component == null) {
-                continue;
-            }
-
-            player.getInventory().setItem(i, component.item);
-        }
-
-        player.setHealth(((double) health / 20D) * player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
     }
 
     public void cleanup() {
@@ -120,7 +101,8 @@ public class ZombiesPlayer {
         }
 
         health = amount;
-        updateInventory();
+
+        player.setHealth(((double) health / 20D) * player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
     }
 
     public Player getPlayer() {

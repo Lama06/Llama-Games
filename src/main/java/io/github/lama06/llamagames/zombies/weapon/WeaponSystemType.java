@@ -24,6 +24,8 @@ public record WeaponSystemType<T extends WeaponSystem>(Function<ZombiesGame, T> 
 
     public static final WeaponSystemType<ShootComponent.ShootSystem> SHOOT = new WeaponSystemType<>(ShootComponent.ShootSystem::new);
 
+    public static final WeaponSystemType<ItemComponent.DisplayItemsSystem> DISPLAY_ITEM = new WeaponSystemType<>(ItemComponent.DisplayItemsSystem::new);
+
     public static final WeaponSystemType<AmmoComponent.DisplayTotalAmmoAsLevelSystem> DISPLAY_TOTAL_AMMO = new WeaponSystemType<>(
             AmmoComponent.DisplayTotalAmmoAsLevelSystem::new
     );
