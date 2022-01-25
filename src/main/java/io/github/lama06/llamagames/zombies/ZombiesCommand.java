@@ -101,7 +101,7 @@ public class ZombiesCommand extends GameCommand {
                 shop -> Component.text("%s - Weapon: %s, Location: %s, Price: %d"
                         .formatted(shop.name, shop.weapon.getName(), shop.activationBLock, shop.gold)),
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 6)) return Optional.empty();
+                    if (requireArgsExact(sender, args, 7)) return Optional.empty();
 
                     String name = args[0];
 
@@ -114,7 +114,10 @@ public class ZombiesCommand extends GameCommand {
                     Optional<Integer> gold = requireInteger(sender, args[5]);
                     if (gold.isEmpty()) return Optional.empty();
 
-                    return Optional.of(new WeaponShop(name, weaponType.get(), activationBlock.get(), gold.get()));
+                    Optional<Integer> refillPrice = requireInteger(sender, args[6]);
+                    if (refillPrice.isEmpty()) return Optional.empty();
+
+                    return Optional.of(new WeaponShop(name, weaponType.get(), activationBlock.get(), gold.get(), refillPrice.get()));
                 },
                 Component.text("A weapon shop with this name already exists"),
                 Component.text("The weapon shop was successfully added"),

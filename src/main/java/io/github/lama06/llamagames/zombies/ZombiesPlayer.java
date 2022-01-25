@@ -1,5 +1,6 @@
 package io.github.lama06.llamagames.zombies;
 
+import io.github.lama06.llamagames.zombies.weapon.AmmoComponent;
 import io.github.lama06.llamagames.zombies.weapon.Knife;
 import io.github.lama06.llamagames.zombies.weapon.Weapon;
 import io.github.lama06.llamagames.zombies.weapon.WeaponType;
@@ -57,17 +58,34 @@ public class ZombiesPlayer {
         return weapons.stream().filter(Objects::nonNull).anyMatch(weapon -> weapon.getType().equals(type));
     }
 
-    public void buyWeapon(WeaponShop shop) {
+    public void handleInteractWithWeaponShop(WeaponShop shop) {
         if (hasWeapon(shop.weapon)) {
-            player.sendMessage(Component.text("You already own this weapon", NamedTextColor.RED));
-            return;
-        }
+            Weapon<?> weapon = getWeaponInHand();
+            if (!weapon.getType().equals(shop.weapon)) {
+                player.sendMessage(Component.text("You can't refill that weapon here", NamedTextColor.RED));
+                return;
+            }
 
-        if (!pay(shop.gold)) {
-            return;
-        }
+            AmmoComponent component = weapon.getComponents().getComponent(AmmoComponent.class);
+            if (component == null) {
+                player.sendMessage(Component.text("You cannot refill that weapon", NamedTextColor.RED));
+                return;
+            }
 
-        giveWeapon(shop.weapon);
+            if (!pay(shop.refillPrice)) {
+                return;
+            }
+
+            component.totalAmmoRemaining = component.maxTotalAmmo;
+            player.sendMessage(Component.text("Successfully refilled your weapons ammo", NamedTextColor.GREEN));
+        } else {
+            if (!pay(shop.gold)) {
+                return;
+            }
+
+            giveWeapon(shop.weapon);
+            player.sendMessage(Component.text("Successfully bought the weapon", NamedTextColor.GREEN));
+        }
     }
 
     public void cleanup() {

@@ -31,6 +31,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
     private int spawnDelay;
     private BukkitTask spawnNextMonsterTask;
     private Set<Monster<?, ?>> monsters;
+    private Set<Door> openDoors;
     private Set<String> unlockedAreas;
     private Set<MonsterSystem> monsterSystems;
     private Set<WeaponSystem> weaponSystems;
@@ -57,6 +58,8 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
 
         unlockedAreas = new HashSet<>();
         unlockedAreas.add(config.startArea);
+
+        openDoors = new HashSet<>();
 
         monsterSystems = new HashSet<>();
         for (MonsterSystemType<?> type : MonsterSystemType.getTypes()) {
@@ -90,6 +93,8 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
         monsters = null;
 
         unlockedAreas = null;
+
+        openDoors = null;
 
         if (spawnNextMonsterTask != null) {
             spawnNextMonsterTask.cancel();
@@ -221,7 +226,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
         return null;
     }
 
-    public void handleMonsterDied(Monster<?, ?> monster, ZombiesPlayer killedBy) {
+    public void killMonster(Monster<?, ?> monster, ZombiesPlayer killedBy) {
         if (killedBy != null) {
             killedBy.giveGold(25);
         }
@@ -254,7 +259,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
     }
 
     @EventHandler
-    public void listenForPlayerOpenDoor(PlayerInteractEvent event) {
+    public void listenForPlayerOpensDoor(PlayerInteractEvent event) {
         if (!running) {
             return;
         }
@@ -281,11 +286,17 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
             return;
         }
 
+        if (openDoors.contains(door.get())) {
+            event.getPlayer().sendMessage(Component.text("This door has already been opened", NamedTextColor.RED));
+            return;
+        }
+
         if (!zombiesPlayer.pay(door.get().gold)) {
             return;
         }
 
         door.get().open(world);
+        openDoors.add(door.get());
         unlockDoorArea(door.get());
     }
 
@@ -298,7 +309,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
     }
 
     @EventHandler
-    public void listenForPlayerBuysWeapon(PlayerInteractEvent event) {
+    public void listenForPlayerBuysOrRefillsWeapon(PlayerInteractEvent event) {
         if (!running) {
             return;
         }
@@ -327,7 +338,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
             return;
         }
 
-        zombiesPlayer.buyWeapon(shop.get());
+        zombiesPlayer.handleInteractWithWeaponShop(shop.get());
     }
 
     @EventHandler

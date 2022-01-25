@@ -10,11 +10,12 @@ public class WeaponShop {
     public WeaponType<?> weapon;
     public BlockPosition activationBLock;
     public int gold;
+    public int refillPrice;
 
     // Gson
     public WeaponShop() { }
 
-    public WeaponShop(String name, WeaponType<?> weapon, BlockPosition activationBLock, int gold) {
+    public WeaponShop(String name, WeaponType<?> weapon, BlockPosition activationBLock, int gold, int refillPrice) {
         this.name = name;
         this.weapon = weapon;
         this.activationBLock = activationBLock;

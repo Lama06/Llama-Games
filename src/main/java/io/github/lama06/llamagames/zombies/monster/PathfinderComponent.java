@@ -2,7 +2,7 @@ package io.github.lama06.llamagames.zombies.monster;
 
 import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import io.github.lama06.llamagames.util.EntityPosition;
-import io.github.lama06.llamagames.zombies.MonsterSpawEvent;
+import io.github.lama06.llamagames.zombies.MonsterSpawnEvent;
 import io.github.lama06.llamagames.zombies.ZombiesGame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -53,7 +53,7 @@ public class PathfinderComponent {
         }
 
         @EventHandler
-        public void removeVanillaGoals(MonsterSpawEvent event) {
+        public void removeVanillaGoals(MonsterSpawnEvent event) {
             if (!event.getGame().equals(game)) {
                 return;
             }

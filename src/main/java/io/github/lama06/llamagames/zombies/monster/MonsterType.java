@@ -24,6 +24,10 @@ public class MonsterType<T extends Monster<T, E>, E extends Entity> {
 
     public static final MonsterType<EasyZombie, Zombie> EASY_ZOMBIE = EasyZombie.TYPE;
 
+    public static final MonsterType<MediumZombie, Zombie> MEDIUM_ZOMBIE = MediumZombie.TYPE;
+
+    public static final MonsterType<HardZombie, Zombie> HARD_ZOMBIE = HardZombie.TYPE;
+
     private final String name;
     private final MonsterSpawnLocation spawnLocation;
     private final Class<E> entityType;

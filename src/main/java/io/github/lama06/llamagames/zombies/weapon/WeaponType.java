@@ -23,6 +23,10 @@ public class WeaponType<T extends Weapon<T>> {
 
     public static final WeaponType<Rifle> RIFLE = Rifle.TYPE;
 
+    public static final WeaponType<Shotgun> SHOTGUN = Shotgun.TYPE;
+
+    public static final WeaponType<Pistol> PISTOL = Pistol.TYPE;
+
     private final String name;
     private final String displayName;
     private final WeaponCreator<T> creator;

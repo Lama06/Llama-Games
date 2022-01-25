@@ -6,8 +6,14 @@ import java.util.Map;
 
 public class SpawnRate {
     public static final Map<Integer, SpawnRate> DEFAULT_SPAWN_RATE = Map.ofEntries(
-            Map.entry(1, new SpawnRate(60, Map.ofEntries(
+            Map.entry(1, new SpawnRate(80, Map.ofEntries(
                     Map.entry(MonsterType.EASY_ZOMBIE, 10)
+            ))),
+            Map.entry(2, new SpawnRate(80, Map.ofEntries(
+                    Map.entry(MonsterType.MEDIUM_ZOMBIE, 10)
+            ))),
+            Map.entry(3, new SpawnRate(80, Map.ofEntries(
+                    Map.entry(MonsterType.HARD_ZOMBIE, 10)
             )))
     );
 

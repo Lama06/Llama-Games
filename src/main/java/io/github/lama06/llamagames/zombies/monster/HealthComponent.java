@@ -56,7 +56,7 @@ public class HealthComponent {
             }
 
             for (DeadMonsterData deadMonster : deadMonsters) {
-                game.handleMonsterDied(deadMonster.monster, deadMonster.killedBy);
+                game.killMonster(deadMonster.monster, deadMonster.killedBy);
             }
         }
     }

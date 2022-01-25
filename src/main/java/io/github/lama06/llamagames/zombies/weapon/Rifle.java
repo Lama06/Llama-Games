@@ -21,6 +21,6 @@ public class Rifle extends Weapon<Rifle> {
         getComponents().addComponent(new AmmoComponent(300, 30, 40));
         getComponents().addComponent(new AttackCooldownComponent(4));
         getComponents().addComponent(new ItemComponent(new ItemStack(Material.STONE_HOE)));
-        getComponents().addComponent(new ShootComponent(20, 1));
+        getComponents().addComponent(new ShootComponent(20, 5));
     }
 }
