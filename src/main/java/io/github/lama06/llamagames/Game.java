@@ -18,7 +18,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class Game<G extends Game<G, C>, C extends GameConfig> implements Listener {
     protected final LlamaGamesPlugin plugin;
@@ -277,10 +276,6 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
 
         return result;
-    }
-
-    public Set<UUID> getPlayerUUUIDs() {
-        return getPlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
     }
 
     public enum GameEndReason {

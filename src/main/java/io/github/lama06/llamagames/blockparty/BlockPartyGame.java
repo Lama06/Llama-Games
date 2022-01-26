@@ -64,7 +64,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
 
     @EventHandler
     private void killPlayersThatTouchDeadlyBlocks(PlayerMoveEvent event) {
-        if (!getPlayers().contains(event.getPlayer())) {
+        if (!running || !getPlayers().contains(event.getPlayer())) {
             return;
         }
 

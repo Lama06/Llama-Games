@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -22,6 +23,7 @@ public class EventCanceler implements Listener {
     private final LlamaGamesPlugin plugin;
     private final Game<?, ?> game;
     private boolean cancelEntityDamage;
+    private boolean cancelEntityRegeneration;
     private boolean cancelPlayerBlockPlacement;
     private boolean cancelPlayerBlockBreaking;
     private boolean cancelEntityExplosions;
@@ -46,6 +48,7 @@ public class EventCanceler implements Listener {
 
     private void setAllFlags(boolean flag) {
         setCancelEntityDamage(flag);
+        setCancelEntityRegeneration(flag);
         setCancelPlayerBlockPlacement(flag);
         setCancelPlayerBlockBreaking(flag);
         setCancelEntityExplosions(flag);
@@ -105,8 +108,15 @@ public class EventCanceler implements Listener {
     }
 
     @EventHandler
-    private void handleEntityDamageEvent(EntityDamageEvent event) {
+    private void cancelEntityDamageEvent(EntityDamageEvent event) {
         if (shouldCancel(event.getEntity(), cancelEntityDamage)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    private void handleEntityRegenerateHealthEvent(EntityRegainHealthEvent event) {
+        if (shouldCancel(event.getEntity(), cancelEntityRegeneration)) {
             event.setCancelled(true);
         }
     }
@@ -169,6 +179,10 @@ public class EventCanceler implements Listener {
 
     public void setCancelEntityDamage(boolean cancelEntityDamage) {
         this.cancelEntityDamage = cancelEntityDamage;
+    }
+
+    public void setCancelEntityRegeneration(boolean cancelEntityRegeneration) {
+        this.cancelEntityRegeneration = cancelEntityRegeneration;
     }
 
     public void setCancelPlayerBlockPlacement(boolean cancelPlayerBlockPlacement) {
