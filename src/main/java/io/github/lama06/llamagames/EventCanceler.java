@@ -115,7 +115,7 @@ public class EventCanceler implements Listener {
     }
 
     @EventHandler
-    private void handleEntityRegenerateHealthEvent(EntityRegainHealthEvent event) {
+    private void cancelEntityRegenerateHealthEvent(EntityRegainHealthEvent event) {
         if (shouldCancel(event.getEntity(), cancelEntityRegeneration)) {
             event.setCancelled(true);
         }
