@@ -72,7 +72,7 @@ public abstract class MiniGame implements Listener {
     public final void startGame() {
         init();
 
-        for (Player player : game.getWorld().getPlayers()) {
+        for (Player player : game.getPlayers()) {
             player.teleport(game.getConfig().getSpawnPoint().asLocation(game.getWorld()));
         }
 

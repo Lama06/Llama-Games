@@ -145,8 +145,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
     }
 
+    protected boolean isSpectator(Player player, boolean cleanup) {
+        return !(cleanup ? getPlayers() : getPlayers(player)).contains(player);
+    }
+
     protected boolean isSpectator(Player player) {
-        return !getPlayers().contains(player);
+        return isSpectator(player, true);
     }
 
     private void handlePlayerJoinedInternal(Player player) {
@@ -161,7 +165,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void handlePlayerLeftInternal(Player player) {
-        if (running && !isSpectator(player)) {
+        if (running && !isSpectator(player, false)) {
             players.remove(player.getUniqueId());
             handlePlayerLeft(player);
 
@@ -258,17 +262,18 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         return canceler;
     }
 
-    public Set<Player> getPlayers() {
+    public Set<Player> getPlayers(Player excludeFromCleanup) {
         if (players == null) {
             return Collections.emptySet();
         }
 
         Set<Player> result = new HashSet<>(players.size());
 
-        Iterator<UUID> iterator = players.iterator();
-        while (iterator.hasNext()) {
-            Player player = Bukkit.getPlayer(iterator.next());
-            if (player == null || !player.getWorld().equals(world)) {
+        for (Iterator<UUID> iterator = players.iterator(); iterator.hasNext();) {
+            UUID uuid = iterator.next();
+            Player player = Bukkit.getPlayer(uuid);
+            if ((excludeFromCleanup == null || !excludeFromCleanup.getUniqueId().equals(uuid)) &&
+                    (player == null || !player.getWorld().equals(world))) {
                 iterator.remove();
                 continue;
             }
@@ -276,6 +281,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         }
 
         return result;
+    }
+
+    public Set<Player> getPlayers() {
+        return getPlayers(null);
     }
 
     public enum GameEndReason {
