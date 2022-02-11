@@ -14,6 +14,21 @@ public class LlamaSaysConfig extends GameConfig {
     // Gson
     public LlamaSaysConfig() { }
 
+    @Override
+    public boolean isComplete() {
+        boolean result = super.isComplete();
+
+        if (floor == null || floor.getPosition1() == null || floor.getPosition2() == null) {
+            result = false;
+        }
+
+        if (floorCenter == null || floorMaterial == null) {
+            result = false;
+        }
+
+        return result;
+    }
+
     public int getNumberOfRounds() {
         return numberOfRounds;
     }

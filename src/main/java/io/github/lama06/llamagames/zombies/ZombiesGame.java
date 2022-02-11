@@ -125,13 +125,8 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
     }
 
     @Override
-    public boolean isConfigComplete() {
-        return super.isConfigComplete() && config.isComplete();
-    }
-
-    @Override
-    public boolean canStart() {
-        return super.canStart() && world.getPlayers().size() >= 1;
+    public boolean canStart(int numberOfPlayers) {
+        return super.canStart(numberOfPlayers) && numberOfPlayers >= 1;
     }
 
     @Override
@@ -145,8 +140,8 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
     }
 
     @Override
-    public boolean canContinueAfterPlayerLeft() {
-        return getPlayers().size() >= 1;
+    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+        return numberOfPlayers >= 1;
     }
 
     private void startNextRound() {

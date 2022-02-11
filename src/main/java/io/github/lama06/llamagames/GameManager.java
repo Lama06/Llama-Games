@@ -257,7 +257,7 @@ public final class GameManager implements Listener {
         if (!successful) {
             errorListener.sendMessage(Component.text("Failed to save the config file", NamedTextColor.RED));
         }
-        return !successful;
+        return successful;
     }
 
     public void unloadGames() {

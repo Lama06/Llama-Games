@@ -2,12 +2,11 @@ package io.github.lama06.llamagames.zombies;
 
 import io.github.lama06.llamagames.util.BlockArea;
 import io.github.lama06.llamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.Named;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import java.util.Objects;
-
-public class Door {
+public class Door implements Named {
     public String name;
     public String area1;
     public String area2;
@@ -20,6 +19,7 @@ public class Door {
     public Door() { }
 
     public Door(String name, String area1, String area2, BlockPosition activationBlock, int gold, BlockArea blocks, BlockArea template) {
+        this.name = name;
         this.area1 = area1;
         this.area2 = area2;
         this.activationBlock = activationBlock;
@@ -37,15 +37,7 @@ public class Door {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Door door = (Door) o;
-        return Objects.equals(name, door.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
+    public String getName() {
+        return name;
     }
 }

@@ -48,18 +48,13 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     }
 
     @Override
-    public boolean canStart() {
-        return super.canStart() && world.getPlayers().size() != 0;
+    public boolean canStart(int numberOfPlayers) {
+        return super.canStart(numberOfPlayers) && numberOfPlayers >= 1;
     }
 
     @Override
-    public boolean isConfigComplete() {
-        return super.isConfigComplete() && config.getDeadlyBlock() != null && config.getFloor() != null && !config.getFloors().isEmpty() && config.getRoundTimes().containsKey(-1);
-    }
-
-    @Override
-    public boolean canContinueAfterPlayerLeft() {
-        return getPlayers().size() >= 1;
+    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+        return numberOfPlayers >= 1;
     }
 
     @EventHandler

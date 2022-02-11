@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.time.Duration;
 import java.util.*;
@@ -41,7 +42,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     public final boolean startGame(String[] args) {
-        if (!canStart()) {
+        if (!canStart(world.getPlayers().size())) {
             return false;
         }
 
@@ -90,7 +91,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         Bukkit.getPluginManager().registerEvents(this, plugin);
         canceler.registerEvents();
 
-        if (!isConfigComplete()) {
+        if (!config.isComplete()) {
             plugin.getLogger().warning("The configuration for the following game is not complete: %s".formatted(world.getName()));
         }
 
@@ -116,15 +117,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     public abstract void handleGameEnded(GameEndReason reason);
 
-    public boolean isConfigComplete() {
-        return config.getSpawnPoint() != null;
+    @MustBeInvokedByOverriders
+    public boolean canStart(int numberOfPlayers) {
+        return !running && config.isComplete() && !isStarting();
     }
 
-    public boolean canStart() {
-        return !running && isConfigComplete() && !isStarting();
-    }
-
-    public abstract boolean canContinueAfterPlayerLeft();
+    public abstract boolean canContinueAfterPlayerLeft(int numberOfPlayers);
 
     public void handlePlayerLeft(Player player) { }
 
@@ -169,7 +167,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
             players.remove(player.getUniqueId());
             handlePlayerLeft(player);
 
-            if (!canContinueAfterPlayerLeft()) {
+            if (!canContinueAfterPlayerLeft(getPlayers().size())) {
                 endGame(GameEndReason.PLAYER_LEFT);
             }
         }
@@ -199,7 +197,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void tryToStartAfterCountdown() {
-        if (!canStart()) {
+        if (!canStart(world.getPlayers().size())) {
             return;
         }
 

@@ -32,6 +32,11 @@ public class BlockPartyConfig extends GameConfig {
     // Gson
     public BlockPartyConfig() { }
 
+    @Override
+    public boolean isComplete() {
+            return super.isComplete() && deadlyBlock != null && floor != null && !floors.isEmpty() && roundTimes.containsKey(-1);
+    }
+
     public Optional<Floor> getFloorByName(String name) {
         return getFloors().stream().filter(floor -> floor.getName().equals(name)).findFirst();
     }

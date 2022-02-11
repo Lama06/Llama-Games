@@ -1,11 +1,10 @@
 package io.github.lama06.llamagames.zombies;
 
 import io.github.lama06.llamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.Named;
 import io.github.lama06.llamagames.zombies.weapon.WeaponType;
 
-import java.util.Objects;
-
-public class WeaponShop {
+public class WeaponShop implements Named {
     public String name;
     public WeaponType<?> weapon;
     public BlockPosition activationBLock;
@@ -23,15 +22,7 @@ public class WeaponShop {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        WeaponShop that = (WeaponShop) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
+    public String getName() {
+        return name;
     }
 }

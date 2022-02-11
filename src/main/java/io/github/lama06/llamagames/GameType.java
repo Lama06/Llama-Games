@@ -7,6 +7,9 @@ import io.github.lama06.llamagames.blockparty.BlockPartyGame;
 import io.github.lama06.llamagames.llama_says.LlamaSaysCommand;
 import io.github.lama06.llamagames.llama_says.LlamaSaysConfig;
 import io.github.lama06.llamagames.llama_says.LlamaSaysGame;
+import io.github.lama06.llamagames.the_floor_is_lava.TheFloorIsLavaCommand;
+import io.github.lama06.llamagames.the_floor_is_lava.TheFloorIsLavaConfig;
+import io.github.lama06.llamagames.the_floor_is_lava.TheFloorIsLavaGame;
 import io.github.lama06.llamagames.zombies.ZombiesCommand;
 import io.github.lama06.llamagames.zombies.ZombiesConfig;
 import io.github.lama06.llamagames.zombies.ZombiesGame;
@@ -65,6 +68,15 @@ public final class GameType<G extends Game<G, C>, C extends GameConfig> {
             ),
             ZombiesConfig::new,
             ZombiesCommand::new,
+            null
+    );
+
+    public static final GameType<TheFloorIsLavaGame, TheFloorIsLavaConfig> THE_FLOOR_IS_LAVA = new GameType<>(
+            "the_floor_is_lava",
+            TheFloorIsLavaGame::new,
+            TheFloorIsLavaConfig.class,
+            null, TheFloorIsLavaConfig::new,
+            TheFloorIsLavaCommand::new,
             null
     );
 

@@ -59,6 +59,14 @@ public class CollectionUtil {
         return pickRandomElement(list, RANDOM);
     }
 
+    public static <T> T pickRandomElement(T[] array, Random random) {
+        return array[random.nextInt(array.length)];
+    }
+
+    public static <T> T pickRandomElement(T[] array) {
+        return pickRandomElement(array, RANDOM);
+    }
+
     @SafeVarargs
     public static <T> Set<T> combineSets(Set<T>... sets) {
         return Stream.of(sets).flatMap(Set::stream).collect(Collectors.toSet());

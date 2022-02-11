@@ -31,25 +31,17 @@ public class BlockPartyCommand extends GameCommand {
                 plugin,
                 BlockPartyGame.class,
                 BlockPartyConfig::getFloors,
-                Component.text("There are no floors"),
-                floor -> Component.text("%s: %s".formatted(floor.getName(), floor.getArea())),
-                (sender, args) -> {
-                    if (requireArgsExact(sender, args, 7)) return Optional.empty();
+                new MapElementsListStrategy<>(Component.text("There are no floors"), floor -> Component.text("%s: %s".formatted(floor.getName(), floor.getArea()))),
+                new ForbidElementsWithSameNameAddStrategy<>((sender, args) -> {
+                    if (!requireArgsExact(sender, args, 7)) return Optional.empty();
                     String name = args[0];
 
                     Optional<BlockArea> area = requireBlockArea(sender, args[1], args[2], args[3], args[4], args[5], args[6]);
                     if (area.isEmpty()) return Optional.empty();
 
                     return Optional.of(new Floor(name, area.get()));
-                },
-                Component.text("A floor with this name already exists"),
-                Component.text("Floor successfully added"),
-                (sender, args, floor) -> {
-                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
-                    String name = args[0];
-                    return Optional.of(floor.getName().equals(name));
-                },
-                Component.text("Floor successfully removed")
+                }, Component.text("Successfully added a new floor"), Component.text("A floor with that name already exists")),
+                new RemoveElementByNameStrategy<>(Component.text("This floor was successfully removed"), Component.text("No floor with this name exists"))
         ));
     }
 }

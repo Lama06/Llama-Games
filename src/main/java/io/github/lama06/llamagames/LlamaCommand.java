@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
@@ -87,17 +88,17 @@ public abstract class LlamaCommand implements TabExecutor {
     public static boolean requireArgsExact(CommandSender sender, String[] args, int number) {
         if (args.length != number) {
             sender.sendMessage(Component.text("This number of arguments that were given to this command is not correct").color(NamedTextColor.RED));
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static boolean requireArgsAtLeast(CommandSender sender, String[] args, int number) {
         if (args.length < number) {
             sender.sendMessage(Component.text("This command needs more arguments").color(NamedTextColor.RED));
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     @SafeVarargs
@@ -124,12 +125,12 @@ public abstract class LlamaCommand implements TabExecutor {
         return Optional.of(TRUE_STRINGS.contains(text));
     }
 
-    public static Optional<Integer> requireInteger(CommandSender sender, String text) {
+    public static OptionalInt requireInteger(CommandSender sender, String text) {
         try {
-            return Optional.of(Integer.parseInt(text));
+            return OptionalInt.of(Integer.parseInt(text));
         } catch (NumberFormatException e) {
             sender.sendMessage(Component.text("This is not a number").color(NamedTextColor.RED));
-            return Optional.empty();
+            return OptionalInt.empty();
         }
     }
 
@@ -192,19 +193,27 @@ public abstract class LlamaCommand implements TabExecutor {
         return Optional.of(material);
     }
 
-    private static final Component noPermissionMsg = Component.text("You don't have the permission to execute this command", NamedTextColor.RED);
+    public static Optional<BlockData> requireBlockData(CommandSender sender, String text) {
+        try {
+            return Optional.of(Bukkit.createBlockData(text));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static final Component NO_PERMISSION_MSG = Component.text("You don't have the permission to execute this command", NamedTextColor.RED);
 
     public static boolean requireOp(CommandSender sender) {
         if (sender instanceof ConsoleCommandSender) {
             return true;
         } else if (sender instanceof Player player) {
             if (!player.isOp()) {
-                player.sendMessage(noPermissionMsg);
+                player.sendMessage(NO_PERMISSION_MSG);
             }
 
             return player.isOp();
         } else {
-            sender.sendMessage(noPermissionMsg);
+            sender.sendMessage(NO_PERMISSION_MSG);
             return false;
         }
     }
@@ -276,7 +285,7 @@ public abstract class LlamaCommand implements TabExecutor {
         return (sender, args) -> {
             if (!requireOp(sender)) return;
 
-            if (requireArgsAtLeast(sender, args, 1)) return;
+            if (!requireArgsAtLeast(sender, args, 1)) return;
 
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
             if (game.isEmpty()) return;
@@ -296,7 +305,7 @@ public abstract class LlamaCommand implements TabExecutor {
 
                 configChangedCallback.accept(game.get().getConfig(), newConfigValue.get());
 
-                boolean failed = plugin.getGameManager().saveGameConfig(sender);
+                boolean failed = !plugin.getGameManager().saveGameConfig(sender);
                 if (failed) {
                     return;
                 }
@@ -320,7 +329,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
+                    if (!requireArgsExact(sender, args, 1)) return Optional.empty();
                     return requireBoolean(sender, args[0]);
                 }
         );
@@ -340,8 +349,9 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
-                    return requireInteger(sender, args[0]);
+                    if (!requireArgsExact(sender, args, 1)) return Optional.empty();
+                    OptionalInt number = requireInteger(sender, args[0]);
+                    return number.isPresent() ? Optional.of(number.getAsInt()) : Optional.empty();
                 }
         );
     }
@@ -360,7 +370,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsAtLeast(sender, args, 1)) return Optional.empty();
+                    if (!requireArgsAtLeast(sender, args, 1)) return Optional.empty();
                     return Optional.of(String.join(" ", args));
                 }
         );
@@ -380,7 +390,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 3)) return Optional.empty();
+                    if (!requireArgsExact(sender, args, 3)) return Optional.empty();
                     return requireBlockPosition(sender, args[0], args[1], args[2]);
                 }
         );
@@ -400,7 +410,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 3)) return Optional.empty();
+                    if (!requireArgsExact(sender, args, 3)) return Optional.empty();
                     return requireEntityPosition(sender, args[0], args[1], args[2]);
                 }
         );
@@ -420,7 +430,7 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 6)) return Optional.empty();
+                    if (!requireArgsExact(sender, args, 6)) return Optional.empty();
                     return requireBlockArea(sender, args[0], args[1], args[2], args[3], args[4], args[5]);
                 }
         );
@@ -440,88 +450,219 @@ public abstract class LlamaCommand implements TabExecutor {
                 configChangedCallback,
                 configChangedMessageSupplier,
                 (sender, args) -> {
-                    if (requireArgsExact(sender, args, 1)) return Optional.empty();
+                    if (!requireArgsExact(sender, args, 1)) return Optional.empty();
                     return requireMaterial(sender, args[0]);
                 }
         );
     }
 
-    public static <G extends Game<G, C>, C extends GameConfig, T> SubCommandExecutor createCollectionConfigSubCommand(
+    public interface ListConfigCollectionElementsStrategy<E, T extends Collection<E>> {
+        void handleList(LlamaGamesPlugin plugin, CommandSender sender, T collection);
+    }
+
+    /**
+     * Displays the elements to the user by mapping each to a component using the supplied mapping function
+     */
+    public record MapElementsListStrategy<E, T extends Collection<E>>(
+            Component noElementsMessage,
+            Function<E, Component> mapper
+    ) implements ListConfigCollectionElementsStrategy<E, T> {
+        @Override
+        public void handleList(LlamaGamesPlugin plugin, CommandSender sender, T collection) {
+            if (collection.isEmpty()) {
+                sender.sendMessage(noElementsMessage.color(NamedTextColor.RED));
+                return;
+            }
+
+            TextComponent.Builder builder = Component.text();
+            boolean first = true;
+            for (E element : collection) {
+                if (first) {
+                    first = false;
+                } else {
+                    builder.append(Component.newline());
+                }
+                builder.append(mapper.apply(element));
+            }
+
+            sender.sendMessage(builder);
+        }
+    }
+
+    @FunctionalInterface
+    public interface ConfigCollectionElementCreator<T> {
+        Optional<T> createCollectionElement(CommandSender sender, String[] args);
+    }
+
+    public interface AddConfigCollectionElementStrategy<E, T extends Collection<E>> {
+        void handleAdd(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T collection);
+    }
+
+    /**
+     * Just adds the element to the list
+     */
+    public record SimpleAddStrategy<E, T extends List<E>>(
+            ConfigCollectionElementCreator<E> creator,
+            Component successMessage
+    ) implements AddConfigCollectionElementStrategy<E, T> {
+        @Override
+        public void handleAdd(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T list) {
+            Optional<E> element = creator.createCollectionElement(sender, args);
+            if (element.isEmpty()) return;
+
+            list.add(element.get());
+
+            if (!plugin.getGameManager().saveGameConfig(sender)) return;
+            sender.sendMessage(successMessage);
+        }
+    }
+
+    /**
+     * Only adds the element to the collection if no other element with the same name exists
+     */
+    public record ForbidElementsWithSameNameAddStrategy<E extends Named, T extends Collection<E>>(
+            ConfigCollectionElementCreator<E> creator,
+            Component successMessage,
+            Component nameAlreadyExistsMessage
+    ) implements AddConfigCollectionElementStrategy<E, T> {
+        @Override
+        public void handleAdd(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T collection) {
+            Optional<E> newElement = creator.createCollectionElement(sender, args);
+            if (newElement.isEmpty()) return;
+
+            boolean duplicate = collection.stream().anyMatch(any -> any.getName().equals(newElement.get().getName()));
+
+            if (duplicate) {
+                sender.sendMessage(nameAlreadyExistsMessage.color(NamedTextColor.RED));
+                return;
+            }
+
+            if (!collection.add(newElement.get())) {
+                sender.sendMessage(Component.text("Failed to add to the collection", NamedTextColor.RED));
+                return;
+            }
+
+            if (!plugin.getGameManager().saveGameConfig(sender)) return;
+            sender.sendMessage(successMessage.color(NamedTextColor.GREEN));
+        }
+    }
+
+    /**
+     * Only adds the element to the collection if no duplicate of that element exists according to the supplied predicate
+     */
+    public record ForbidDuplicatesAddStrategy<E, T extends Collection<E>>(
+            ConfigCollectionElementCreator<E> creator,
+            BiPredicate<E, E> duplicateChecker,
+            Component successMessage,
+            Component alreadyExistsMessage
+    ) implements AddConfigCollectionElementStrategy<E, T> {
+        @Override
+        public void handleAdd(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T collection) {
+            Optional<E> newElement = creator.createCollectionElement(sender, args);
+            if (newElement.isEmpty()) return;
+
+            boolean duplicate = false;
+            for (E element : collection) {
+                if (duplicateChecker.test(element, newElement.get())) {
+                    duplicate = true;
+                    break;
+                }
+            }
+
+            if (duplicate) {
+                sender.sendMessage(alreadyExistsMessage.color(NamedTextColor.RED));
+                return;
+            }
+
+            if (!collection.add(newElement.get())) {
+                sender.sendMessage(Component.text("Failed to add to the collection", NamedTextColor.RED));
+                return;
+            }
+
+            if (!plugin.getGameManager().saveGameConfig(sender)) return;
+            sender.sendMessage(successMessage);
+        }
+    }
+
+    public interface RemoveConfigCollectionElementStrategy<E, T extends Collection<E>> {
+        void handleRemove(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T collection);
+    }
+
+    /**
+     * Removes an element by asking the user for the elements name
+     */
+    public record RemoveElementByNameStrategy<E extends Named, T extends Collection<E>>(
+            Component removedMessage,
+            Component notFoundMessage
+    ) implements RemoveConfigCollectionElementStrategy<E, T> {
+        @Override
+        public void handleRemove(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T collection) {
+            if (!requireArgsExact(sender, args, 1)) return;
+
+            String name = args[0];
+
+            for (Iterator<E> iterator = collection.iterator(); iterator.hasNext();) {
+                E element = iterator.next();
+
+                if (element.getName().equals(name)) {
+                    iterator.remove();
+                    if (!plugin.getGameManager().saveGameConfig(sender)) return;
+                    sender.sendMessage(removedMessage.color(NamedTextColor.GREEN));
+                    return;
+                }
+            }
+
+            if (!plugin.getGameManager().saveGameConfig(sender)) return;
+            sender.sendMessage(notFoundMessage.color(NamedTextColor.RED));
+        }
+    }
+
+    /**
+     * Removes an element by asking the user for the elements index
+     */
+    public record RemoveByListIndexStrategy<E, T extends List<E>>(Component removedMessage) implements RemoveConfigCollectionElementStrategy<E, T> {
+        @Override
+        public void handleRemove(LlamaGamesPlugin plugin, CommandSender sender, String[] args, T list) {
+            if (!requireArgsExact(sender, args, 1)) return;
+
+            OptionalInt index = requireInteger(sender, args[0]);
+            if (index.isEmpty()) return;
+
+            if (index.getAsInt() < 0 || index.getAsInt() >= list.size()) {
+                sender.sendMessage(Component.text("Index out of bounds", NamedTextColor.RED));
+                return;
+            }
+
+            if (!plugin.getGameManager().saveGameConfig(sender)) return;
+
+            list.remove(index.getAsInt());
+            sender.sendMessage(removedMessage.color(NamedTextColor.GREEN));
+        }
+    }
+
+    public static <G extends Game<G, C>, C extends GameConfig, E, T extends Collection<E>> SubCommandExecutor createCollectionConfigSubCommand(
             LlamaGamesPlugin plugin,
             Class<G> gameType,
-            Function<C, Collection<T>> collectionSupplier,
-            Component noElementsQueryMessage,
-            Function<T, Component> elementToQueryTextSupplier,
-            BiFunction<CommandSender, String[], Optional<T>> elementCreator,
-            Component elementAlreadyExistsMessage,
-            Component elementAddedMessage,
-            TriFunction<CommandSender, String[], T, Optional<Boolean>> elementRemoveMatcher,
-            Component elementRemovedMessage
+            Function<C, T> collectionSupplier,
+            ListConfigCollectionElementsStrategy<E, T> listElementsStrategy,
+            AddConfigCollectionElementStrategy<E, T> addElementStrategy,
+            RemoveConfigCollectionElementStrategy<E, T> removeElementStrategy
     ) {
         return (sender, args) -> {
             if (!requireOp(sender)) return;
 
-            if (requireArgsAtLeast(sender, args, 2)) return;
+            if (!requireArgsAtLeast(sender, args, 2)) return;
 
             Optional<G> game = requireGame(plugin, sender, args[0], gameType);
             if (game.isEmpty()) return;
 
-            Collection<T> collection = collectionSupplier.apply(game.get().getConfig());
+            T collection = collectionSupplier.apply(game.get().getConfig());
 
-            switch (args[1]) {
-                case "list" -> {
-                    if (collection.isEmpty()) {
-                        sender.sendMessage(noElementsQueryMessage.color(NamedTextColor.RED));
-                        return;
-                    }
-
-                    TextComponent.Builder builder = Component.text();
-                    boolean first = true;
-                    for (T element : collection) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            builder.append(Component.newline());
-                        }
-                        builder.append(elementToQueryTextSupplier.apply(element));
-                    }
-
-                    sender.sendMessage(builder);
-                }
-                case "add" -> {
-                    Optional<T> value = elementCreator.apply(sender, Arrays.copyOfRange(args, 2, args.length));
-                    if (value.isEmpty()) {
-                        return;
-                    }
-
-                    if (collection.contains(value.get())) {
-                        sender.sendMessage(elementAlreadyExistsMessage.color(NamedTextColor.RED));
-                        return;
-                    }
-
-                    collection.add(value.get());
-
-                    if (plugin.getGameManager().saveGameConfig(sender)) return;
-
-                    sender.sendMessage(elementAddedMessage.color(NamedTextColor.GREEN));
-                }
-                case "remove" -> {
-                    for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-                        T element = iterator.next();
-
-                        Optional<Boolean> matchResult = elementRemoveMatcher.apply(sender, Arrays.copyOfRange(args, 2, args.length), element);
-                        if (matchResult.isEmpty()) {
-                            return;
-                        }
-
-                        if (matchResult.get()) {
-                            iterator.remove();
-                            if (plugin.getGameManager().saveGameConfig(sender)) return;
-                            sender.sendMessage(elementRemovedMessage.color(NamedTextColor.GREEN));
-                            return;
-                        }
-                    }
-                }
+            switch (args[1].toLowerCase(Locale.ROOT)) {
+                case "list" -> listElementsStrategy.handleList(plugin, sender, collection);
+                case "add" -> addElementStrategy.handleAdd(plugin, sender, Arrays.copyOfRange(args, 2, args.length), collection);
+                case "remove" -> removeElementStrategy.handleRemove(plugin, sender, Arrays.copyOfRange(args, 2, args.length), collection);
+                default -> sender.sendMessage(Component.text("No sub command with this name was found. Please use: list/add/remove", NamedTextColor.RED));
             }
         };
     }

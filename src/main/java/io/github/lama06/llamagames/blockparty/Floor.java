@@ -1,10 +1,9 @@
 package io.github.lama06.llamagames.blockparty;
 
 import io.github.lama06.llamagames.util.BlockArea;
+import io.github.lama06.llamagames.util.Named;
 
-import java.util.Objects;
-
-public class Floor {
+public class Floor implements Named {
     private String name;
     private BlockArea area;
 
@@ -12,23 +11,11 @@ public class Floor {
     public Floor() { }
 
     public Floor(String name, BlockArea area) {
-        this.setName(name);
-        this.setArea(area);
+        this.name = name;
+        this.area = area;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Floor floor = (Floor) o;
-        return Objects.equals(getName(), floor.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName());
-    }
-
     public String getName() {
         return name;
     }

@@ -103,28 +103,13 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     }
 
     @Override
-    public boolean canStart() {
-        return super.canStart() && world.getPlayers().size() >= 1;
+    public boolean canStart(int numberOfPlayers) {
+        return super.canStart(numberOfPlayers) && numberOfPlayers >= 1;
     }
 
     @Override
-    public boolean canContinueAfterPlayerLeft() {
-        return getPlayers().size() >= 1;
-    }
-
-    @Override
-    public boolean isConfigComplete() {
-        boolean result = super.isConfigComplete();
-
-        if (config.getFloor() == null || config.getFloor().getPosition1() == null || config.getFloor().getPosition2() == null) {
-            result = false;
-        }
-
-        if (config.getFloorCenter() == null || config.getFloorMaterial() == null) {
-            result = false;
-        }
-
-        return result;
+    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+        return numberOfPlayers >= 1;
     }
 
     public MiniGame getCurrentMiniGame() {

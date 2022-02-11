@@ -30,7 +30,8 @@ public class ZombiesConfig extends GameConfig {
         return null;
     }
 
+    @Override
     public boolean isComplete() {
-        return startArea != null && powerSwitch != null;
+        return super.isComplete() && startArea != null && powerSwitch != null;
     }
 }

@@ -1,11 +1,17 @@
 package io.github.lama06.llamagames;
 
 import io.github.lama06.llamagames.util.EntityPosition;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public class GameConfig {
+public abstract class GameConfig {
     private EntityPosition spawnPoint;
     private boolean cancelEvents = true;
     private boolean doNotCancelOpEvents = true;
+
+    @MustBeInvokedByOverriders
+    public boolean isComplete() {
+        return getSpawnPoint() != null;
+    }
 
     public EntityPosition getSpawnPoint() {
         return spawnPoint;

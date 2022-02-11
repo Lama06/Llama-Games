@@ -26,6 +26,10 @@ public final class BlockPosition {
         z = location.getBlockZ();
     }
 
+    public BlockPosition(Block block) {
+        this(block.getLocation());
+    }
+
     // Gson
     public BlockPosition() { }
 

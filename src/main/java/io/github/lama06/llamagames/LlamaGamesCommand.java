@@ -22,7 +22,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void create(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 2) || !requireOp(sender)) return;
+        if (!requireArgsExact(sender, args, 2) || !requireOp(sender)) return;
 
         Optional<World> world = requireWorld(sender, args[0]);
         if (world.isEmpty()) return;
@@ -47,7 +47,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void delete(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 1) || !requireOp(sender)) return;
+        if (!requireArgsExact(sender, args, 1) || !requireOp(sender)) return;
 
         Optional<World> world = requireWorld(sender, args[0]);
         if (world.isEmpty()) return;
@@ -80,7 +80,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void start(CommandSender sender, String[] args) {
-        if (requireArgsAtLeast(sender, args, 1) || !requireOp(sender)) return;
+        if (!requireArgsAtLeast(sender, args, 1) || !requireOp(sender)) return;
 
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
@@ -93,7 +93,7 @@ public class LlamaGamesCommand extends LlamaCommand {
     }
 
     public void stop(CommandSender sender, String[] args) {
-        if (requireArgsExact(sender, args, 1) || !requireOp(sender)) return;
+        if (!requireArgsExact(sender, args, 1) || !requireOp(sender)) return;
 
         Optional<Game<?, ?>> game = requireGame(plugin, sender, args[0]);
         if (game.isEmpty()) return;
