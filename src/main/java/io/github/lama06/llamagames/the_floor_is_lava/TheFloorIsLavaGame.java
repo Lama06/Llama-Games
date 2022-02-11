@@ -59,6 +59,10 @@ public class TheFloorIsLavaGame extends Game<TheFloorIsLavaGame, TheFloorIsLavaC
             cleanupPlayer(player);
         }
 
+        for (Item item : world.getEntitiesByClass(Item.class)) {
+            item.remove();
+        }
+
         blockAges = null;
         safeWalkUntilTick = null;
     }
@@ -190,6 +194,7 @@ public class TheFloorIsLavaGame extends Game<TheFloorIsLavaGame, TheFloorIsLavaC
         player.getInventory().addItem(perk.createItem(plugin));
 
         item.remove();
+        event.setCancelled(true);
     }
 
     @EventHandler
