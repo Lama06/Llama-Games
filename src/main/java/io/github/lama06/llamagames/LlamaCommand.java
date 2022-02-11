@@ -612,7 +612,6 @@ public abstract class LlamaCommand implements TabExecutor {
                 }
             }
 
-            if (!plugin.getGameManager().saveGameConfig(sender)) return;
             sender.sendMessage(notFoundMessage.color(NamedTextColor.RED));
         }
     }

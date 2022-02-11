@@ -142,6 +142,7 @@ public class TheFloorIsLavaGame extends Game<TheFloorIsLavaGame, TheFloorIsLavaC
         }
 
         setSpectator(event.getPlayer(), true);
+        cleanupPlayer(event.getPlayer());
 
         if (getPlayers().size() == 0) {
             endGame(GameEndReason.ENDED);
