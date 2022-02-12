@@ -61,6 +61,11 @@ public class ZombiesPlayer {
     public void handleInteractWithWeaponShop(WeaponShop shop) {
         if (hasWeapon(shop.weapon)) {
             Weapon<?> weapon = getWeaponInHand();
+            if (weapon == null) {
+                player.sendMessage(Component.text("You already own this", NamedTextColor.RED));
+                return;
+            }
+
             if (!weapon.getType().equals(shop.weapon)) {
                 player.sendMessage(Component.text("You can't refill that weapon here", NamedTextColor.RED));
                 return;

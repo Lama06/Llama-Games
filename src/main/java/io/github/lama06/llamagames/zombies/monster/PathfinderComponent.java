@@ -20,7 +20,6 @@ public class PathfinderComponent {
 
         private Optional<Player> searchNearestTarget(Monster<?, ?> monster) {
             return game.getPlayers().stream()
-                    .filter(game.getPlayers()::contains)
                     .min((p1, p2) -> {
                         EntityPosition position = new EntityPosition(monster.getEntity().getLocation());
                         EntityPosition.Distance distance1 = new EntityPosition(p1.getLocation()).getDistanceTo(position);

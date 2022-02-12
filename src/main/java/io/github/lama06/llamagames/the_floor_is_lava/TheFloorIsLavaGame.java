@@ -73,7 +73,7 @@ public class TheFloorIsLavaGame extends Game<TheFloorIsLavaGame, TheFloorIsLavaC
     }
 
     @Override
-    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+    public boolean canContinueAfterNumberOfPlayersChanged(int numberOfPlayers) {
         return numberOfPlayers >= 1;
     }
 
@@ -147,10 +147,6 @@ public class TheFloorIsLavaGame extends Game<TheFloorIsLavaGame, TheFloorIsLavaC
 
         setSpectator(event.getPlayer(), true);
         cleanupPlayer(event.getPlayer());
-
-        if (getPlayers().size() == 0) {
-            endGame(GameEndReason.ENDED);
-        }
     }
 
     private static final String PERK_ITEM_ID_KEY = "perk_item_id";

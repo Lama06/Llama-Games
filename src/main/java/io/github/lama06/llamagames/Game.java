@@ -28,7 +28,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     protected boolean running = false;
     protected final EventCanceler canceler;
     protected final Random random = new Random();
-    private Set<UUID> players = new HashSet<>();
+    private Set<Player> players = new HashSet<>();
     private BukkitTask countdownTask = null;
 
     public Game(LlamaGamesPlugin plugin, World world, C config, GameType<G, C> type) {
@@ -48,7 +48,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
         players = new HashSet<>();
         for (Player player : world.getPlayers()) {
-            players.add(player.getUniqueId());
+            players.add(player);
             player.teleport(config.getSpawnPoint().asLocation(world));
             player.setGameMode(GameMode.SURVIVAL);
         }
@@ -56,6 +56,8 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         running = true;
 
         handleGameStarted(args);
+
+        plugin.getSLF4JLogger().info("Game in world %s was started".formatted(world.getName()));
 
         return true;
     }
@@ -83,6 +85,8 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         if (reason.isShouldAttemptToStartNextGame()) {
             tryToStartAfterCountdown();
         }
+
+        plugin.getSLF4JLogger().info("Game in world %s has ended".formatted(world.getName()));
 
         return true;
     }
@@ -122,13 +126,13 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         return !running && config.isComplete() && !isStarting();
     }
 
-    public abstract boolean canContinueAfterPlayerLeft(int numberOfPlayers);
+    public abstract boolean canContinueAfterNumberOfPlayersChanged(int numberOfPlayers);
 
     public void handlePlayerLeft(Player player) { }
 
     protected void setSpectator(Player player, boolean spectator) {
         if (spectator) {
-            players.remove(player.getUniqueId());
+            players.remove(player);
 
             player.setGameMode(GameMode.SPECTATOR);
             player.showTitle(Title.title(
@@ -136,19 +140,20 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
                     Component.empty(),
                     Title.Times.of(Duration.ofSeconds(2), Duration.ofSeconds(3), Duration.ofSeconds(1))
             ));
-        } else {
-            players.add(player.getUniqueId());
 
+            if (!canContinueAfterNumberOfPlayersChanged(players.size())) {
+                endGame(GameEndReason.TOO_FEW_PLAYERS);
+            }
+        } else {
+            players.add(player);
+
+            player.teleport(config.getSpawnPoint().asLocation(world));
             player.setGameMode(GameMode.SURVIVAL);
         }
     }
 
-    protected boolean isSpectator(Player player, boolean cleanup) {
-        return !(cleanup ? getPlayers() : getPlayers(player)).contains(player);
-    }
-
     protected boolean isSpectator(Player player) {
-        return isSpectator(player, true);
+        return !players.contains(player);
     }
 
     private void handlePlayerJoinedInternal(Player player) {
@@ -163,12 +168,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     private void handlePlayerLeftInternal(Player player) {
-        if (running && !isSpectator(player, false)) {
-            players.remove(player.getUniqueId());
+        if (running && !isSpectator(player)) {
+            players.remove(player);
             handlePlayerLeft(player);
 
-            if (!canContinueAfterPlayerLeft(getPlayers().size())) {
-                endGame(GameEndReason.PLAYER_LEFT);
+            if (!canContinueAfterNumberOfPlayersChanged(players.size())) {
+                endGame(GameEndReason.TOO_FEW_PLAYERS);
             }
         }
     }
@@ -191,7 +196,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     @EventHandler
     public void handlePlayerQuitEvent(PlayerQuitEvent event) {
-        if (getPlayers().contains(event.getPlayer())) {
+        if (event.getPlayer().getWorld().equals(world)) {
             handlePlayerLeftInternal(event.getPlayer());
         }
     }
@@ -260,35 +265,18 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
         return canceler;
     }
 
-    public Set<Player> getPlayers(Player excludeFromCleanup) {
-        if (players == null) {
-            return Collections.emptySet();
-        }
-
-        Set<Player> result = new HashSet<>(players.size());
-
-        for (Iterator<UUID> iterator = players.iterator(); iterator.hasNext();) {
-            UUID uuid = iterator.next();
-            Player player = Bukkit.getPlayer(uuid);
-            if ((excludeFromCleanup == null || !excludeFromCleanup.getUniqueId().equals(uuid)) &&
-                    (player == null || !player.getWorld().equals(world))) {
-                iterator.remove();
-                continue;
-            }
-            result.add(player);
-        }
-
-        return result;
-    }
-
+    /**
+     * Returns all players in this game world excluding spectators.
+     * Will return null if the game is not running.
+     */
     public Set<Player> getPlayers() {
-        return getPlayers(null);
+        return players;
     }
 
     public enum GameEndReason {
         UNLOAD(false),
         COMMAND(false),
-        PLAYER_LEFT(false),
+        TOO_FEW_PLAYERS(false),
         ENDED(true);
 
         private final boolean shouldAttemptToStartNextGame;

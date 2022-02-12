@@ -140,7 +140,7 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
     }
 
     @Override
-    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+    public boolean canContinueAfterNumberOfPlayersChanged(int numberOfPlayers) {
         return numberOfPlayers >= 1;
     }
 
@@ -247,10 +247,6 @@ public class ZombiesGame extends Game<ZombiesGame, ZombiesConfig> {
 
     public void killPlayer(Player player) {
         setSpectator(player, true);
-
-        if (getPlayers().isEmpty()) {
-            endGame(GameEndReason.ENDED);
-        }
     }
 
     @EventHandler

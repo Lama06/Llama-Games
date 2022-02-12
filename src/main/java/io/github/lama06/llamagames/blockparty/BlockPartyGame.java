@@ -53,7 +53,7 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
     }
 
     @Override
-    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+    public boolean canContinueAfterNumberOfPlayersChanged(int numberOfPlayers) {
         return numberOfPlayers >= 1;
     }
 
@@ -68,10 +68,6 @@ public class BlockPartyGame extends Game<BlockPartyGame, BlockPartyConfig> {
         }
 
         setSpectator(event.getPlayer(), true);
-
-        if (getPlayers().size() == 0) {
-            endGame(GameEndReason.ENDED);
-        }
     }
 
     private Floor getNextFloor() {

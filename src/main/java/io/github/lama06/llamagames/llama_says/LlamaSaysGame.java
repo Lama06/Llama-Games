@@ -108,7 +108,7 @@ public class LlamaSaysGame extends Game<LlamaSaysGame, LlamaSaysConfig> {
     }
 
     @Override
-    public boolean canContinueAfterPlayerLeft(int numberOfPlayers) {
+    public boolean canContinueAfterNumberOfPlayersChanged(int numberOfPlayers) {
         return numberOfPlayers >= 1;
     }
 
