@@ -1,5 +1,6 @@
 package io.github.lama06.llamagames.zombies;
 
+import io.github.lama06.llamagames.util.GsonConstructor;
 import io.github.lama06.llamagames.zombies.monster.MonsterType;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ public class SpawnRate {
     public int delay;
     public Map<MonsterType<?, ?>, Integer> monsters;
 
-    // Gson
+    @GsonConstructor
     public SpawnRate() { }
 
     public SpawnRate(int delay, Map<MonsterType<?, ?>, Integer> monsters) {

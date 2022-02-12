@@ -2,6 +2,7 @@ package io.github.lama06.llamagames.zombies;
 
 import io.github.lama06.llamagames.util.BlockArea;
 import io.github.lama06.llamagames.util.EntityPosition;
+import io.github.lama06.llamagames.util.GsonConstructor;
 import io.github.lama06.llamagames.util.Named;
 
 public class Window implements Named {
@@ -10,7 +11,7 @@ public class Window implements Named {
     public EntityPosition spawnLocation;
     public BlockArea blocks;
 
-    // Gson
+    @GsonConstructor
     public Window() { }
 
     public Window(String name, String area, EntityPosition spawnLocation, BlockArea blocks) {

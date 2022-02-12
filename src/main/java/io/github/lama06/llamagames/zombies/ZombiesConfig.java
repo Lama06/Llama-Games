@@ -1,6 +1,7 @@
 package io.github.lama06.llamagames.zombies;
 
 import io.github.lama06.llamagames.GameConfig;
+import io.github.lama06.llamagames.util.GsonConstructor;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class ZombiesConfig extends GameConfig {
     public PowerSwitch powerSwitch = null;
     public Map<Integer, SpawnRate> spawnRates = SpawnRate.DEFAULT_SPAWN_RATE;
 
-    // Gson
+    @GsonConstructor
     public ZombiesConfig() { }
 
     public SpawnRate getSpawnRate(int round) {

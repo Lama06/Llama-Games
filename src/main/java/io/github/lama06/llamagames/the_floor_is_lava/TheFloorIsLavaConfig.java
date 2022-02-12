@@ -1,6 +1,7 @@
 package io.github.lama06.llamagames.the_floor_is_lava;
 
 import io.github.lama06.llamagames.GameConfig;
+import io.github.lama06.llamagames.util.GsonConstructor;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
@@ -15,7 +16,7 @@ public class TheFloorIsLavaConfig extends GameConfig {
     public int blockAgeTime = 20;
     public Material deadlyBlock;
 
-    // Gson
+    @GsonConstructor
     public TheFloorIsLavaConfig() { }
 
     @Override

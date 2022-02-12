@@ -1,13 +1,14 @@
 package io.github.lama06.llamagames.blockparty;
 
 import io.github.lama06.llamagames.util.BlockArea;
+import io.github.lama06.llamagames.util.GsonConstructor;
 import io.github.lama06.llamagames.util.Named;
 
 public class Floor implements Named {
     private String name;
     private BlockArea area;
 
-    // Gson
+    @GsonConstructor
     public Floor() { }
 
     public Floor(String name, BlockArea area) {

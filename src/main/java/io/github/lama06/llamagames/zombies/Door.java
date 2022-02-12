@@ -2,6 +2,7 @@ package io.github.lama06.llamagames.zombies;
 
 import io.github.lama06.llamagames.util.BlockArea;
 import io.github.lama06.llamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.GsonConstructor;
 import io.github.lama06.llamagames.util.Named;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -15,7 +16,7 @@ public class Door implements Named {
     public BlockArea blocks;
     public BlockArea template;
 
-    // Gson
+    @GsonConstructor
     public Door() { }
 
     public Door(String name, String area1, String area2, BlockPosition activationBlock, int gold, BlockArea blocks, BlockArea template) {

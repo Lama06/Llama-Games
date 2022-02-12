@@ -3,6 +3,7 @@ package io.github.lama06.llamagames.llama_says;
 import io.github.lama06.llamagames.GameConfig;
 import io.github.lama06.llamagames.util.BlockArea;
 import io.github.lama06.llamagames.util.BlockPosition;
+import io.github.lama06.llamagames.util.GsonConstructor;
 import org.bukkit.Material;
 
 public class LlamaSaysConfig extends GameConfig {
@@ -11,7 +12,7 @@ public class LlamaSaysConfig extends GameConfig {
     private BlockPosition floorCenter = null;
     private Material floorMaterial;
 
-    // Gson
+    @GsonConstructor
     public LlamaSaysConfig() { }
 
     @Override

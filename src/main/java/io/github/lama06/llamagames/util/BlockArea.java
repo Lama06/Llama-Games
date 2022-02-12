@@ -14,7 +14,7 @@ public class BlockArea {
         this.position2 = position2;
     }
 
-    // Gson
+    @GsonConstructor
     public BlockArea() { }
 
     public int getUpperX() {

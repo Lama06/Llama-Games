@@ -34,7 +34,7 @@ public final class EntityPosition {
         yaw = location.getYaw();
     }
 
-    // Gson
+    @GsonConstructor
     public EntityPosition() { }
 
     public Distance getDistanceTo(EntityPosition other) {

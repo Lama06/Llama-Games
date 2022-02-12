@@ -3,6 +3,7 @@ package io.github.lama06.llamagames.blockparty;
 import com.google.common.collect.ImmutableMap;
 import io.github.lama06.llamagames.GameConfig;
 import io.github.lama06.llamagames.util.BlockArea;
+import io.github.lama06.llamagames.util.GsonConstructor;
 import org.bukkit.Material;
 
 import java.util.HashSet;
@@ -29,7 +30,7 @@ public class BlockPartyConfig extends GameConfig {
     private Map<Integer, Integer> roundTimes = DEFAULT_ROUND_TIMES;
     private Material deadlyBlock;
 
-    // Gson
+    @GsonConstructor
     public BlockPartyConfig() { }
 
     @Override

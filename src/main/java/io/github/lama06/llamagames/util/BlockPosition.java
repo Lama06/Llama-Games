@@ -30,7 +30,7 @@ public final class BlockPosition {
         this(block.getLocation());
     }
 
-    // Gson
+    @GsonConstructor
     public BlockPosition() { }
 
     public int getX() {
