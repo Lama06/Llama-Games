@@ -274,7 +274,7 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     /**
      * Returns all players in this game world excluding spectators.
      */
-    public Set<Player> getPlayers() throws IllegalStateException {
+    public Set<Player> getPlayers() {
         if (!running) {
             throw new IllegalStateException("getPlayers() but the game is not running");
         }
