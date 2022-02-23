@@ -131,6 +131,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     public void handlePlayerLeft(Player player) { }
 
     protected void setSpectator(Player player, boolean spectator) {
+        if (!running) {
+            throw new IllegalStateException("setSpectator() called but the game is not running");
+        }
+
         if (spectator) {
             players.remove(player);
 
@@ -153,6 +157,10 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
     }
 
     protected boolean isSpectator(Player player) {
+        if (!running) {
+            throw new IllegalStateException("isSpectator() called but the game is not running");
+        }
+
         return !players.contains(player);
     }
 
@@ -217,13 +225,11 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
                 getBroadcastAudience().sendMessage(Component.text("Start failed").color(NamedTextColor.RED));
             }
         } else {
-            for (Player player : world.getPlayers()) {
-                player.showTitle(Title.title(
-                        Component.text(countdown).color(NamedTextColor.GREEN),
-                        Component.empty(),
-                        Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
-                ));
-            }
+            getBroadcastAudience().showTitle(Title.title(
+                    Component.text(countdown).color(NamedTextColor.GREEN),
+                    Component.empty(),
+                    Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
+            ));
 
             countdownTask = Bukkit.getScheduler().runTaskLater(plugin, () -> startAfterCountdown(countdown - 1), 20);
         }
@@ -267,9 +273,12 @@ public abstract class Game<G extends Game<G, C>, C extends GameConfig> implement
 
     /**
      * Returns all players in this game world excluding spectators.
-     * Will return null if the game is not running.
      */
-    public Set<Player> getPlayers() {
+    public Set<Player> getPlayers() throws IllegalStateException {
+        if (!running) {
+            throw new IllegalStateException("getPlayers() but the game is not running");
+        }
+
         return players;
     }
 
