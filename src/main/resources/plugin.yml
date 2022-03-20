@@ -1,16 +1,17 @@
-name: Llama-Games
-description: A minigame plugin
+name: Llama-Plugin
 website: github.com/Lama06/Llama-Games
 author: Lama06
 api-version: 1.18
-main: io.github.lama06.llamagames.LlamaGamesPlugin
+main: io.github.lama06.llamaplugin.LlamaPlugin
 version: 1.0.0
 softdepend:
   - Multiverse-Core
 
 commands:
+  llamaplugin:
+    description: The main command of the LlamaPlugin
   llamagames:
-    description: The main command of the LlamaGames plugin
+    description: The main command of the LlamaGames module
   llamasays:
     description: Used to setup LlamaSays games
   blockparty:
